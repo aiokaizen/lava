@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "name": "SERVICES",
+        "address": "bjedrychowski0@ask.com"
+    },
+    {
+        "id": 2,
+        "name": "ACCOUNTING",
+        "address": "egyver2@soup.io"
+    },
+    {
+        "id": 3,
+        "name": "MARKETING",
+        "address": "crubertelli3@storify.com"
+    },
+    {
+        "id": 4,
+        "name": "RESEARCH AND DEVELOPMENT",
+        "address": "mvedeniktov4@loc.gov"
+    },
+    {
+        "id": 5,
+        "name": "LEGAL",
+        "address": "psaulter6@bing.com"
+    },
+    {
+        "id": 6,
+        "name": "PRODUCT MANAGEMENT",
+        "address": "jbradwell8@hexun.com"
+    },
+    {
+        "id": 7,
+        "name": "SUPPORT",
+        "address": "frennox9@edublogs.org"
+    },
+    {
+        "id": 8,
+        "name": "SALES",
+        "address": "mscownc@google.pl"
+    },
+    {
+        "id": 9,
+        "name": "TRAINING",
+        "address": "pnisbithe@discovery.com"
+    },
+    {
+        "id": 10,
+        "name": "HUMAN RESOURCES",
+        "address": "zschwandero@unblog.fr"
+    },
+    {
+        "id": 11,
+        "name": "BUSINESS DEVELOPMENT",
+        "address": "ajirur@pcworld.com"
+    },
+    {
+        "id": 12,
+        "name": "ENGINEERING",
+        "address": "apengilly18@wordpress.com"
+    }
+]
