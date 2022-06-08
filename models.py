@@ -8,6 +8,7 @@ from lava import settings as ektools_settings
 from lava.utils import (
     get_user_cover_filename, get_user_photo_filename
 )
+from lava.managers import LavaUserManager
 
 
 class Preferences(models.Model):
@@ -81,15 +82,12 @@ class User(AbstractUser):
     cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
 
+    # objects = LavaUserManager()
+
     def save(self, *args, **kwargs):
         if not self.id and not hasattr(self, 'preferences'):
             self.preferences = Preferences.objects.create()
         return super().save(*args, **kwargs)
-    
-    def update_password(self, new_password):
-        self.set_password(new_password)
-        self.save(update_fields=('password', ))
-        # maybe send email?
     
 
 class Notification(models.Model):

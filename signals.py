@@ -3,7 +3,7 @@ import os
 from django.core.files.storage import default_storage
 from django.db.models import FileField, signals
 
-from lava.models import User, Preferences
+from lava.models import User
 
 
 def post_delete_file_cleanup(sender, **kwargs):
@@ -76,9 +76,9 @@ def pre_save_file_cleanup(sender, **kwargs):
 # Connecting signals
 signals.post_delete.connect(
     post_delete_file_cleanup, sender=User,
-    dispatch_uid="main.User.post_delete_file_cleanup"
+    dispatch_uid="lava.User.post_delete_file_cleanup"
 )
 signals.pre_save.connect(
     pre_save_file_cleanup, sender=User,
-    dispatch_uid="main.User.pre_save_file_cleanup"
+    dispatch_uid="lava.User.pre_save_file_cleanup"
 )

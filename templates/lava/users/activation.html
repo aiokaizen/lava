@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account activation</title>
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .vh-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="vh-center">
+        {% if status == 'success' %}
+            <h3>Your account has been activated successfully!</h3>
+            <br />
+            <p>Go back to InfinityPoshClub app on your mobile phone and try to login to your account.</p>
+        {% else %}
+            <h3>Something went wrong. Sorry for the inconvenience.</h3>
+            <br />
+            <p>Please try again later.</p>
+            <br />
+            <p>Error: {{ content }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

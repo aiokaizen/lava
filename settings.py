@@ -20,3 +20,14 @@ GENDER_CHOICES = (
 NOTIFICATION_CATEGORY_CHOICES = (
     ("alert", _("Alert")),
 )
+
+ALLOWED_SIGNUP_GROUPS = getattr(settings, 'ALLOWED_SIGNUP_GROUPS', (
+    # (groupe1_id, _("Group name")),
+    # (groupe2_id, _("Group name")),
+    # (groupe3_id, _("Group name")),
+))
+
+# This setting is used to map groups to other models.
+# When creating a user in a certain group, an object
+# from the group's mapped model is created and associated to the user.
+GROUPS_ASSOCIATED_MODELS = getattr(settings, "GROUPS_ASSOCIATED_MODELS", {})

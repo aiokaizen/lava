@@ -1,10 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 from rest_framework.fields import empty
 
 from lava.models import Preferences, User
+from lava import settings as lava_settings
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
@@ -67,15 +69,40 @@ class UserSerializer(serializers.ModelSerializer):
             'cover_picture', 'is_active', 'groups', 'last_login', 'date_joined'
         ]
         read_only_fields = [
-            'id', 'last_login', 'date_joined'
+            'id', 'is_active', 'last_login', 'date_joined'
         ]
-
-    def __init__(self, instance=None, data=empty, **kwargs):
-        if instance is None:
-            self.Meta.extra_kwargs['photo'] = {'read_only': True}
-            self.Meta.extra_kwargs['cover_picture'] = {'read_only': True}
-        super().__init__(instance, data, **kwargs)
     
-    def save(self, **kwargs):
-        return super().save(**kwargs)
+    def validate_email(self, value):
+        try:
+            User.objects.get(email=value)
+            raise serializers.ValidationError(_("A user with that email already exists."))
+        except User.DoesNotExist:
+            return value
+    
+    def get_allowed_groups(self):
+        group_list = [pk for pk, _ in lava_settings.ALLOWED_SIGNUP_GROUPS]
+        return Group.objects.filter(pk__in=group_list)
+    
+    def validate_groups(self, value):
+        allowed_groups = self.get_allowed_groups()
+        allowed_groups_names = [name for _, name in lava_settings.ALLOWED_SIGNUP_GROUPS]
+        for group in value:
+            if group not in allowed_groups:
+                raise serializers.ValidationError(
+                    str(
+                        _("Invalid group choice. Please choose from the following list:") + 
+                        f" {allowed_groups_names}"
+                    )
+                )
+        return value
+
+    def create(self, validated_data):
+        photo = validated_data.pop('photo')
+        cover = validated_data.pop('cover_picture')
+        instance = super().create(validated_data)
+        instance.photo = photo
+        instance.is_active = False
+        instance.cover_picture = cover
+        instance.save()
+        return instance
     
