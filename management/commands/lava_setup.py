@@ -1,7 +1,8 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
+
+from lava.models import User, Group
 
 
 class Command(BaseCommand):
@@ -11,13 +12,19 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        # Create the superadmin
-        User = get_user_model()
+        # Create the superadmin and the `ADMINS` group if they don't exist
         try:
             ekadmin = User.objects.get(username='ekadmin')
             logging.warning("ekadmin already exists!")
         except User.DoesNotExist:
-            ekadmin = User.objects.create(username='ekadmin', is_staff=True, is_superuser=True)
+            group, _ = Group.objects.get_or_create(name="ADMINS")
+            ekadmin = User(
+                username='ekadmin', email="admin@ekblocks.com",
+                first_name="Jane", last_name="Doe",
+                is_staff=True, is_superuser=True
+            )
+            ekadmin.create(groups=[group])
             ekadmin.set_password('admin_pass')
             ekadmin.save()
             logging.info("ekadmin was created successfully!")
+        

@@ -4,6 +4,78 @@ from datetime import datetime
 from django.conf import settings
 
 
+class imdict(dict):
+    """ Immutable dictionary. """
+    def __hash__(self):
+        return id(self)
+
+    def _immutable(self, *args, **kws):
+        raise TypeError('This object is immutable')
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    clear       = _immutable
+    update      = _immutable
+    setdefault  = _immutable
+    pop         = _immutable
+    popitem     = _immutable
+
+
+class odict(dict):
+    """
+    A dictionnary that supports the '.' syntax for its members.
+    ex:
+    >>> user = odict(username="janedoe", password="secret_pass")
+    >>> user.username
+    janedoe
+    >>> user['password']
+    secret_pass
+    """
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
+class Result(imdict):
+    """
+    An immutable Result object representing
+    both Success and Error results from functions and APIs.
+    """
+
+    def __init__(self, success:bool, message:str, instance=None, errors:dict=None, tag:str=None):
+        self.success = success
+        self.message = message
+        self.instance = instance
+        self.tag = tag
+        if not self.tag:
+            self.tag = 'success' if success else 'error'
+        self.errors = errors
+        dict.__init__(self, success=success, message=message, errors=errors)
+    
+    @classmethod
+    def from_dict(cls, result_dict):
+        if "success" not in result_dict or "message" not in result_dict:
+            raise TypeError()
+
+        return cls(
+            result_dict["success"],
+            result_dict["message"],
+            result_dict.get("instance", None),
+            result_dict.get("errors", None),
+            result_dict.get("tag", None),
+        )
+    
+    def to_dict(self):
+        res_dict = {
+            "success": self.success,
+            "message": self.message
+        }
+        if not self.success:
+            res_dict["errors"] = self.errors
+        return res_dict
+
+
 def mask_number(n):
     """ This function disguises an ID before using it in a public context. """
     if isinstance(n, int):

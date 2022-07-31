@@ -2,7 +2,7 @@ import sys
 
 from django.urls import path
 
-from lava.views import main_views
+from lava.views import main_views, api_views
 
 
 urlpatterns = [
@@ -14,6 +14,13 @@ urlpatterns = [
     path('users/<int:pk>/', main_views.user_details, name='user-detail'),
     path('users/<int:pk>/change', main_views.user_change, name='user-change'),
     path('users/<int:pk>/change_pwd', main_views.user_change_pwd, name='user-change-pwd'),
+
+    # API urls
+    path('api/users/', api_views.UserListCreate.as_view(), name='api-user-list'),
+    path('api/users/<int:pk>/', api_views.UserRetrieveUpdateDestroy.as_view(), name='api-user-detail'),
+#     path('api/users/<int:pk>/change_pwd', api_views.user_change_pwd, name='user-change-pwd'),
+#     path('api/users/activate/<str:uid>/<str:token>', api_views.activate_user, name='user-activate'),
+#     path('api/users/password/reset/confirm/<str:uid>/<str:token>', api_views.reset_pwd_confirm, name='user-reset-pwd-confirm'),
 ]
 
 if 'rest_framework' in sys.modules:

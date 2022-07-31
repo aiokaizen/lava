@@ -27,6 +27,12 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def delete(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=kwargs.get('pk'))
+        result = user.delete()
+        return Response(result.to_dict(), status=status.HTTP_204_NO_CONTENT)
+
+
 
 @api_view(('PUT', ))
 @permission_classes((permissions.BasePermission, ))

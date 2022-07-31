@@ -1,14 +1,19 @@
-from django.contrib.auth import get_user
+from django.apps import apps
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user
 from django.conf import settings
-from django.contrib.auth.models import AbstractUser, Group, Permission
-
-from lava import settings as ektools_settings
-from lava.utils import (
-    get_user_cover_filename, get_user_photo_filename
+from django.contrib.auth.models import (
+    AbstractUser,
+    Group,  # as BaseGroup,
+    Permission
 )
-from lava.managers import LavaUserManager
+from django.utils.translation import ugettext_lazy as _
+
+from lava import settings as lava_settings
+from lava.utils import (
+    get_user_cover_filename, get_user_photo_filename,
+    Result
+)
 
 
 class Preferences(models.Model):
@@ -45,10 +50,14 @@ class Preferences(models.Model):
         return super().__str__()
 
 
+# class Group(BaseGroup):
+#     pass
+
+
 class User(AbstractUser):
 
     class Meta(AbstractUser.Meta):
-        ordering = ('last_name', 'first_name', '-date_joined')
+        ordering = ('-date_joined', 'last_name', 'first_name')
 
     user_permissions = models.ManyToManyField(
         Permission,
@@ -73,22 +82,84 @@ class User(AbstractUser):
 
     photo = models.ImageField(_("Photo"), upload_to=get_user_photo_filename, blank=True, null=True)
     birth_day = models.DateField(_("Birth day"), blank=True, null=True)
-    gender = models.CharField(_("Gender"), max_length=1, choices=ektools_settings.GENDER_CHOICES, blank=True, default='')
+    gender = models.CharField(_("Gender"), max_length=1, choices=lava_settings.GENDER_CHOICES, blank=True, default='')
     country = models.CharField(_("Country"), max_length=64, blank=True, default="")
     city = models.CharField(_("City"), max_length=64, blank=True, default="")
     address = models.TextField(_("Address"), blank=True, default="")
     phone_number = models.CharField(_("Phone number"), max_length=32, blank=True, default="")
+    fax = models.CharField(_("Fax"), max_length=32, default="", blank=True)
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
     cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
 
-    # objects = LavaUserManager()
-
-    def save(self, *args, **kwargs):
-        if not self.id and not hasattr(self, 'preferences'):
-            self.preferences = Preferences.objects.create()
-        return super().save(*args, **kwargs)
+    def groups_names(self):
+        return self.groups.all().values_list('name', flat=True)
     
+    def create(self, photo=None, cover=None, groups=None, extra_attributes=None):
+
+        if self.id:
+            return Result(
+                success=False,
+                message=_("User is already saved.")
+            )
+
+        if not hasattr(self, 'preferences'):
+            self.preferences = Preferences.objects.create()
+
+        if photo or cover or groups:
+            self.save()
+            # FileInputs and ManyToMany fields must be saved after
+            # the object has been already created
+            self.photo = photo
+            self.cover_picture = cover
+            if groups is not None:
+                self.groups.set(groups)
+
+        self.save()
+        
+        if groups.count() == 1:
+            self.create_associated_objects(extra_attributes)
+
+        return Result(
+            success=True,
+            message=_("User has been created successfully."),
+        )
+    
+    def create_associated_objects(self, associated_object_attributes={}):
+        model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
+        groups = self.groups.all()
+        if groups.count() != 1:
+            return Result(
+                success=False,
+                message=_("This functionnality is not valid for a user that belongs to many.")
+            )
+        group = groups.first()
+        if group.name in model_mapping.keys():
+            class_name = model_mapping[group.name]
+            klass = apps.get_model(class_name)
+            if 'create' in dir(klass):
+                object = klass(user=self)
+                result = object.create(**associated_object_attributes)
+                if not result.success:
+                    raise Exception(result.message)
+            else:
+                object = klass(user=self, **associated_object_attributes)
+                object.save()
+    
+    def update(self, update_fields=None):
+        self.save(update_fields=update_fields)
+        return Result(
+            success=True,
+            message=_("User has been updated successfully.")
+        )
+    
+    def delete(self):
+        super().delete()
+        return Result(
+            success=True,
+            message=_("User has been deleted successfully")
+        )
+
 
 class Notification(models.Model):
 
@@ -103,7 +174,7 @@ class Notification(models.Model):
     content = models.TextField(_("Content"), blank=True, default='')
     category = models.CharField(
         _("Category"), max_length=32, default='alert',
-        choices=ektools_settings.NOTIFICATION_CATEGORY_CHOICES
+        choices=lava_settings.NOTIFICATION_CATEGORY_CHOICES
     )
     target_groups = models.JSONField(_("Target groups"), default=list, blank=True)
     target_users = models.JSONField(_("Target users"), default=list, blank=True)

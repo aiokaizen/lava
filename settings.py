@@ -30,4 +30,14 @@ ALLOWED_SIGNUP_GROUPS = getattr(settings, 'ALLOWED_SIGNUP_GROUPS', (
 # This setting is used to map groups to other models.
 # When creating a user in a certain group, an object
 # from the group's mapped model is created and associated to the user.
-GROUPS_ASSOCIATED_MODELS = getattr(settings, "GROUPS_ASSOCIATED_MODELS", {})
+GROUPS_ASSOCIATED_MODELS = getattr(settings, "GROUPS_ASSOCIATED_MODELS", {
+#   "ADMINS": "ecom.models.Admin",
+#   "CONTENT_MANAGERS": "ecom.models.ContentManager",
+#   "CONTENT_CREATERS": "ecom.models.ContentCreater",
+})
+
+DENY_DUPLICATE_EMAILS = getattr(settings, 'DENY_DUPLICATE_EMAILS', False)
+EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
+    # If `DENY_DUPLICATE_EMAILS` is set to True, it overrides this setting.
+    settings, 'EMAIL_GROUP_UNIQUE_TOGETHER', False
+)

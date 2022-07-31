@@ -3,7 +3,7 @@ from django.contrib.auth import admin as auth_admin
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
-from lava.models import Preferences, User, Permission
+from lava.models import Preferences, User, Group, Permission
 
 
 @admin.register(User)
@@ -39,6 +39,11 @@ class UserAdmin(auth_admin.UserAdmin):
         return format_html(f'<div style="{style}"></div>')
     
     thumbnail.short_description = ''
+
+
+# @admin.register(Group)
+# class GroupAdmin(admin.ModelAdmin):
+#     pass
 
 
 @admin.register(Permission)
