@@ -117,7 +117,7 @@ class User(AbstractUser):
 
         self.save()
         
-        if groups.count() == 1:
+        if groups and len(groups) == 1:
             self.create_associated_objects(extra_attributes)
 
         return Result(

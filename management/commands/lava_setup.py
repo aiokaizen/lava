@@ -15,7 +15,7 @@ class Command(BaseCommand):
         # Create the superadmin and the `ADMINS` group if they don't exist
         try:
             ekadmin = User.objects.get(username='ekadmin')
-            logging.warning("ekadmin already exists!")
+            logging.warning("superuser ekadmin already exists!")
         except User.DoesNotExist:
             group, _ = Group.objects.get_or_create(name="ADMINS")
             ekadmin = User(
