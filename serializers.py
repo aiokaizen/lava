@@ -83,13 +83,14 @@ class UserSerializer(serializers.ModelSerializer):
             'birth_day', 'gender', 'job', 'email',
             'phone_number', 'country', 'city', 'address',
             'cover_picture', 'is_active', 'groups_names', 'last_login', 'date_joined',
-            'extra_attributes'
+            'extra_attributes', 'password',
         ]
         read_only_fields = [
             'id', 'is_active', 'last_login', 'date_joined'
         ]
         extra_kwargs = {
             "extra_attributes": {"write_only": True},
+            "password": {"write_only": True},
             "birth_day": {
                 "format": "%m/%d/%Y",
                 "input_formats": settings.DATE_INPUT_FORMATS
@@ -129,7 +130,10 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_("A user with that email already exists."))
         except User.DoesNotExist:
             return value
-
+ 
+    def validate_password(self, value):
+            validate_password(value, User)
+    
     def get_allowed_groups(self):
         group_list = [name.upper() for name, _ in lava_settings.ALLOWED_SIGNUP_GROUPS]
         return Group.objects.filter(name__in=group_list)
@@ -146,9 +150,15 @@ class UserSerializer(serializers.ModelSerializer):
         photo = validated_data.pop('photo', None)
         cover = validated_data.pop('cover_picture', None)
         groups = validated_data.pop('groups_names', None)
+        password = validated_data.pop('password', None)
         extra_attributes = validated_data.pop("extra_attributes", None)
         instance = User(**validated_data)
-        instance.create(photo, cover, groups, extra_attributes=extra_attributes)
+        result = instance.create(
+            photo, cover, groups,
+            password=password, extra_attributes=extra_attributes
+        )
+        if not result.success:
+            raise serializers.ValidationError(result.to_dict())
         return instance
     
     def update(self, instance, validated_data):

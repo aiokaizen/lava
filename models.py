@@ -2,11 +2,13 @@ from django.apps import apps
 from django.db import models
 from django.contrib.auth import get_user
 from django.conf import settings
+from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import (
     AbstractUser,
     Group,  # as BaseGroup,
     Permission
 )
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from lava import settings as lava_settings
@@ -93,9 +95,9 @@ class User(AbstractUser):
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
 
     def groups_names(self):
-        return self.groups.all().values_list('name', flat=True)
+        return self.groups.all().values_list('name', flat=True) if self.id else []
     
-    def create(self, photo=None, cover=None, groups=None, extra_attributes=None):
+    def create(self, photo=None, cover=None, groups=None, password=None, extra_attributes=None):
 
         if self.id:
             return Result(
@@ -115,23 +117,51 @@ class User(AbstractUser):
             if groups is not None:
                 self.groups.set(groups)
 
-        self.save()
+        if password is not None:
+            result = self.validate_password(password)
+            if not result.success:
+                self.delete()
+                return result
+            self.set_password(password)
         
+        self.save()
+
         if groups and len(groups) == 1:
-            self.create_associated_objects(extra_attributes)
+            try:
+                result = self.create_associated_objects(extra_attributes)
+                if not result.success:
+                    self.delete()
+                    return result
+            except Exception as e:
+                self.delete()
+                return Result(success=False, message=str(e))
 
         return Result(
             success=True,
             message=_("User has been created successfully."),
         )
     
+    def validate_password(self, password):
+        if not isinstance(password, str):
+            return Result(success=False, message=_("`password` must be a string."))
+
+        try:
+            validate_password(password, User)
+            return Result(success=True, message=_("User password is valid."))
+        except ValidationError as e:
+            return Result(
+                success=False, message=_("Invalid password."), errors=e.messages
+            )
+    
     def create_associated_objects(self, associated_object_attributes={}):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
         groups = self.groups.all()
+        associated_object_attributes = associated_object_attributes or {}
         if groups.count() != 1:
             return Result(
                 success=False,
-                message=_("This functionnality is not valid for a user that belongs to many.")
+                tag='warning',
+                message=_("This functionnality is not valid for a user that belongs to many groups."),
             )
         group = groups.first()
         if group.name in model_mapping.keys():
@@ -141,10 +171,11 @@ class User(AbstractUser):
                 object = klass(user=self)
                 result = object.create(**associated_object_attributes)
                 if not result.success:
-                    raise Exception(result.message)
+                    return result
             else:
                 object = klass(user=self, **associated_object_attributes)
                 object.save()
+        return Result(success=True, message=_("Accossiated object was created successfully."))
     
     def update(self, update_fields=None):
         self.save(update_fields=update_fields)

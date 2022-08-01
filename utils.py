@@ -72,7 +72,7 @@ class Result(imdict):
             "message": self.message
         }
         if not self.success:
-            res_dict["errors"] = self.errors
+            res_dict["errors"] = self.errors or []
         return res_dict
 
 
