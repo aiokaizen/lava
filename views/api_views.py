@@ -44,3 +44,15 @@ def change_password(request, pk):
         return Response({"ok": _("Password has been changed successfully!")})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(('GET', ))
+@permission_classes((permissions.AllowAny, ))
+def maintenance(request):
+    data = {
+        "maintenance_mode": True,
+        "message": _(
+            "This site is under maintenance. Our team is working hard "
+            "to resolve the issues ASAP. Please come back later."
+        )
+    }
+    return Response(data, status=status.HTTP_307_TEMPORARY_REDIRECT)
