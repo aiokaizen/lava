@@ -139,8 +139,12 @@ class UserSerializer(serializers.ModelSerializer):
         return Group.objects.filter(name__in=group_list)
     
     def validate_groups_names(self, value):
+        groups_names = []
+        for gn in value:
+            if not isinstance(gn, str):
+                raise serializers.ValidationError(_("groups names must be a list of names."))
+            groups_names.append(gn.upper())
         allowed_groups = self.get_allowed_groups().values_list('name', flat=True)
-        groups_names = [gn.upper() for gn in value]
         for group_name in groups_names:
             if group_name not in allowed_groups:
                 raise serializers.ValidationError(_("Invalid group choice."))
