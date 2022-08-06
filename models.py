@@ -87,7 +87,7 @@ class User(AbstractUser):
     gender = models.CharField(_("Gender"), max_length=1, choices=lava_settings.GENDER_CHOICES, blank=True, default='')
     country = models.CharField(_("Country"), max_length=64, blank=True, default="")
     city = models.CharField(_("City"), max_length=64, blank=True, default="")
-    address = models.TextField(_("Address"), blank=True, default="")
+    address = models.TextField(_("Street address"), blank=True, default="")
     phone_number = models.CharField(_("Phone number"), max_length=32, blank=True, default="")
     fax = models.CharField(_("Fax"), max_length=32, default="", blank=True)
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
@@ -126,6 +126,9 @@ class User(AbstractUser):
         
         self.save()
 
+        # Refresh groups from db in case the groups param was not passed and the groups
+        # attribute was already assigned before calling .create() method.
+        groups = self.groups.all()
         if groups and len(groups) == 1:
             try:
                 result = self.create_associated_objects(extra_attributes)
