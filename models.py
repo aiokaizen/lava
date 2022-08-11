@@ -94,6 +94,8 @@ class User(AbstractUser):
     cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
 
+    # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
+
     def groups_names(self):
         return self.groups.all().values_list('name', flat=True) if self.id else []
     
@@ -102,7 +104,7 @@ class User(AbstractUser):
         if self.id:
             return Result(
                 success=False,
-                message=_("User is already saved.")
+                message=_("User is already created.")
             )
 
         if not hasattr(self, 'preferences'):
@@ -124,6 +126,9 @@ class User(AbstractUser):
                 return result
             self.set_password(password)
         
+        if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+            self.is_active = False
+
         self.save()
 
         # Refresh groups from db in case the groups param was not passed and the groups
