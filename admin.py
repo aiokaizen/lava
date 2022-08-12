@@ -52,10 +52,10 @@ class UserAdmin(auth_admin.UserAdmin):
             if not result.success:
                 raise Exception(result.message)
         elif obj is not None:  # Modification
-            try:
+            if 'groups' in form.changed_data:
+                # Remove groups from changed_data because .save() method does not accept related fields
+                # to be passed in the update_fields parameter.
                 form.changed_data.remove('groups')
-            except Exception:
-                pass
             result = obj.update(update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
