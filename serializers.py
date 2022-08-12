@@ -112,7 +112,7 @@ class UserSerializer(serializers.ModelSerializer):
             not lava_settings.DENY_DUPLICATE_EMAILS
         ):
             try:
-                User.objects.get(email=value, groups__in=groups)
+                User.objects.get(email=value['email'], groups__in=groups)
                 raise serializers.ValidationError(
                     {"email": _("A user with that email already exists.")}
                 )
@@ -132,7 +132,8 @@ class UserSerializer(serializers.ModelSerializer):
             return value
  
     def validate_password(self, value):
-            validate_password(value, User)
+        validate_password(value, User)
+        return value
     
     def get_allowed_groups(self):
         group_list = [name.upper() for name, _ in lava_settings.ALLOWED_SIGNUP_GROUPS]
