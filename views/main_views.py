@@ -8,42 +8,42 @@ def home(request):
     context = {
 
     }
-    return render(request, 'users/home.html', context)
+    return render(request, 'lava/home.html', context)
 
 
 def user_list(request):
     context = {
 
     }
-    return render(request, 'users/user_list.html', context)
+    return render(request, 'lava/users/user_list.html', context)
 
 
 def user_add(request):
     context = {
 
     }
-    return render(request, 'users/user_add.html', context)
+    return render(request, 'lava/users/user_add.html', context)
 
 
 def user_details(request, pk):
     context = {
 
     }
-    return render(request, 'users/user_details.html', context)
+    return render(request, 'lava/users/user_details.html', context)
 
 
 def user_change(request, pk):
     context = {
 
     }
-    return render(request, 'users/user_change.html', context)
+    return render(request, 'lava/users/user_change.html', context)
 
 
 def user_change_pwd(request, pk):
     context = {
 
     }
-    return render(request, 'users/user_change_pwd.html', context)
+    return render(request, 'lava/users/user_change_pwd.html', context)
 
 
 def activate_user(request, uid, token):
