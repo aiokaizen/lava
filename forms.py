@@ -12,6 +12,6 @@ class LavaUserChangeForm(UserChangeForm):
             group = self.instance.groups.all().first()
             model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
             if group.name in model_mapping.keys():
-                raise ValidationError(_("You can't change the group of a user that is linked to another object."))
+                raise ValidationError(_("You can't change the group for this user."))
         
         return self.cleaned_data['groups']
