@@ -122,7 +122,8 @@ class User(AbstractUser):
         if password is not None:
             result = self.validate_password(password)
             if not result.success:
-                self.delete()
+                if self.id:
+                    self.delete()
                 return result
             self.set_password(password)
         
@@ -134,7 +135,7 @@ class User(AbstractUser):
         # Refresh groups from db in case the groups param was not passed and the groups
         # attribute was already assigned before calling .create() method.
         groups = self.groups.all()
-        if groups and len(groups) == 1:
+        if groups and groups.count() == 1:
             try:
                 result = self.create_associated_objects(extra_attributes)
                 if not result.success:
@@ -169,7 +170,7 @@ class User(AbstractUser):
             return Result(
                 success=False,
                 tag='warning',
-                message=_("This functionnality is not valid for a user that belongs to many groups."),
+                message=_("This functionnality is not valid for a user with many or no groups."),
             )
         group = groups.first()
         if group.name in model_mapping.keys():
@@ -185,12 +186,46 @@ class User(AbstractUser):
                 object.save()
         return Result(success=True, message=_("Accossiated object was created successfully."))
     
-    def update(self, update_fields=None):
+    def update(self, update_fields=None, extra_attributes=None):
+        groups = self.groups.all()
+        if groups and groups.count() == 1 and extra_attributes:
+            try:
+                result = self.update_associated_objects(extra_attributes)
+                if not result.success:
+                    return result
+            except Exception as e:
+                return Result(success=False, message=str(e))
+
         self.save(update_fields=update_fields)
         return Result(
             success=True,
             message=_("User has been updated successfully.")
         )
+    
+    def update_associated_objects(self, associated_object_attributes={}):
+        model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
+        groups = self.groups.all()
+        associated_object_attributes = associated_object_attributes or {}
+        if groups.count() != 1:
+            return Result(
+                success=False,
+                tag='warning',
+                message=_("This functionnality is not valid for a user with many or no groups."),
+            )
+
+        group = groups.first()
+        if group.name in model_mapping.keys():
+            # Get class name (eg: `manager`) from class path (eg: myapp.Manager)
+            class_name = model_mapping[group.name].split('.')[1].lower()
+            object = getattr(self, class_name, None)
+            if object is None:
+                return Result(False, _("Invalid group type for this operation."))
+            
+            for key, value in associated_object_attributes.items():
+                if hasattr(object, key):
+                    setattr(object, key, value)
+            object.save()
+        return Result(success=True, message=_("Accossiated object was updated successfully."))
     
     def delete(self):
         super().delete()

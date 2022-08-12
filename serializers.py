@@ -73,7 +73,8 @@ class UserSerializer(serializers.ModelSerializer):
         label=_("Groups"), required=True
     )
     extra_attributes = serializers.JSONField(
-        label=_("Extra attributes"), required=False, help_text=_("")
+        label=_("Extra attributes"), required=False,
+        help_text=_("Attributes related to an object that is related to the current user.")
     )
 
     class Meta:
@@ -106,8 +107,8 @@ class UserSerializer(serializers.ModelSerializer):
             groups = Group.objects.filter(name__in=groups_names)
         else:
             groups = groups_names
-
-        if (
+        
+        if groups and (
             lava_settings.EMAIL_GROUP_UNIQUE_TOGETHER and
             not lava_settings.DENY_DUPLICATE_EMAILS
         ):
@@ -166,11 +167,14 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
     
     def update(self, instance, validated_data):
-        update_fields = []
-        validated_data.pop("extra_attributes", None)
+        extra_attributes = validated_data.pop("extra_attributes", None)
+        update_fields = validated_data.keys()
         for key, value in validated_data.items():
-            if hasattr(instance, key):
-                setattr(instance, key, value)
-                update_fields.append(key)
-        instance.update(update_fields=update_fields)
+            setattr(instance, key, value)
+        result = instance.update(
+            update_fields=update_fields, extra_attributes=extra_attributes
+        )
+        if not result.success:
+            raise serializers.ValidationError(result.as_dict())
+        return instance
  

@@ -5,8 +5,11 @@ from django.urls import path
 from lava.views import main_views
 
 
+app_name = 'lava'
+
+
 urlpatterns = [
-    path('', main_views.home),
+    path('', main_views.home, name="home"),
     path('users/', main_views.user_list, name='user-list'),
     path('users/add', main_views.user_add, name='user-add'),
     path('users/activate/<str:uid>/<str:token>', main_views.activate_user, name='user-activate'),
