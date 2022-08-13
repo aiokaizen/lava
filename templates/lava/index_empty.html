@@ -28,31 +28,33 @@
 
 <body>
     <div class="app">
-        <div class="container-fluid">
-            <div class="d-flex full-height p-v-20 flex-column justify-content-between">
+        {% block app %}
+            <div class="container-fluid">
+                <div class="d-flex full-height p-v-20 flex-column justify-content-between">
 
-                <!-- Content Wrapper START -->
-                <div class="main-content" style="flex: 1">
-                    <!-- Content goes Here -->
-                    {% block main %}
-                    {% endblock main %}
-                </div>
-                <!-- Content Wrapper END -->
-
-                <!-- Footer START -->
-                <footer class="footer">
-                    <div class="footer-content">
-                        <p class="m-b-0">Copyright © 2022 EKBlocks. All rights reserved.</p>
-                        <!-- <span>
-                            <a href="" class="text-gray m-r-15">Term &amp; Conditions</a>
-                            <a href="" class="text-gray">Privacy &amp; Policy</a>
-                        </span> -->
+                    <!-- Content Wrapper START -->
+                    <div class="main-content" style="flex: 1">
+                        <!-- Content goes Here -->
+                        {% block main %}
+                        {% endblock main %}
                     </div>
-                </footer>
-                <!-- Footer END -->
-            </div>
+                    <!-- Content Wrapper END -->
 
-        </div>
+                    <!-- Footer START -->
+                    <footer class="footer">
+                        <div class="footer-content">
+                            <p class="m-b-0">Copyright © 2022 EKBlocks. All rights reserved.</p>
+                            <!-- <span>
+                                <a href="" class="text-gray m-r-15">Term &amp; Conditions</a>
+                                <a href="" class="text-gray">Privacy &amp; Policy</a>
+                            </span> -->
+                        </div>
+                    </footer>
+                    <!-- Footer END -->
+                </div>
+
+            </div>
+        {% endblock app %}
 
     </div>
 
