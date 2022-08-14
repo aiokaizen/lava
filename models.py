@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from lava import settings as lava_settings
 from lava.utils import (
     get_user_cover_filename, get_user_photo_filename,
-    Result
+    Result, generate_password
 )
 
 
@@ -93,13 +93,18 @@ class User(AbstractUser):
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
     cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
+    tmp_pwd = models.CharField(_("Temporary password"), max_length=64, default="", blank=True)
 
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
     def groups_names(self):
         return self.groups.all().values_list('name', flat=True) if self.id else []
     
-    def create(self, photo=None, cover=None, groups=None, password=None, extra_attributes=None):
+    def create(
+        self, photo=None, cover=None, groups=None, password=None,
+        extra_attributes=None, create_associated_objects=True,
+        force_is_active=False, generate_tmp_password=False
+    ):
 
         if self.id:
             return Result(
@@ -126,8 +131,14 @@ class User(AbstractUser):
                     self.delete()
                 return result
             self.set_password(password)
+        elif generate_tmp_password:
+            tmp_pwd = generate_password(12)
+            self.tmp_pwd = tmp_pwd
+            self.set_password(tmp_pwd)
         
-        if settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+        if force_is_active:
+            self.is_active = True
+        elif settings.DJOSER['SEND_ACTIVATION_EMAIL']:
             self.is_active = False
 
         self.save()
@@ -135,7 +146,7 @@ class User(AbstractUser):
         # Refresh groups from db in case the groups param was not passed and the groups
         # attribute was already assigned before calling .create() method.
         groups = self.groups.all()
-        if groups and groups.count() == 1:
+        if groups and groups.count() == 1 and create_associated_objects:
             try:
                 result = self.create_associated_objects(extra_attributes)
                 if not result.success:

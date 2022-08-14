@@ -20,11 +20,8 @@ class Command(BaseCommand):
             group, _ = Group.objects.get_or_create(name="ADMINS")
             ekadmin = User(
                 username='ekadmin', email="admin@ekblocks.com",
-                first_name="Jane", last_name="Doe",
+                first_name="EKBlocks", last_name="Administrator",
                 is_staff=True, is_superuser=True
             )
-            ekadmin.create(groups=[group])
-            ekadmin.set_password('admin_pass')
-            ekadmin.save()
+            ekadmin.create(groups=[group], password="admin_pass", force_is_active=True)
             logging.info("ekadmin was created successfully!")
-        

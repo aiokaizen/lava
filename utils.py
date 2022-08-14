@@ -1,5 +1,7 @@
 import os
 from datetime import datetime
+import random
+from slugify import slugify
 
 from django.conf import settings
 
@@ -69,6 +71,7 @@ class Result(imdict):
     def to_dict(self):
         res_dict = {
             "success": self.success,
+            "tag": self.tag,
             "message": self.message
         }
         if not self.success:
@@ -108,3 +111,46 @@ def get_log_filepath():
     if not os.path.exists(settings.LOG_ROOT):
         os.makedirs(settings.LOG_ROOT)
     return filepath
+
+
+def generate_password(length=8, include_special_characters=True):
+    lower_alphabets = 'abcdefghijklmnopqrstuvwxyz'
+    upper_alphabets = lower_alphabets.upper()
+    numbers = '1234567890'
+    special_characters = '-_!?.^*@#$%'
+    pool = lower_alphabets + upper_alphabets + numbers
+    if include_special_characters:
+        pool += special_characters
+    
+    random_password = ''.join(random.SystemRandom().choices(pool, k=length))
+    return random_password
+
+
+def generate_username(email="", first_name="", last_name=""):
+    """ Geneartes a random username from user data. """
+    if email:
+        username = email.split('@')[0]
+        if _is_username_valid(username):
+            return username
+
+    if first_name:
+        username = slugify(first_name, separator='')
+        if last_name:
+            username += f".{slugify(last_name, separator='')}"
+        if _is_username_valid(username):
+            return username
+    
+    while True:
+        suffix = ''.join(random.SystemRandom().choices('1234567890', k=5))
+        username = f"controller_{suffix}"
+        if _is_username_valid(username):
+            return username
+
+
+def _is_username_valid(username):
+    from lava.models import User
+    try:
+        User.objects.get(username=username)
+        return False
+    except User.DoesNotExist:
+        return True

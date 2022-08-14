@@ -14,7 +14,7 @@ class UserAdmin(auth_admin.UserAdmin):
 
     form = LavaUserChangeForm
     fieldsets = (
-        (None, {'fields': ('username', 'password')}),
+        (None, {'fields': ('username', 'password', 'tmp_pwd')}),
         (_('Personal info'), {'fields': (
             'photo', 'first_name', 'last_name',
             'birth_day', 'gender', 'job', 'email',
@@ -28,6 +28,7 @@ class UserAdmin(auth_admin.UserAdmin):
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
+    readonly_fields = ['tmp_pwd']
     
     list_display = ('thumbnail', 'username', 'email', 'first_name', 'last_name', 'is_staff')
 

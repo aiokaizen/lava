@@ -8,13 +8,17 @@ from lava import settings as lava_settings
 from lava.models import User
 
 
-def validate_email(email, groups):
+def validate_email(email, groups, email_group_unique_together=None):
     
     base_validator = EmailValidator()
     base_validator(email)
-    
+
+    # Override default behaviour
+    if email_group_unique_together is None:
+        email_group_unique_together = lava_settings.EMAIL_GROUP_UNIQUE_TOGETHER
+
     if not lava_settings.DENY_DUPLICATE_EMAILS:
-        if groups and lava_settings.EMAIL_GROUP_UNIQUE_TOGETHER:
+        if groups and email_group_unique_together:
             try:
                 User.objects.get(email=email, groups__in=groups)
                 raise ValidationError(
