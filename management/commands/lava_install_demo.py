@@ -18,12 +18,12 @@ class Command(BaseCommand):
         # Create some demo content here
 
         # Getting user data
-        number_of_users = args['n']
+        number_of_users = args.get('n', 25)
 
         # Creating groups
         groups = []
         groups_filename = os.path.join(
-            settings.BASE_DIR, 'laval', 'demo_content', 'groups.json'
+            settings.BASE_DIR, 'lava', 'demo_content', 'groups.json'
         )
         with open(groups_filename, 'r') as f:
             groups = json.load(f.read())
@@ -39,13 +39,14 @@ class Command(BaseCommand):
         # Creating users
         people = []
         people_filename = os.path.join(
-            settings.BASE_DIR, 'laval', 'demo_content', 'people.json'
+            settings.BASE_DIR, 'lava', 'demo_content', 'people.json'
         )
         with open(people_filename, 'r') as f:
             people = json.load(f.read())
 
         for i in range(number_of_users):
             person = random.choice(people)
+            people.remove(person)
             user = User.objects.create(
                 username=f'emp{i}',
                 first_name=person['first_name'],

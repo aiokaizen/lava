@@ -1,12 +1,14 @@
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from lava.models import Preferences, User, Group
 from lava import settings as lava_settings
+from lava.models import Preferences, User, Group
+from lava.validators import validate_email
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
@@ -103,35 +105,22 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, value):
         validated_data = super().validate(value)
         groups_names = validated_data.get('groups_names')
+        email = validated_data.get('email')
         if isinstance(groups_names, list):
             groups = Group.objects.filter(name__in=groups_names)
         else:
             groups = groups_names
         
-        if groups and (
-            lava_settings.EMAIL_GROUP_UNIQUE_TOGETHER and
-            not lava_settings.DENY_DUPLICATE_EMAILS
-        ):
+        if email:
             try:
-                User.objects.get(email=value['email'], groups__in=groups)
-                raise serializers.ValidationError(
-                    {"email": _("A user with that email already exists.")}
-                )
-            except User.DoesNotExist:
-                return validated_data
+                validated_data['email'] = validate_email(email, groups)
+            except ValidationError as e:
+                raise serializers.ValidationError({
+                    'email': e.message
+                })
         
         return validated_data
      
-    def validate_email(self, value):
-        if not lava_settings.DENY_DUPLICATE_EMAILS:
-            return value
-
-        try:
-            User.objects.get(email=value)
-            raise serializers.ValidationError(_("A user with that email already exists."))
-        except User.DoesNotExist:
-            return value
- 
     def validate_password(self, value):
         validate_password(value, User)
         return value
