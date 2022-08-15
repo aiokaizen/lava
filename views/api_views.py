@@ -16,7 +16,7 @@ class UserListCreate(generics.ListCreateAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
 
 
 class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
@@ -25,7 +25,7 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
 
     def delete(self, request, *args, **kwargs):
         user = get_object_or_404(User, pk=kwargs.get('pk'))
@@ -35,7 +35,7 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(('PUT', ))
-@permission_classes((permissions.BasePermission, ))
+@permission_classes((permissions.IsAdminUser, ))
 def change_password(request, pk):
     instance = get_object_or_404(User, pk=pk)
     serializer = ChangePasswordFormSerializer(instance, data=request.data)
