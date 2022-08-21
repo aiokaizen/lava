@@ -45,7 +45,7 @@ class Result(imdict):
     both Success and Error results from functions and APIs.
     """
 
-    def __init__(self, success:bool, message:str, instance=None, errors:dict=None, tag:str=None):
+    def __init__(self, success:bool, message:str='', instance=None, errors:dict=None, tag:str=None):
         self.success = success
         self.message = message
         self.instance = instance
