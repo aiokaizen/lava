@@ -1,17 +1,17 @@
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import permissions, generics, status
+from rest_framework import permissions, generics, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from lava.messages import HTTP_403_MESSAGE
 
 from lava.serializers import (
     ChangePasswordFormSerializer, UserSerializer,
-    NotificationSerializer
+    NotificationSerializer, PreferencesSerializer
 )
-from lava.models import Notification, User
+from lava.models import Notification, Preferences, User
 from lava.services import permissions as lava_permissions
 
 
@@ -38,6 +38,37 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         return Response(result.to_dict(), status=status.HTTP_204_NO_CONTENT)
 
 
+class PreferencesViewSet(
+    mixins.ListModelMixin,
+    GenericViewSet
+):
+    queryset = Preferences.objects.none()
+    serializer_class = PreferencesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return Preferences.objects.get(user=self.user)
+
+    def list(self, request, *args, **kwargs):
+        """
+        This is used as the get() method because DRF SimpleRouter
+        always maps get to list().
+        # Try to create a custom router?
+        """
+        self.user = request.user
+        preferences = self.get_object()
+        serializer = self.get_serializer(preferences)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["POST"])
+    def set(self, request):
+        self.user = request.user
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
 @api_view(('PUT', ))
 @permission_classes((permissions.IsAdminUser, ))
@@ -48,19 +79,6 @@ def change_password(request, pk):
         serializer.save()
         return Response({"ok": _("Password has been changed successfully!")})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(('GET', ))
-@permission_classes((permissions.AllowAny, ))
-def maintenance(request):
-    data = {
-        "maintenance_mode": True,
-        "message": _(
-            "This site is under maintenance. Our team is working hard "
-            "to resolve the issues ASAP. Please come back later."
-        )
-    }
-    return Response(data, status=status.HTTP_307_TEMPORARY_REDIRECT)
 
 
 class NotificationViewSet(ReadOnlyModelViewSet):
@@ -94,3 +112,16 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         if not result:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)
+
+
+@api_view(('GET', ))
+@permission_classes((permissions.AllowAny, ))
+def maintenance(request):
+    data = {
+        "maintenance_mode": True,
+        "message": _(
+            "This site is under maintenance. Our team is working hard "
+            "to resolve the issues as soon as possible. Please come back later."
+        )
+    }
+    return Response(data, status=status.HTTP_307_TEMPORARY_REDIRECT)

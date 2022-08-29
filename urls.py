@@ -10,6 +10,7 @@ app_name = 'lava'
 
 router = routers.SimpleRouter()
 router.register(r'notifications', api_views.NotificationViewSet)
+router.register(r'preferences', api_views.PreferencesViewSet)
 
 
 urlpatterns = [

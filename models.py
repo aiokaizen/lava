@@ -240,7 +240,9 @@ class User(AbstractUser):
         return Result(success=True, message=_("Accossiated object was updated successfully."))
     
     def delete(self):
+        preferences = self.preferences
         super().delete()
+        preferences.delete()
         return Result(
             success=True,
             message=_("User has been deleted successfully")
