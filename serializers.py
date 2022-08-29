@@ -7,7 +7,7 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from lava import settings as lava_settings
-from lava.models import Preferences, User, Group
+from lava.models import Notification, Preferences, User, Group
 from lava.validators import validate_email
 
 
@@ -69,6 +69,18 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         return instance
 
 
+class UserExerptSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'photo', 'first_name', 'last_name'
+        ]
+    
+    def save(self, **kwargs):
+        raise serializers.ValidationError(_("You can't create or update objects using a read-only serializer."))
+
+    
 class UserSerializer(serializers.ModelSerializer):
 
     groups_names = serializers.ListField(
@@ -167,4 +179,42 @@ class UserSerializer(serializers.ModelSerializer):
         if not result.success:
             raise serializers.ValidationError(result.as_dict())
         return instance
+ 
+class NotificationSerializer(serializers.ModelSerializer):
+
+    sender = UserExerptSerializer(required=False)
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id',
+            'sender',
+            'date',
+            'title',
+            'content',
+            'category',
+        ]
+        read_only_fields = [
+            'id', 'sender', 'date'
+        ]
+        extra_kwargs = {
+            "date": {
+                "format": "%m/%d/%Y %H:%M:%S",
+            },
+        }
+    
+    def __init__(self, user, instance=None, data=empty, **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self.user = user
+    
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        if not validated_data.get('target_groups') and not validated_data.get('target_users'):
+            raise serializers.ValidationError(
+                _("You must specify either target groups or target users.")
+            )
+        return validated_data
+    
+    def create(self, validated_data):
+        return self.user.send_notification(**validated_data)
  

@@ -6,7 +6,7 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from lava.forms import LavaUserChangeForm
-from lava.models import Preferences, User, Group, Permission
+from lava.models import Notification, Preferences, User, Group, Permission
 
 
 @admin.register(User)
@@ -69,6 +69,11 @@ class UserAdmin(auth_admin.UserAdmin):
 
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
     pass
 
 

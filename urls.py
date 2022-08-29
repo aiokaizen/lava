@@ -1,9 +1,15 @@
 from django.urls import path
 
+from rest_framework import routers
+
 from lava.views import main_views, api_views
 
 
 app_name = 'lava'
+
+
+router = routers.SimpleRouter()
+router.register(r'notifications', api_views.NotificationViewSet)
 
 
 urlpatterns = [
@@ -18,3 +24,5 @@ urlpatterns = [
 
     path('api/maintenance', api_views.maintenance, name='maintenance'),
 ]
+
+urlpatterns.extend(router.urls)
