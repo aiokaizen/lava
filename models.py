@@ -256,7 +256,7 @@ class User(AbstractUser):
     
     def send_notification(self, title, content, category="alert", target_users=None, target_groups=None, system_alert=False):
 
-        sender = self if not system_alert else False
+        sender = self if not system_alert else None
 
         notification = Notification(
             sender=sender,
