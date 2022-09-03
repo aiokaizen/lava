@@ -11,6 +11,12 @@ from lava.models import Notification, Preferences, User, Group
 from lava.validators import validate_email
 
 
+class ReadOnlyModelSerializer(serializers.ModelSerializer):
+    
+    def save(self, **kwargs):
+        raise serializers.ValidationError(_("You can't create or update objects using a read-only serializer."))
+
+
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -69,7 +75,7 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         return instance
 
 
-class UserExerptSerializer(serializers.ModelSerializer):
+class UserExerptSerializer(ReadOnlyModelSerializer):
 
     class Meta:
         model = User
@@ -180,6 +186,7 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(result.as_dict())
         return instance
  
+
 class NotificationSerializer(serializers.ModelSerializer):
 
     sender = UserExerptSerializer(required=False)
