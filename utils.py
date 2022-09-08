@@ -1,9 +1,11 @@
 import os
 from datetime import datetime
 import random
-from slugify import slugify
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class imdict(dict):
@@ -100,6 +102,45 @@ def get_user_photo_filename(instance, filename):
     ext = filename.split('.')[-1]
     folder = "user/{}".format(mask_number(instance.id))
     return '{}/profile_picture.{}'.format(folder, ext)
+
+def handle_excel_file(file, start_row=1, extract_columns=[]):
+    """
+    file | File like object: The file to extract data from.
+    start_row | int: the number of row where the header of the file is located.
+    extract_columns | List of strings: the names of columns to extract from the file.
+    The extract_columns param will be slugified as well as the columns from the excel file,
+    so caps, spaces, and special characters are ignored making it easier to match.
+
+    example:
+    >>> with read('file.xlsx', 'r') as f:
+    >>>     start_row = 3
+    >>>     column_names = [
+    >>>         "name", "age", "address"
+    >>>     ]
+    >>>     data = handle_excel_file(f, start_row, column_names)
+    """
+    extract_columns = [
+        slugify(name) for name in extract_columns
+    ] if extract_columns else None
+
+    column_names = []  # This list will be extracted from the file and then slugified.
+
+    for column_name in extract_columns:
+        if column_name not in column_names:
+            raise ValidationError(_("The uploaded file does not contain `email` column."))
+
+    # return odict object with the following format:
+    # {
+    #   'column_names': ['name', 'age', 'email'],
+    #   'column_names_display': ['Name', 'Age', 'Email'],
+    #   'data': [
+    #       odict({"name": "Albert", "age": 39, "email": "albert@mail.com"}),
+    #       odict({"name": "Emily", "age": 26, "email": "emily@mail.com"}),
+    #   ],
+    # }
+    result = odict()
+
+    return file
 
 
 # Othr things
