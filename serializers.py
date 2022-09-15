@@ -24,6 +24,7 @@ class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             'font_style', 'dark_theme',
             'list_layout', 'menu_layout', 'language',
+            'notifications_settings',
         ]
 
 
@@ -200,6 +201,9 @@ class NotificationSerializer(serializers.ModelSerializer):
             'title',
             'content',
             'category',
+            'url',
+            'target_groups',
+            'target_users',
         ]
         read_only_fields = [
             'id', 'sender', 'date'
@@ -208,6 +212,10 @@ class NotificationSerializer(serializers.ModelSerializer):
             "date": {
                 "format": "%m/%d/%Y %H:%M:%S",
             },
+            "writeonly_fields": [
+                'target_groups',
+                'target_users',
+            ]
         }
     
     def __init__(self, user, instance=None, data=empty, **kwargs):
@@ -216,7 +224,9 @@ class NotificationSerializer(serializers.ModelSerializer):
     
     def validate(self, attrs):
         validated_data = super().validate(attrs)
-        if not validated_data.get('target_groups') and not validated_data.get('target_users'):
+        target_groups = validated_data.get('target_groups')
+        target_users = validated_data.get('target_users')
+        if not target_groups and not target_users:
             raise serializers.ValidationError(
                 _("You must specify either target groups or target users.")
             )

@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from templated_mail.mail import BaseEmailMessage
 
 class imdict(dict):
     """ Immutable dictionary. """
@@ -142,6 +143,18 @@ def handle_excel_file(file, start_row=1, extract_columns=[]):
 
     return file
 
+
+def send_html_email(request, template, recipients, sender=None, context={}, fail_silently=False):
+
+    email = BaseEmailMessage(
+        request, context=context, template_name=template
+    )
+
+    email.send(
+        to=recipients,
+        from_email=sender,
+        fail_silently=fail_silently
+    )
 
 # Othr things
 def get_log_filepath():

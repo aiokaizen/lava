@@ -1,7 +1,6 @@
 from django.apps import apps
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth import get_user
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import (
@@ -13,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from lava import settings as lava_settings
+from lava import validators as lava_validators
 from lava.utils import (
     get_user_cover_filename, get_user_photo_filename,
     Result, generate_password
@@ -46,6 +46,11 @@ class Preferences(models.Model):
     list_layout = models.CharField(_("List layout"), max_length=8, choices=LIST_LAYOUT_CHOICES, default="list")
     menu_layout = models.CharField(_("Menu layout"), max_length=16, choices=MENU_LAYOUT_CHOICES, default="default")
     language = models.CharField(_("Language"), max_length=2, choices=LANGUAGE_CHOICES, default="en")
+    notifications_settings = models.JSONField(
+        _("Notifications settings"),
+        blank=True, default=dict,
+        validators=[lava_validators.validate_notifications_settings]
+    )
 
     def __str__(self):
         if hasattr(self, "user"):
@@ -254,7 +259,7 @@ class User(AbstractUser):
         )
         return notifications
     
-    def send_notification(self, title, content, category="alert", target_users=None, target_groups=None, system_alert=False):
+    def send_notification(self, title, content, category="alert", url="", target_users=None, target_groups=None, system_alert=False):
 
         sender = self if not system_alert else None
 
@@ -263,6 +268,7 @@ class User(AbstractUser):
             title=title,
             content=content,
             category=category,
+            url=url
         )
 
         # Send the notification by e-mail?
@@ -292,6 +298,11 @@ class Notification(models.Model):
     category = models.CharField(
         _("Category"), max_length=32, default='alert',
         choices=lava_settings.NOTIFICATION_CATEGORY_CHOICES
+    )
+    url = models.CharField(
+        _("URL"), help_text=_("Action URL"), default="", blank=True,
+        max_length=200,
+        validators=[lava_validators.SchemelessURLValidator()]
     )
     target_groups = models.ManyToManyField(Group, related_name='notifications', blank=True)
     target_users = models.ManyToManyField(User, related_name='notifications', blank=True)
