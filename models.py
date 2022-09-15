@@ -306,10 +306,14 @@ class Notification(models.Model):
     )
     target_groups = models.ManyToManyField(Group, related_name='notifications', blank=True)
     target_users = models.ManyToManyField(User, related_name='notifications', blank=True)
+    seen_by = models.JSONField(_("Seen by"), default=list, blank=True)
 
     def __str__(self):
         sender = self.sender if self.sender else "System"
         return f"{sender} : {self.title}"
+    
+    def seen(self, user):
+        return user.id in self.seen_by
 
     def create(self, target_users=None, target_groups=None):
         if not target_users and not target_groups:
@@ -324,3 +328,9 @@ class Notification(models.Model):
             self.target_groups.set(target_groups)
 
         return Result(True, _("The notification has been created successfully."))
+    
+    def register_view(self, user):
+        """ Call this function when a user have seen the notification. """
+        if user.id in self.seen_by:
+            self.seen_by.add(user.id)
+            self.save()

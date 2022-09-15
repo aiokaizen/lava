@@ -191,6 +191,7 @@ class UserSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
 
     sender = UserExerptSerializer(required=False)
+    seen = serializers.SerializerMethodField(label=_("Seen"))
 
     class Meta:
         model = Notification
@@ -204,6 +205,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             'url',
             'target_groups',
             'target_users',
+            'seen',
         ]
         read_only_fields = [
             'id', 'sender', 'date'
@@ -221,6 +223,11 @@ class NotificationSerializer(serializers.ModelSerializer):
     def __init__(self, user, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
         self.user = user
+    
+    def get_seen(self):
+        if not self.instance:
+            return False
+        return self.instance.seen(self.user)
     
     def validate(self, attrs):
         validated_data = super().validate(attrs)
