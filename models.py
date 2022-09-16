@@ -329,8 +329,23 @@ class Notification(models.Model):
 
         return Result(True, _("The notification has been created successfully."))
     
-    def register_view(self, user):
+    def mark_as_read(self, user):
         """ Call this function when a user have seen the notification. """
-        if user.id in self.seen_by:
-            self.seen_by.add(user.id)
+        if user.id not in self.seen_by:
+            self.seen_by.append(user.id)
             self.save()
+    
+    @classmethod
+    def mark_as_read_bulk(self, notifications, user):
+        """
+        Marks many notifications as read by the user.
+        """
+        for notification in notifications:
+            notification.mark_as_read(user)
+
+    def mark_as_not_read(self, user):
+        """ Call this function when a user marks the notification as not read. """
+        if user.id in self.seen_by:
+            self.seen_by.remove(user.id)
+            self.save()
+    

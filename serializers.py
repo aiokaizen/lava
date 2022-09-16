@@ -224,10 +224,10 @@ class NotificationSerializer(serializers.ModelSerializer):
         super().__init__(instance, data, **kwargs)
         self.user = user
     
-    def get_seen(self):
-        if not self.instance:
+    def get_seen(self, instance):
+        if not instance:
             return False
-        return self.instance.seen(self.user)
+        return instance.seen(self.user)
     
     def validate(self, attrs):
         validated_data = super().validate(attrs)

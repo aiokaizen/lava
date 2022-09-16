@@ -98,7 +98,24 @@ class NotificationViewSet(ReadOnlyModelViewSet):
     
     def list(self, request, *args, **kwargs):
         self.user = request.user
-        return super().list(request, *args, **kwargs)
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(instance=page, user=self.user, many=True)
+            response = self.get_paginated_response(serializer.data)
+
+            # Mark all the notifications in the current page as read
+            Notification.mark_as_read_bulk(page, self.user)
+
+            return response
+
+        serializer = self.get_serializer(instance=queryset, user=self.user, many=True)
+
+        # Mark all the notifications as read
+        Notification.mark_as_read_bulk(queryset, self.user)
+
+        return Response(serializer.data)
     
     @action(detail=False, methods=["POST"])
     def send(self, request, *args, **kwargs):
