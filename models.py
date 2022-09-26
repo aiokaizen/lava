@@ -246,8 +246,14 @@ class User(AbstractUser):
     
     def delete(self):
         preferences = self.preferences
+        if hasattr(self, 'customer'):
+            self.customer.delete(delete_user=False)
+        if hasattr(self, 'account'):
+            self.account.delete()
+
         super().delete()
-        preferences.delete()
+        if preferences:
+            preferences.delete()
         return Result(
             success=True,
             message=_("User has been deleted successfully")
