@@ -12,6 +12,7 @@ from lava.serializers import (
     NotificationSerializer, PreferencesSerializer
 )
 from lava.models import Notification, Preferences, User
+from lava.utils import Result
 from lava.services import permissions as lava_permissions
 
 
@@ -36,6 +37,21 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         user = get_object_or_404(User, pk=kwargs.get('pk'))
         result = user.delete()
         return Response(result.to_dict(), status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def update_device_id(request):
+    device_id = request.data.get('device_id')
+    if not device_id:
+        return Response(
+            Result(False, _("'device_id' field is mandatory.")).to_dict(),
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    user = request.user
+    result = user.update_devices(device_id)
+    return Response(result.to_dict())
 
 
 class PreferencesViewSet(

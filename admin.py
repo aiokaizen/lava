@@ -19,6 +19,7 @@ class UserAdmin(auth_admin.UserAdmin):
             'photo', 'first_name', 'last_name',
             'birth_day', 'gender', 'job', 'email',
             'phone_number', 'country', 'city', 'address',
+            'device_id_list'
         )}),
         (_('Preferences'), {
             'fields': ('cover_picture', 'preferences'),

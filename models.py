@@ -100,6 +100,10 @@ class User(AbstractUser):
     cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
     preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
     tmp_pwd = models.CharField(_("Temporary password"), max_length=64, default="", blank=True)
+    device_id_list = models.JSONField(
+        _("Device IDs"), default=list, blank=True,
+        help_text=_("A list of devices the the user is connected from.")
+    )
 
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
@@ -287,6 +291,12 @@ class User(AbstractUser):
             return result
         
         return Result(True, _("The notification was sent successfully."))
+    
+    def update_devices(self, device_id):
+        if device_id not in self.device_id_list:
+            self.device_id_list.append(device_id)
+            self.save(update_fields=['device_id_list'])
+        return Result(True)
 
 
 class Notification(models.Model):
