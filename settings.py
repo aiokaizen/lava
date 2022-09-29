@@ -1,9 +1,10 @@
 import logging
+import os
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from lava.utils import get_log_filepath
+from lava.utils import get_log_filepath, init_firebase
 
 
 logging.basicConfig(
@@ -43,3 +44,10 @@ EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
 )
 
 BREADCRUMBS_DEPTH_LEVEL = getattr(settings, 'BREADCRUMBS_DEPTH_LEVEL', 3)
+
+FIREBASE_CREDENTIALS_FILE_PATH = os.path.join(settings.BASE_DIR, 'firebase-adminsdk-private-key.json')
+FIREBASE_ACTIVATED = False
+
+_init_firebase_result = init_firebase()
+if _init_firebase_result.success:
+    FIREBASE_ACTIVATED = True

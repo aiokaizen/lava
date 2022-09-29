@@ -1,6 +1,7 @@
 import os
-from datetime import datetime
 import random
+import logging
+from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -8,6 +9,11 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from templated_mail.mail import BaseEmailMessage
+
+import firebase_admin
+from firebase_admin import credentials
+
+from lava import settings as lava_settings
 
 class imdict(dict):
     """ Immutable dictionary. """
@@ -208,3 +214,21 @@ def _is_username_valid(username):
         return False
     except User.DoesNotExist:
         return True
+
+
+def init_firebase():
+    creds_file_path = lava_settings.FIREBASE_CREDENTIALS_FILE_PATH
+    if not os.path.exists(creds_file_path):
+        logging.error("Firebase credentials file does not exist.")
+        return Result(False, _("Firebase credentials file does not exist."))
+
+    try:
+        creds = credentials.Certificate(creds_file_path)
+        print('creds:', creds)
+        # cred = credentials.RefreshToken(creds_file_path)
+        default_app = firebase_admin.initialize_app(creds)
+        print('app name:', default_app.name)
+        return Result(True)
+    except Exception as e:
+        logging.error(e)
+        return Result(False, str(e))

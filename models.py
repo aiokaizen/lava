@@ -1,3 +1,6 @@
+import logging
+import itertools
+
 from django.apps import apps
 from django.db import models
 from django.db.models import Q
@@ -10,6 +13,8 @@ from django.contrib.auth.models import (
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+
+from firebase_admin import messaging
 
 from lava import settings as lava_settings
 from lava import validators as lava_validators
@@ -281,8 +286,6 @@ class User(AbstractUser):
             url=url
         )
 
-        # Send the notification by e-mail?
-
         result = notification.create(
             target_users=target_users,
             target_groups=target_groups
@@ -290,6 +293,11 @@ class User(AbstractUser):
         if not result.success:
             return result
         
+        # Send the notification by e-mail?
+
+        # Send the notification via firebase api
+        notification.send_firebase_notification()
+
         return Result(True, _("The notification was sent successfully."))
     
     def update_devices(self, device_id):
@@ -330,6 +338,18 @@ class Notification(models.Model):
     
     def seen(self, user):
         return user.id in self.seen_by
+    
+    def get_target_users(self):
+        """ Returns the sum of target users and the users in the target groups. """
+        target_users = self.target_users.all()
+        target_users_from_groups = User.objects.filter(groups__in=self.target_groups.all())
+        target_users = target_users | target_users_from_groups
+        target_users = target_users.filter(is_active=True)
+        return target_users
+    
+    def get_target_devices(self):
+        target_users = self.get_target_users()
+        return itertools.chain(target_users.values_list('device_id_list', flat=True))
 
     def create(self, target_users=None, target_groups=None):
         if not target_users and not target_groups:
@@ -365,3 +385,36 @@ class Notification(models.Model):
             self.seen_by.remove(user.id)
             self.save()
     
+    def send_firebase_notification(self):
+        """
+        Send notification via firebase API.
+        """
+        if not lava_settings.FIREBASE_ACTIVATED:
+            logging.warn("Firebase is not activated.")
+            return Result(False)
+
+        registration_tokens = self.get_target_devices()
+        dataObject = None
+        android_configs = messaging.AndroidConfig(
+            priority="high"
+        )
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+                title=self.title,
+                body=self.content
+            ),
+            data=dataObject,
+            tokens=registration_tokens,
+            android=android_configs,
+        )
+
+        # Send a message to the device corresponding to the provided
+        # registration tokens.
+        try:
+            response = messaging.send_multicast(message)
+        except Exception as e:
+            logging.error(e)
+            return Result(False, str(e))
+
+        logging.info('Successfully sent message:', response)
+        return Result(True)
