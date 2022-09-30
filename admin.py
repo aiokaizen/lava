@@ -75,7 +75,7 @@ class PermissionAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    pass
+    icon_name = 'notifications'
 
 
 @admin.register(Preferences)
