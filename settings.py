@@ -45,6 +45,8 @@ EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
 
 BREADCRUMBS_DEPTH_LEVEL = getattr(settings, 'BREADCRUMBS_DEPTH_LEVEL', 3)
 
+LOGO_FILE_PATH = getattr(settings, "LOGO_FILE_PATH", 'lava/assets/images/email/logo.png')
+
 FIREBASE_CREDENTIALS_FILE_PATH = os.path.join(settings.BASE_DIR, 'firebase-adminsdk-private-key.json')
 FIREBASE_ACTIVATED = False
 

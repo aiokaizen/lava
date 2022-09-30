@@ -4,6 +4,8 @@ from templated_mail.mail import BaseEmailMessage
 from djoser import utils
 from djoser.conf import settings
 
+from lava import settings as lava_settings
+
 
 class ActivationEmail(BaseEmailMessage):
     template_name = "lava/email/activation.html"
@@ -13,6 +15,8 @@ class ActivationEmail(BaseEmailMessage):
         context = super().get_context_data()
 
         user = context.get("user")
+        context['logo_file_path'] = lava_settings.LOGO_FILE_PATH
+        context["email"] = user.email
         context["uid"] = utils.encode_uid(user.pk)
         context["token"] = default_token_generator.make_token(user)
         context["url"] = settings.ACTIVATION_URL.format(**context)
