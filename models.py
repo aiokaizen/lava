@@ -349,7 +349,9 @@ class Notification(models.Model):
     
     def get_target_devices(self):
         target_users = self.get_target_users()
-        return list(itertools.chain(target_users.values_list('device_id_list', flat=True)))
+        devices_lists = list(target_users.values_list('device_id_list', flat=True))
+        return list(itertools.chain(*devices_lists))
+        
 
     def create(self, target_users=None, target_groups=None):
         if not target_users and not target_groups:
