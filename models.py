@@ -349,7 +349,7 @@ class Notification(models.Model):
     
     def get_target_devices(self):
         target_users = self.get_target_users()
-        return itertools.chain(target_users.values_list('device_id_list', flat=True))
+        return list(itertools.chain(target_users.values_list('device_id_list', flat=True)))
 
     def create(self, target_users=None, target_groups=None):
         if not target_users and not target_groups:
@@ -396,7 +396,11 @@ class Notification(models.Model):
         registration_tokens = self.get_target_devices()
         dataObject = None
         android_configs = messaging.AndroidConfig(
-            priority="high"
+            priority="high",
+            notification=messaging.AndroidNotification(
+                # click_action=self.url or None,
+                priority='high',
+            )
         )
         message = messaging.MulticastMessage(
             notification=messaging.Notification(
@@ -411,10 +415,9 @@ class Notification(models.Model):
         # Send a message to the device corresponding to the provided
         # registration tokens.
         try:
-            response = messaging.send_multicast(message)
+            messaging.send_multicast(message)
         except Exception as e:
             logging.error(e)
             return Result(False, str(e))
 
-        logging.info('Successfully sent message:', response)
         return Result(True)
