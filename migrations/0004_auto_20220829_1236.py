@@ -7,31 +7,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
-        ('lava', '0003_user_tmp_pwd'),
+        ("auth", "0012_alter_user_first_name_max_length"),
+        ("lava", "0003_user_tmp_pwd"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='notification',
-            options={'ordering': ('-date',), 'verbose_name': 'Notification', 'verbose_name_plural': 'Notifications'},
+            name="notification",
+            options={
+                "ordering": ("-date",),
+                "verbose_name": "Notification",
+                "verbose_name_plural": "Notifications",
+            },
         ),
         migrations.RemoveField(
-            model_name='notification',
-            name='target_groups',
+            model_name="notification",
+            name="target_groups",
         ),
         migrations.AddField(
-            model_name='notification',
-            name='target_groups',
-            field=models.ManyToManyField(blank=True, related_name='notifications', to='auth.Group'),
+            model_name="notification",
+            name="target_groups",
+            field=models.ManyToManyField(
+                blank=True, related_name="notifications", to="auth.Group"
+            ),
         ),
         migrations.RemoveField(
-            model_name='notification',
-            name='target_users',
+            model_name="notification",
+            name="target_users",
         ),
         migrations.AddField(
-            model_name='notification',
-            name='target_users',
-            field=models.ManyToManyField(blank=True, related_name='notifications', to=settings.AUTH_USER_MODEL),
+            model_name="notification",
+            name="target_users",
+            field=models.ManyToManyField(
+                blank=True, related_name="notifications", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

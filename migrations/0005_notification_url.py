@@ -7,13 +7,19 @@ import lava.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0004_auto_20220829_1236'),
+        ("lava", "0004_auto_20220829_1236"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='url',
-            field=models.URLField(blank=True, default='', help_text='Action URL', validators=[lava.validators.SchemelessURLValidator()], verbose_name='URL'),
+            model_name="notification",
+            name="url",
+            field=models.URLField(
+                blank=True,
+                default="",
+                help_text="Action URL",
+                validators=[lava.validators.SchemelessURLValidator()],
+                verbose_name="URL",
+            ),
         ),
     ]

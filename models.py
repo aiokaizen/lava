@@ -6,11 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.models import (
-    AbstractUser,
-    Group,  # as BaseGroup,
-    Permission
-)
+from django.contrib.auth.models import AbstractUser, Group, Permission  # as BaseGroup,
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -19,8 +15,10 @@ from firebase_admin import messaging
 from lava import settings as lava_settings
 from lava import validators as lava_validators
 from lava.utils import (
-    get_user_cover_filename, get_user_photo_filename,
-    Result, generate_password
+    get_user_cover_filename,
+    get_user_photo_filename,
+    Result,
+    generate_password,
 )
 
 
@@ -31,10 +29,8 @@ class Preferences(models.Model):
         ("cards", _("Cards")),
     )
 
-    MENU_LAYOUT_CHOICES = (
-        ("default", _("Default")),
-    )
-    
+    MENU_LAYOUT_CHOICES = (("default", _("Default")),)
+
     LANGUAGE_CHOICES = (
         ("en", _("English")),
         ("fr", _("Français")),
@@ -48,13 +44,20 @@ class Preferences(models.Model):
 
     font_style = models.JSONField(_("Font style"), blank=True, default=dict)
     dark_theme = models.BooleanField(_("Dark theme on?"), default=False)
-    list_layout = models.CharField(_("List layout"), max_length=8, choices=LIST_LAYOUT_CHOICES, default="list")
-    menu_layout = models.CharField(_("Menu layout"), max_length=16, choices=MENU_LAYOUT_CHOICES, default="default")
-    language = models.CharField(_("Language"), max_length=2, choices=LANGUAGE_CHOICES, default="en")
+    list_layout = models.CharField(
+        _("List layout"), max_length=8, choices=LIST_LAYOUT_CHOICES, default="list"
+    )
+    menu_layout = models.CharField(
+        _("Menu layout"), max_length=16, choices=MENU_LAYOUT_CHOICES, default="default"
+    )
+    language = models.CharField(
+        _("Language"), max_length=2, choices=LANGUAGE_CHOICES, default="en"
+    )
     notifications_settings = models.JSONField(
         _("Notifications settings"),
-        blank=True, default=dict,
-        validators=[lava_validators.validate_notifications_settings]
+        blank=True,
+        default=dict,
+        validators=[lava_validators.validate_notifications_settings],
     )
 
     def __str__(self):
@@ -68,66 +71,86 @@ class Preferences(models.Model):
 
 
 class User(AbstractUser):
-
     class Meta(AbstractUser.Meta):
-        ordering = ('-date_joined', 'last_name', 'first_name')
+        ordering = ("-date_joined", "last_name", "first_name")
 
     user_permissions = models.ManyToManyField(
         Permission,
-        verbose_name=_('user permissions'),
+        verbose_name=_("user permissions"),
         blank=True,
-        help_text=_('Specific permissions for this user.'),
+        help_text=_("Specific permissions for this user."),
         related_name="users",
         related_query_name="user",
     )
 
     groups = models.ManyToManyField(
         Group,
-        verbose_name=_('groups'),
+        verbose_name=_("groups"),
         blank=True,
         help_text=_(
-            'The groups this user belongs to. A user will get all permissions '
-            'granted to each of their groups.'
+            "The groups this user belongs to. A user will get all permissions "
+            "granted to each of their groups."
         ),
         related_name="users",
         related_query_name="user",
     )
 
-    photo = models.ImageField(_("Photo"), upload_to=get_user_photo_filename, blank=True, null=True)
+    photo = models.ImageField(
+        _("Photo"), upload_to=get_user_photo_filename, blank=True, null=True
+    )
     birth_day = models.DateField(_("Birth day"), blank=True, null=True)
-    gender = models.CharField(_("Gender"), max_length=1, choices=lava_settings.GENDER_CHOICES, blank=True, default='')
+    gender = models.CharField(
+        _("Gender"),
+        max_length=1,
+        choices=lava_settings.GENDER_CHOICES,
+        blank=True,
+        default="",
+    )
     country = models.CharField(_("Country"), max_length=64, blank=True, default="")
     city = models.CharField(_("City"), max_length=64, blank=True, default="")
     address = models.TextField(_("Street address"), blank=True, default="")
-    phone_number = models.CharField(_("Phone number"), max_length=32, blank=True, default="")
+    phone_number = models.CharField(
+        _("Phone number"), max_length=32, blank=True, default=""
+    )
     fax = models.CharField(_("Fax"), max_length=32, default="", blank=True)
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
-    cover_picture = models.ImageField(_("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True)
-    preferences = models.OneToOneField(Preferences, on_delete=models.PROTECT, blank=True)
-    tmp_pwd = models.CharField(_("Temporary password"), max_length=64, default="", blank=True)
+    cover_picture = models.ImageField(
+        _("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True
+    )
+    preferences = models.OneToOneField(
+        Preferences, on_delete=models.PROTECT, blank=True
+    )
+    tmp_pwd = models.CharField(
+        _("Temporary password"), max_length=64, default="", blank=True
+    )
     device_id_list = models.JSONField(
-        _("Device IDs"), default=list, blank=True,
-        help_text=_("A list of devices the the user is connected from.")
+        _("Device IDs"),
+        default=list,
+        blank=True,
+        help_text=_("A list of devices the the user is connected from."),
     )
 
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
     def groups_names(self):
-        return self.groups.all().values_list('name', flat=True) if self.id else []
-    
+        return self.groups.all().values_list("name", flat=True) if self.id else []
+
     def create(
-        self, photo=None, cover=None, groups=None, password=None,
-        extra_attributes=None, create_associated_objects=True,
-        force_is_active=False, generate_tmp_password=False
+        self,
+        photo=None,
+        cover=None,
+        groups=None,
+        password=None,
+        extra_attributes=None,
+        create_associated_objects=True,
+        force_is_active=False,
+        generate_tmp_password=False,
     ):
 
         if self.id:
-            return Result(
-                success=False,
-                message=_("User is already created.")
-            )
+            return Result(success=False, message=_("User is already created."))
 
-        if not hasattr(self, 'preferences'):
+        if not hasattr(self, "preferences"):
             self.preferences = Preferences.objects.create()
 
         if photo or cover or groups:
@@ -150,10 +173,10 @@ class User(AbstractUser):
             tmp_pwd = generate_password(12)
             self.tmp_pwd = tmp_pwd
             self.set_password(tmp_pwd)
-        
+
         if force_is_active:
             self.is_active = True
-        elif settings.DJOSER['SEND_ACTIVATION_EMAIL']:
+        elif settings.DJOSER["SEND_ACTIVATION_EMAIL"]:
             self.is_active = False
 
         self.save()
@@ -175,7 +198,7 @@ class User(AbstractUser):
             success=True,
             message=_("User has been created successfully."),
         )
-    
+
     def validate_password(self, password):
         if not isinstance(password, str):
             return Result(success=False, message=_("`password` must be a string."))
@@ -187,7 +210,7 @@ class User(AbstractUser):
             return Result(
                 success=False, message=_("Invalid password."), errors=e.messages
             )
-    
+
     def create_associated_objects(self, associated_object_attributes={}):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
         groups = self.groups.all()
@@ -195,14 +218,16 @@ class User(AbstractUser):
         if groups.count() != 1:
             return Result(
                 success=False,
-                tag='warning',
-                message=_("This functionnality is not valid for a user with many or no groups."),
+                tag="warning",
+                message=_(
+                    "This functionnality is not valid for a user with many or no groups."
+                ),
             )
         group = groups.first()
         if group.name in model_mapping.keys():
             class_name = model_mapping[group.name]
             klass = apps.get_model(class_name)
-            if 'create' in dir(klass):
+            if "create" in dir(klass):
                 object = klass(user=self)
                 result = object.create(**associated_object_attributes)
                 if not result.success:
@@ -210,8 +235,10 @@ class User(AbstractUser):
             else:
                 object = klass(user=self, **associated_object_attributes)
                 object.save()
-        return Result(success=True, message=_("Accossiated object was created successfully."))
-    
+        return Result(
+            success=True, message=_("Accossiated object was created successfully.")
+        )
+
     def update(self, update_fields=None, extra_attributes=None):
         groups = self.groups.all()
         if groups and groups.count() == 1 and extra_attributes:
@@ -223,11 +250,8 @@ class User(AbstractUser):
                 return Result(success=False, message=str(e))
 
         self.save(update_fields=update_fields)
-        return Result(
-            success=True,
-            message=_("User has been updated successfully.")
-        )
-    
+        return Result(success=True, message=_("User has been updated successfully."))
+
     def update_associated_objects(self, associated_object_attributes={}):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
         groups = self.groups.all()
@@ -235,128 +259,146 @@ class User(AbstractUser):
         if groups.count() != 1:
             return Result(
                 success=False,
-                tag='warning',
-                message=_("This functionnality is not valid for a user with many or no groups."),
+                tag="warning",
+                message=_(
+                    "This functionnality is not valid for a user with many or no groups."
+                ),
             )
 
         group = groups.first()
         if group.name in model_mapping.keys():
             # Get class name (eg: `manager`) from class path (eg: myapp.Manager)
-            class_name = model_mapping[group.name].split('.')[1].lower()
+            class_name = model_mapping[group.name].split(".")[1].lower()
             object = getattr(self, class_name, None)
             if object is None:
                 return Result(False, _("Invalid group type for this operation."))
-            
+
             for key, value in associated_object_attributes.items():
                 if hasattr(object, key):
                     setattr(object, key, value)
             object.save()
-        return Result(success=True, message=_("Accossiated object was updated successfully."))
-    
+        return Result(
+            success=True, message=_("Accossiated object was updated successfully.")
+        )
+
     def delete(self):
         preferences = self.preferences
-        if hasattr(self, 'customer'):
+        if hasattr(self, "customer"):
             self.customer.delete(delete_user=False)
-        if hasattr(self, 'account'):
+        if hasattr(self, "account"):
             self.account.delete()
 
         super().delete()
         if preferences:
             preferences.delete()
-        return Result(
-            success=True,
-            message=_("User has been deleted successfully")
-        )
+        return Result(success=True, message=_("User has been deleted successfully"))
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
             Q(target_users=self.id) | Q(target_groups__in=self.groups.all())
         )
         return notifications
-    
-    def send_notification(self, title, content, category="alert", url="", target_users=None, target_groups=None, system_alert=False):
+
+    def send_notification(
+        self,
+        title,
+        content,
+        category="alert",
+        url="",
+        target_users=None,
+        target_groups=None,
+        system_alert=False,
+    ):
 
         sender = self if not system_alert else None
 
         notification = Notification(
-            sender=sender,
-            title=title,
-            content=content,
-            category=category,
-            url=url
+            sender=sender, title=title, content=content, category=category, url=url
         )
 
         result = notification.create(
-            target_users=target_users,
-            target_groups=target_groups
+            target_users=target_users, target_groups=target_groups
         )
         if not result.success:
             return result
-        
+
         # Send the notification by e-mail?
 
         # Send the notification via firebase api
         notification.send_firebase_notification()
 
         return Result(True, _("The notification was sent successfully."))
-    
+
     def update_devices(self, device_id):
         if device_id not in self.device_id_list:
             self.device_id_list.append(device_id)
-            self.save(update_fields=['device_id_list'])
+            self.save(update_fields=["device_id_list"])
         return Result(True)
 
 
 class Notification(models.Model):
-
     class Meta:
         verbose_name = _("Notification")
         verbose_name_plural = _("Notifications")
-        ordering = ("-date", )
-    
+        ordering = ("-date",)
+
     # empty sender means that the notification was generated by the system.
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True
+    )
     date = models.DateTimeField(_("Date sent"), auto_now_add=True)
     title = models.CharField(_("Title"), max_length=128)
-    content = models.TextField(_("Content"), blank=True, default='')
+    content = models.TextField(_("Content"), blank=True, default="")
     category = models.CharField(
-        _("Category"), max_length=32, default='alert',
-        choices=lava_settings.NOTIFICATION_CATEGORY_CHOICES
+        _("Category"),
+        max_length=32,
+        default="alert",
+        choices=lava_settings.NOTIFICATION_CATEGORY_CHOICES,
     )
     url = models.CharField(
-        _("URL"), help_text=_("Action URL"), default="", blank=True,
+        _("URL"),
+        help_text=_("Action URL"),
+        default="",
+        blank=True,
         max_length=200,
-        validators=[lava_validators.SchemelessURLValidator()]
+        validators=[lava_validators.SchemelessURLValidator()],
     )
-    target_groups = models.ManyToManyField(Group, related_name='notifications', blank=True)
-    target_users = models.ManyToManyField(User, related_name='notifications', blank=True)
+    target_groups = models.ManyToManyField(
+        Group, related_name="notifications", blank=True
+    )
+    target_users = models.ManyToManyField(
+        User, related_name="notifications", blank=True
+    )
     seen_by = models.JSONField(_("Seen by"), default=list, blank=True)
 
     def __str__(self):
         sender = self.sender if self.sender else "System"
         return f"{sender} : {self.title}"
-    
+
     def seen(self, user):
         return user.id in self.seen_by
-    
+
     def get_target_users(self):
-        """ Returns the sum of target users and the users in the target groups. """
+        """Returns the sum of target users and the users in the target groups."""
         target_users = self.target_users.all()
-        target_users_from_groups = User.objects.filter(groups__in=self.target_groups.all())
+        target_users_from_groups = User.objects.filter(
+            groups__in=self.target_groups.all()
+        )
         target_users = target_users | target_users_from_groups
         target_users = target_users.filter(is_active=True)
         return target_users
-    
+
     def get_target_devices(self):
         target_users = self.get_target_users()
-        devices_lists = list(target_users.values_list('device_id_list', flat=True))
+        devices_lists = list(target_users.values_list("device_id_list", flat=True))
         return list(itertools.chain(*devices_lists))
-        
 
     def create(self, target_users=None, target_groups=None):
         if not target_users and not target_groups:
-            return Result(False, _("You must specify either target users or target groups."))
-        
+            return Result(
+                False, _("You must specify either target users or target groups.")
+            )
+
         self.save()
 
         if target_users:
@@ -366,13 +408,13 @@ class Notification(models.Model):
             self.target_groups.set(target_groups)
 
         return Result(True, _("The notification has been created successfully."))
-    
+
     def mark_as_read(self, user):
-        """ Call this function when a user have seen the notification. """
+        """Call this function when a user have seen the notification."""
         if user.id not in self.seen_by:
             self.seen_by.append(user.id)
             self.save()
-    
+
     @classmethod
     def mark_as_read_bulk(self, notifications, user):
         """
@@ -382,11 +424,11 @@ class Notification(models.Model):
             notification.mark_as_read(user)
 
     def mark_as_not_read(self, user):
-        """ Call this function when a user marks the notification as not read. """
+        """Call this function when a user marks the notification as not read."""
         if user.id in self.seen_by:
             self.seen_by.remove(user.id)
             self.save()
-    
+
     def send_firebase_notification(self):
         """
         Send notification via firebase API.
@@ -401,14 +443,11 @@ class Notification(models.Model):
             priority="high",
             notification=messaging.AndroidNotification(
                 # click_action=self.url or None,
-                priority='high',
-            )
+                priority="high",
+            ),
         )
         message = messaging.MulticastMessage(
-            notification=messaging.Notification(
-                title=self.title,
-                body=self.content
-            ),
+            notification=messaging.Notification(title=self.title, body=self.content),
             data=dataObject,
             tokens=registration_tokens,
             android=android_configs,

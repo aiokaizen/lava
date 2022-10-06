@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0002_alter_user_address'),
+        ("lava", "0002_alter_user_address"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='tmp_pwd',
-            field=models.CharField(blank=True, default='', max_length=64, verbose_name='Temporary password'),
+            model_name="user",
+            name="tmp_pwd",
+            field=models.CharField(
+                blank=True, default="", max_length=64, verbose_name="Temporary password"
+            ),
         ),
     ]

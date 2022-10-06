@@ -14,28 +14,62 @@ class UserAdmin(auth_admin.UserAdmin):
 
     form = LavaUserChangeForm
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'tmp_pwd')}),
-        (_('Personal info'), {'fields': (
-            'photo', 'first_name', 'last_name',
-            'birth_day', 'gender', 'job', 'email',
-            'phone_number', 'country', 'city', 'address',
-            'device_id_list'
-        )}),
-        (_('Preferences'), {
-            'fields': ('cover_picture', 'preferences'),
-        }),
-        (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-        }),
-        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (None, {"fields": ("username", "password", "tmp_pwd")}),
+        (
+            _("Personal info"),
+            {
+                "fields": (
+                    "photo",
+                    "first_name",
+                    "last_name",
+                    "birth_day",
+                    "gender",
+                    "job",
+                    "email",
+                    "phone_number",
+                    "country",
+                    "city",
+                    "address",
+                    "device_id_list",
+                )
+            },
+        ),
+        (
+            _("Preferences"),
+            {
+                "fields": ("cover_picture", "preferences"),
+            },
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    readonly_fields = ['tmp_pwd']
-    
-    list_display = ('thumbnail', 'username', 'email', 'first_name', 'last_name', 'is_staff')
+    readonly_fields = ["tmp_pwd"]
+
+    list_display = (
+        "thumbnail",
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+    )
 
     def thumbnail(self, object):
-        url = object.photo.url if object.photo else (
-            '/static/ektools/assets/img/user_avatar.png'
+        url = (
+            object.photo.url
+            if object.photo
+            else ("/static/ektools/assets/img/user_avatar.png")
         )
         style = f"""
             width: 30px; height: 30px; border-radius:50%; background-color: #fafafa;
@@ -43,8 +77,8 @@ class UserAdmin(auth_admin.UserAdmin):
             background-size: cover;
         """
         return format_html(f'<div style="{style}"></div>')
-    
-    thumbnail.short_description = ''
+
+    thumbnail.short_description = ""
 
     def save_model(self, request, obj, form, change):
         if not change:  # Creation
@@ -54,14 +88,14 @@ class UserAdmin(auth_admin.UserAdmin):
             if not result.success:
                 raise Exception(result.message)
         elif obj is not None:  # Modification
-            if 'groups' in form.changed_data:
+            if "groups" in form.changed_data:
                 # Remove groups from changed_data because .save() method does not accept related fields
                 # to be passed in the update_fields parameter.
-                form.changed_data.remove('groups')
+                form.changed_data.remove("groups")
             result = obj.update(update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
-        
+
 
 # @admin.register(Group)
 # class GroupAdmin(admin.ModelAdmin):
@@ -75,7 +109,7 @@ class PermissionAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    icon_name = 'notifications'
+    icon_name = "notifications"
 
 
 @admin.register(Preferences)

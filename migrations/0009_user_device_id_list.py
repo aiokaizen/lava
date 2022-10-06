@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0008_notification_seen_by'),
+        ("lava", "0008_notification_seen_by"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='device_id_list',
-            field=models.JSONField(blank=True, default=list, help_text='A list of devices the the user is connected from.', verbose_name='Device IDs'),
+            model_name="user",
+            name="device_id_list",
+            field=models.JSONField(
+                blank=True,
+                default=list,
+                help_text="A list of devices the the user is connected from.",
+                verbose_name="Device IDs",
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0007_alter_notification_url'),
+        ("lava", "0007_alter_notification_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='seen_by',
-            field=models.JSONField(blank=True, default=list, verbose_name='Seen by'),
+            model_name="notification",
+            name="seen_by",
+            field=models.JSONField(blank=True, default=list, verbose_name="Seen by"),
         ),
     ]

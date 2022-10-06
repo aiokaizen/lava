@@ -7,13 +7,20 @@ import lava.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0006_preferences_notifications_settings'),
+        ("lava", "0006_preferences_notifications_settings"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='url',
-            field=models.CharField(blank=True, default='', help_text='Action URL', max_length=200, validators=[lava.validators.SchemelessURLValidator()], verbose_name='URL'),
+            model_name="notification",
+            name="url",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Action URL",
+                max_length=200,
+                validators=[lava.validators.SchemelessURLValidator()],
+                verbose_name="URL",
+            ),
         ),
     ]

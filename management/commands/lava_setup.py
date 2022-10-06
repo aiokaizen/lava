@@ -14,14 +14,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Create the superadmin and the `ADMINS` group if they don't exist
         try:
-            ekadmin = User.objects.get(username='ekadmin')
+            ekadmin = User.objects.get(username="ekadmin")
             logging.warning("superuser ekadmin already exists!")
         except User.DoesNotExist:
             group, _ = Group.objects.get_or_create(name="ADMINS")
             ekadmin = User(
-                username='ekadmin', email="admin@ekblocks.com",
-                first_name="EKBlocks", last_name="Administrator",
-                is_staff=True, is_superuser=True
+                username="ekadmin",
+                email="admin@ekblocks.com",
+                first_name="EKBlocks",
+                last_name="Administrator",
+                is_staff=True,
+                is_superuser=True,
             )
             ekadmin.create(groups=[group], password="admin_pass", force_is_active=True)
             logging.info("ekadmin was created successfully!")

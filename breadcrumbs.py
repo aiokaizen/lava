@@ -1,15 +1,12 @@
-
-
 class Page:
-
-    def __init__(self, title, label='', url='', parent=None, is_root=False):
+    def __init__(self, title, label="", url="", parent=None, is_root=False):
         self.title = title
-        self.label = ''
+        self.label = ""
         self.is_root = is_root
         self.set_label(label)
         self.url = url
         self.set_parent(parent)
-    
+
     def __str__(self):
         return self.label or self.title
 
@@ -23,8 +20,9 @@ class Page:
                 self.parent = parent
             else:
                 raise Exception(
-                    "Parent has to be an instance of the class 'Page', not a '" +
-                    str(parent.__class__) + "' instance."
+                    "Parent has to be an instance of the class 'Page', not a '"
+                    + str(parent.__class__)
+                    + "' instance."
                 )
 
 
@@ -47,7 +45,7 @@ def get_page(breadcrumb_id):
 
 
 # Define site structure
-breadcrumbs = {'home': Page(title='Home - Lava', label='Home', is_root=True)}
+breadcrumbs = {"home": Page(title="Home - Lava", label="Home", is_root=True)}
 
 # breadcrumbs['profile_details'] = Page(title='Profile', label='Profile', parent=breadcrumbs['home'])
 # breadcrumbs['profile_change'] = Page(title='Update Profile', label='Update profile', parent=breadcrumbs['profile_details'])

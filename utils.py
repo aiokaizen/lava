@@ -15,21 +15,23 @@ from firebase_admin import credentials
 
 from lava import settings as lava_settings
 
+
 class imdict(dict):
-    """ Immutable dictionary. """
+    """Immutable dictionary."""
+
     def __hash__(self):
         return id(self)
 
     def _immutable(self, *args, **kws):
-        raise TypeError('This object is immutable')
+        raise TypeError("This object is immutable")
 
     __setitem__ = _immutable
     __delitem__ = _immutable
-    clear       = _immutable
-    update      = _immutable
-    setdefault  = _immutable
-    pop         = _immutable
-    popitem     = _immutable
+    clear = _immutable
+    update = _immutable
+    setdefault = _immutable
+    pop = _immutable
+    popitem = _immutable
 
 
 class odict(dict):
@@ -42,6 +44,7 @@ class odict(dict):
     >>> user['password']
     secret_pass
     """
+
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
         for key, value in kwargs.items():
@@ -54,16 +57,23 @@ class Result(imdict):
     both Success and Error results from functions and APIs.
     """
 
-    def __init__(self, success:bool, message:str='', instance=None, errors:dict=None, tag:str=None):
+    def __init__(
+        self,
+        success: bool,
+        message: str = "",
+        instance=None,
+        errors: dict = None,
+        tag: str = None,
+    ):
         self.success = success
         self.message = message
         self.instance = instance
         self.tag = tag
         if not self.tag:
-            self.tag = 'success' if success else 'error'
+            self.tag = "success" if success else "error"
         self.errors = errors
         dict.__init__(self, success=success, message=message, errors=errors)
-    
+
     @classmethod
     def from_dict(cls, result_dict):
         if "success" not in result_dict or "message" not in result_dict:
@@ -76,39 +86,39 @@ class Result(imdict):
             result_dict.get("errors", None),
             result_dict.get("tag", None),
         )
-    
+
     def to_dict(self):
-        res_dict = {
-            "success": self.success,
-            "tag": self.tag,
-            "message": self.message
-        }
+        res_dict = {"success": self.success, "tag": self.tag, "message": self.message}
         if not self.success:
             res_dict["errors"] = self.errors or []
         return res_dict
 
 
 def mask_number(n):
-    """ This function disguises an ID before using it in a public context. """
+    """This function disguises an ID before using it in a public context."""
     if isinstance(n, int):
         return n + 747251
     return n
+
 
 def unmask_number(mask):
     if isinstance(mask, int):
         return mask - 747251
     return mask
 
+
 # Handle Uploaded file names
 def get_user_cover_filename(instance, filename):
-    ext = filename.split('.')[-1]
+    ext = filename.split(".")[-1]
     folder = "user/{}".format(mask_number(instance.id))
-    return '{}/cover_picture.{}'.format(folder, ext)
+    return "{}/cover_picture.{}".format(folder, ext)
+
 
 def get_user_photo_filename(instance, filename):
-    ext = filename.split('.')[-1]
+    ext = filename.split(".")[-1]
     folder = "user/{}".format(mask_number(instance.id))
-    return '{}/profile_picture.{}'.format(folder, ext)
+    return "{}/profile_picture.{}".format(folder, ext)
+
 
 def handle_excel_file(file, start_row=1, extract_columns=[]):
     """
@@ -126,15 +136,17 @@ def handle_excel_file(file, start_row=1, extract_columns=[]):
     >>>     ]
     >>>     data = handle_excel_file(f, start_row, column_names)
     """
-    extract_columns = [
-        slugify(name) for name in extract_columns
-    ] if extract_columns else None
+    extract_columns = (
+        [slugify(name) for name in extract_columns] if extract_columns else None
+    )
 
     column_names = []  # This list will be extracted from the file and then slugified.
 
     for column_name in extract_columns:
         if column_name not in column_names:
-            raise ValidationError(_("The uploaded file does not contain `email` column."))
+            raise ValidationError(
+                _("The uploaded file does not contain `email` column.")
+            )
 
     # return odict object with the following format:
     # {
@@ -150,17 +162,14 @@ def handle_excel_file(file, start_row=1, extract_columns=[]):
     return file
 
 
-def send_html_email(request, template, recipients, sender=None, context={}, fail_silently=False):
+def send_html_email(
+    request, template, recipients, sender=None, context={}, fail_silently=False
+):
 
-    email = BaseEmailMessage(
-        request, context=context, template_name=template
-    )
+    email = BaseEmailMessage(request, context=context, template_name=template)
 
-    email.send(
-        to=recipients,
-        from_email=sender,
-        fail_silently=fail_silently
-    )
+    email.send(to=recipients, from_email=sender, fail_silently=fail_silently)
+
 
 # Othr things
 def get_log_filepath():
@@ -174,34 +183,34 @@ def get_log_filepath():
 
 
 def generate_password(length=8, include_special_characters=True):
-    lower_alphabets = 'abcdefghijklmnopqrstuvwxyz'
+    lower_alphabets = "abcdefghijklmnopqrstuvwxyz"
     upper_alphabets = lower_alphabets.upper()
-    numbers = '1234567890'
-    special_characters = '-_!?.^*@#$%'
+    numbers = "1234567890"
+    special_characters = "-_!?.^*@#$%"
     pool = lower_alphabets + upper_alphabets + numbers
     if include_special_characters:
         pool += special_characters
-    
-    random_password = ''.join(random.SystemRandom().choices(pool, k=length))
+
+    random_password = "".join(random.SystemRandom().choices(pool, k=length))
     return random_password
 
 
 def generate_username(email="", first_name="", last_name=""):
-    """ Geneartes a random username from user data. """
+    """Geneartes a random username from user data."""
     if email:
-        username = email.split('@')[0]
+        username = email.split("@")[0]
         if _is_username_valid(username):
             return username
 
     if first_name:
-        username = slugify(first_name, separator='')
+        username = slugify(first_name, separator="")
         if last_name:
             username += f".{slugify(last_name, separator='')}"
         if _is_username_valid(username):
             return username
-    
+
     while True:
-        suffix = ''.join(random.SystemRandom().choices('1234567890', k=5))
+        suffix = "".join(random.SystemRandom().choices("1234567890", k=5))
         username = f"controller_{suffix}"
         if _is_username_valid(username):
             return username
@@ -209,6 +218,7 @@ def generate_username(email="", first_name="", last_name=""):
 
 def _is_username_valid(username):
     from lava.models import User
+
     try:
         User.objects.get(username=username)
         return False
@@ -224,10 +234,10 @@ def init_firebase():
 
     try:
         creds = credentials.Certificate(creds_file_path)
-        print('creds:', creds)
+        print("creds:", creds)
         # cred = credentials.RefreshToken(creds_file_path)
         default_app = firebase_admin.initialize_app(creds)
-        print('app name:', default_app.name)
+        print("app name:", default_app.name)
         return Result(True)
     except Exception as e:
         logging.error(e)

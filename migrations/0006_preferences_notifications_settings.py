@@ -7,13 +7,18 @@ import lava.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0005_notification_url'),
+        ("lava", "0005_notification_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='preferences',
-            name='notifications_settings',
-            field=models.JSONField(blank=True, default=dict, validators=[lava.validators.validate_notifications_settings], verbose_name='Notifications settings'),
+            model_name="preferences",
+            name="notifications_settings",
+            field=models.JSONField(
+                blank=True,
+                default=dict,
+                validators=[lava.validators.validate_notifications_settings],
+                verbose_name="Notifications settings",
+            ),
         ),
     ]

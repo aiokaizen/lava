@@ -8,8 +8,10 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from lava.messages import HTTP_403_MESSAGE
 
 from lava.serializers import (
-    ChangePasswordFormSerializer, UserSerializer,
-    NotificationSerializer, PreferencesSerializer
+    ChangePasswordFormSerializer,
+    UserSerializer,
+    NotificationSerializer,
+    PreferencesSerializer,
 )
 from lava.models import Notification, Preferences, User
 from lava.utils import Result
@@ -20,6 +22,7 @@ class UserListCreate(generics.ListCreateAPIView):
     """
     API endpoint that allows users to be listed or created.
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
@@ -29,35 +32,33 @@ class UserRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     """
     API endpoint that allows users to be viewed, edited, or deleted.
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def delete(self, request, *args, **kwargs):
-        user = get_object_or_404(User, pk=kwargs.get('pk'))
+        user = get_object_or_404(User, pk=kwargs.get("pk"))
         result = user.delete()
         return Response(result.to_dict(), status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def update_device_id(request):
-    device_id = request.data.get('device_id')
+    device_id = request.data.get("device_id")
     if not device_id:
         return Response(
             Result(False, _("'device_id' field is mandatory.")).to_dict(),
-            status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
     user = request.user
     result = user.update_devices(device_id)
     return Response(result.to_dict())
 
 
-class PreferencesViewSet(
-    mixins.ListModelMixin,
-    GenericViewSet
-):
+class PreferencesViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = Preferences.objects.none()
     serializer_class = PreferencesSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -75,7 +76,7 @@ class PreferencesViewSet(
         preferences = self.get_object()
         serializer = self.get_serializer(preferences)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=["POST"])
     def set(self, request):
         self.user = request.user
@@ -86,8 +87,8 @@ class PreferencesViewSet(
         return Response(serializer.data)
 
 
-@api_view(('PUT', ))
-@permission_classes((permissions.IsAdminUser, ))
+@api_view(("PUT",))
+@permission_classes((permissions.IsAdminUser,))
 def change_password(request, pk):
     instance = get_object_or_404(User, pk=pk)
     serializer = ChangePasswordFormSerializer(instance, data=request.data)
@@ -111,7 +112,7 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         # if self.action == 'scan_ticket':
         #     permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
-    
+
     def list(self, request, *args, **kwargs):
         self.user = request.user
         queryset = self.filter_queryset(self.get_queryset())
@@ -132,7 +133,7 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         Notification.mark_as_read_bulk(queryset, self.user)
 
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=["POST"])
     def send(self, request, *args, **kwargs):
         user = request.user
@@ -147,14 +148,14 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
 
-@api_view(('GET', ))
-@permission_classes((permissions.AllowAny, ))
+@api_view(("GET",))
+@permission_classes((permissions.AllowAny,))
 def maintenance(request):
     data = {
         "maintenance_mode": True,
         "message": _(
             "This site is under maintenance. Our team is working hard "
             "to resolve the issues as soon as possible. Please come back later."
-        )
+        ),
     }
     return Response(data, status=status.HTTP_307_TEMPORARY_REDIRECT)

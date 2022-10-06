@@ -20,7 +20,7 @@ def in_range_2(current, index):
     return in_range(current, index, 2)
 
 
-@register.filter('get_page')
+@register.filter("get_page")
 def get_page_from_id(breadcrumb_id):
     page = get_page(breadcrumb_id)
     return page
@@ -33,14 +33,14 @@ def get_breadcrumbs(breadcrumb_id, path):
     if page:
         parents = get_parents(page)
         index = 0
-        parent_url = ''
+        parent_url = ""
         # if len(parents) > depth:
         #     index = len(parents) - depth
         #     parent_url = '/'
         #     parents = parents[-depth:]
-        path_fragments = path.split('/')
+        path_fragments = path.split("/")
         for parent in parents:
-            parent_url += path_fragments[index] + '/'
+            parent_url += path_fragments[index] + "/"
             parent.url = parent_url
             index += 1
         return parents, page.label

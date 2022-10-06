@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lava', '0001_initial'),
+        ("lava", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='address',
-            field=models.TextField(blank=True, default='', verbose_name='Street address'),
+            model_name="user",
+            name="address",
+            field=models.TextField(
+                blank=True, default="", verbose_name="Street address"
+            ),
         ),
     ]
