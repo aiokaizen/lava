@@ -234,10 +234,8 @@ def init_firebase():
 
     try:
         creds = credentials.Certificate(creds_file_path)
-        print("creds:", creds)
         # cred = credentials.RefreshToken(creds_file_path)
         default_app = firebase_admin.initialize_app(creds)
-        print("app name:", default_app.name)
         return Result(True)
     except Exception as e:
         logging.error(e)
