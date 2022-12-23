@@ -61,9 +61,10 @@ class Result(imdict):
         self,
         success: bool,
         message: str = "",
-        instance=None,
+        instance: any = None,
         errors: dict = None,
         tag: str = None,
+        error_code: str = "",
     ):
         self.success = success
         self.message = message
@@ -71,7 +72,10 @@ class Result(imdict):
         self.tag = tag
         if not self.tag:
             self.tag = "success" if success else "error"
+        self.is_error = True if self.tag == "error" else False
+        self.is_warning = True if self.tag in ["warn", "warning"] else False
         self.errors = errors
+        self.error_code = error_code
         dict.__init__(self, success=success, message=message, errors=errors)
 
     @classmethod
@@ -85,12 +89,18 @@ class Result(imdict):
             result_dict.get("instance", None),
             result_dict.get("errors", None),
             result_dict.get("tag", None),
+            result_dict.get("error_code", None),
         )
 
     def to_dict(self):
-        res_dict = {"success": self.success, "tag": self.tag, "message": self.message}
+        res_dict = {
+            "success": self.success,
+            "tag": self.tag,
+            "message": self.message
+        }
         if not self.success:
             res_dict["errors"] = self.errors or []
+            res_dict["error_code"] = self.error_code
         return res_dict
 
 

@@ -14,6 +14,8 @@ from firebase_admin import messaging
 
 from lava import settings as lava_settings
 from lava import validators as lava_validators
+from lava.error_codes import UNIMPLEMENTED, UNKNOWN
+from lava.messages import UNKNOWN_ERROR_MESSAGE
 from lava.utils import (
     get_user_cover_filename,
     get_user_photo_filename,
@@ -130,6 +132,7 @@ class User(AbstractUser):
         help_text=_("A list of devices the the user is connected from."),
     )
 
+    deleted_at = models.DateTimeField(_("Deleted at"), null=True)
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
     def groups_names(self):
@@ -145,10 +148,11 @@ class User(AbstractUser):
         create_associated_objects=True,
         force_is_active=False,
         generate_tmp_password=False,
+        link_payments_app=True,
     ):
 
         if self.id:
-            return Result(success=False, message=_("User is already created."))
+            return Result(success=False, message=_("User is already created."), tag="warning")
 
         if not hasattr(self, "preferences"):
             self.preferences = Preferences.objects.create()
@@ -165,14 +169,12 @@ class User(AbstractUser):
         if password is not None:
             result = self.validate_password(password)
             if not result.success:
-                if self.id:
-                    self.delete()
+                self.delete()
                 return result
-            self.set_password(password)
         elif generate_tmp_password:
-            tmp_pwd = generate_password(12)
-            self.tmp_pwd = tmp_pwd
-            self.set_password(tmp_pwd)
+            password = generate_password(12)
+            self.tmp_pwd = password
+        self.set_password(password)
 
         if force_is_active:
             self.is_active = True
@@ -180,6 +182,15 @@ class User(AbstractUser):
             self.is_active = False
 
         self.save()
+
+        if link_payments_app:
+            res = self.link_payments_app()
+            if res.is_error:
+                self.delete()
+                return res
+            elif res.error_code == UNIMPLEMENTED:
+                self.delete()
+                raise Exception(res.to_dict())
 
         # Refresh groups from db in case the groups param was not passed and the groups
         # attribute was already assigned before calling .create() method.
@@ -192,56 +203,97 @@ class User(AbstractUser):
                     return result
             except Exception as e:
                 self.delete()
-                return Result(success=False, message=str(e))
+                logging.error(e)
+                return Result(success=False, message=UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN)
 
         return Result(
             success=True,
             message=_("User has been created successfully."),
         )
 
-    def validate_password(self, password):
-        if not isinstance(password, str):
-            return Result(success=False, message=_("`password` must be a string."))
+    def link_payments_app(self):
+        if "payments" not in settings.INSTALLED_APPS:
+            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
 
+        res = self.create_account()
+        if res.is_error:
+            return res
+
+        res = self.create_braintree_customer()
+        if res.is_error:
+            return res
+
+        return Result(True, _("Payments application was implemented successfully."))
+
+    def create_account(self):
+        if "payments" not in settings.INSTALLED_APPS:
+            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
+        if hasattr(self, "account"):
+            return Result(False, _("Account already created"), tag="warning")
+
+        from payments.models import Account
+
+        account = Account(user=self)
+        result = account.create()
+        if result.is_error:
+            return result
+        self.account = account
+        return Result(True, _("Associated account was created successfully."))
+
+    def create_braintree_customer(self):
+        if "payments" not in settings.INSTALLED_APPS:
+            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
+        if hasattr(self, "customer"):
+            return Result(False, _("Customer already created"), tag="warning")
+
+        from payments.models import Customer
+
+        bt_customer = Customer(user=self)
         try:
-            validate_password(password, User)
-            return Result(success=True, message=_("User password is valid."))
-        except ValidationError as e:
-            return Result(
-                success=False, message=_("Invalid password."), errors=e.messages
-            )
+            result = bt_customer.create()
+            if result.is_error:
+                return result
+            self.customer = bt_customer
+            return Result(True, _("Associated BrainTree customer was created successfully."))
+        except Exception as e:
+            logging.error(e)
+            return Result(False, _(
+                    "Unable to connect to one of our servers, "
+                    "please try again later. We apologize for the inconvenience."
+                ),)
 
-    def create_associated_objects(self, associated_object_attributes={}):
+    def create_associated_objects(self, associated_object_attributes=None):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
         groups = self.groups.all()
         associated_object_attributes = associated_object_attributes or {}
         if groups.count() != 1:
             return Result(
                 success=False,
-                tag="warning",
                 message=_(
-                    "This functionnality is not valid for a user with many or no groups."
+                    "This functionality is not valid for a user with many or no groups."
                 ),
+                tag="warning",
+                error_code=UNIMPLEMENTED
             )
         group = groups.first()
         if group.name in model_mapping.keys():
             class_name = model_mapping[group.name]
             klass = apps.get_model(class_name)
             if "create" in dir(klass):
-                object = klass(user=self)
-                result = object.create(**associated_object_attributes)
+                obj = klass(user=self)
+                result = obj.create(**associated_object_attributes)
                 if not result.success:
                     return result
             else:
-                object = klass(user=self, **associated_object_attributes)
-                object.save()
+                obj = klass(user=self, **associated_object_attributes)
+                obj.save()
         return Result(
-            success=True, message=_("Accossiated object was created successfully.")
+            success=True, message=_("Associated object was created successfully.")
         )
 
     def update(self, update_fields=None, extra_attributes=None):
         groups = self.groups.all()
-        if groups and groups.count() == 1 and extra_attributes:
+        if extra_attributes and groups and groups.count() == 1:
             try:
                 result = self.update_associated_objects(extra_attributes)
                 if not result.success:
@@ -252,7 +304,7 @@ class User(AbstractUser):
         self.save(update_fields=update_fields)
         return Result(success=True, message=_("User has been updated successfully."))
 
-    def update_associated_objects(self, associated_object_attributes={}):
+    def update_associated_objects(self, associated_object_attributes=None):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
         groups = self.groups.all()
         associated_object_attributes = associated_object_attributes or {}
@@ -261,33 +313,38 @@ class User(AbstractUser):
                 success=False,
                 tag="warning",
                 message=_(
-                    "This functionnality is not valid for a user with many or no groups."
+                    "This functionality is not valid for a user with many or no groups."
                 ),
+                error_code=UNIMPLEMENTED
             )
 
         group = groups.first()
         if group.name in model_mapping.keys():
             # Get class name (eg: `manager`) from class path (eg: myapp.Manager)
             class_name = model_mapping[group.name].split(".")[1].lower()
-            object = getattr(self, class_name, None)
-            if object is None:
+            obj = getattr(self, class_name, None)
+            if obj is None:
                 return Result(False, _("Invalid group type for this operation."))
 
             for key, value in associated_object_attributes.items():
-                if hasattr(object, key):
-                    setattr(object, key, value)
-            object.save()
+                if hasattr(obj, key):
+                    setattr(obj, key, value)
+            obj.save()
         return Result(
-            success=True, message=_("Accossiated object was updated successfully.")
+            success=True, message=_("Associated object was updated successfully.")
         )
 
-    def delete(self):
-        preferences = self.preferences
+    def delete(self, *args, **kwargs):
+        if not self.id:
+            return Result(False, _("User is already deleted"), tag="warning")
+
+        # Unlink from payments app
         if hasattr(self, "customer"):
             self.customer.delete(delete_user=False)
         if hasattr(self, "account"):
             self.account.delete()
 
+        preferences = self.preferences
         super().delete()
         if preferences:
             preferences.delete()
@@ -334,6 +391,19 @@ class User(AbstractUser):
             self.device_id_list.append(device_id)
             self.save(update_fields=["device_id_list"])
         return Result(True)
+
+    @classmethod
+    def validate_password(cls, password):
+        if not isinstance(password, str):
+            return Result(success=False, message=_("`password` must be a string."))
+
+        try:
+            validate_password(password, User)
+            return Result(success=True, message=_("User password is valid."))
+        except ValidationError as e:
+            return Result(
+                success=False, message=_("Invalid password."), errors=e.messages
+            )
 
 
 class Notification(models.Model):
@@ -416,7 +486,7 @@ class Notification(models.Model):
             self.save()
 
     @classmethod
-    def mark_as_read_bulk(self, notifications, user):
+    def mark_as_read_bulk(cls, notifications, user):
         """
         Marks many notifications as read by the user.
         """
@@ -434,11 +504,11 @@ class Notification(models.Model):
         Send notification via firebase API.
         """
         if not lava_settings.FIREBASE_ACTIVATED:
-            logging.warn("Firebase is not activated.")
+            logging.warning("Firebase is not activated.")
             return Result(False)
 
         registration_tokens = self.get_target_devices()
-        dataObject = None
+        data_object = None
         android_configs = messaging.AndroidConfig(
             priority="high",
             notification=messaging.AndroidNotification(
@@ -448,7 +518,7 @@ class Notification(models.Model):
         )
         message = messaging.MulticastMessage(
             notification=messaging.Notification(title=self.title, body=self.content),
-            data=dataObject,
+            data=data_object,
             tokens=registration_tokens,
             android=android_configs,
         )
