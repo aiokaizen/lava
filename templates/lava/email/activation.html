@@ -25,81 +25,72 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
         body {
             --primary-color: #00acc1;
             padding: 0;
             margin: 0;
         }
-
-        * {
-            font-family: 'Cairo', sans-serif;
-        }
-
-        #wrapper {
-            background-color: #f0f0f0;
-            width: 100%;
-            height: 100vh;
-        }
-
-        #container {
-            margin: 50px auto;
-            padding: 50px;
-            width: 600px;
-        }
-
-        #message {
-            background-color: #fefefe;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-        #action-btn {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white !important;
-            font-weight: bold;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: .2s ease-in-out;
-        }
         #action-btn:hover {
             background-color: #0abfd5;
-        }
-        span.primary {
-            color: var(--primary-color);
-        }
-        p.silent {
-            color: #777;
-        }
-        #footer {
-            border-top: 1px solid #333;
-            width: 100%;
-            margin-top: 30px;
-            padding-top: 10px;
-            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div id="wrapper">
-        <div id="container">
+    <div style="
+            background-color: #f0f0f0;
+            width: 100%;
+            height: 100vh;
+    ">
+        <div style="
+            margin: 50px auto;
+            padding: 50px;
+            width: 600px;
+        ">
             <img src="{{ protocol }}://{{ domain }}/{{ logo_file_path }}" alt="logo">
-            <div id="message">
+            <div style="
+                background-color: #fefefe;
+                padding: 10px 20px;
+                border-radius: 5px;
+            ">
                 <h1>{% trans "Click the button below to activate your account." %}</h1>
-                <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}" id="action-btn">
+                <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}" id="action-btn" style="
+                    padding: 10px 20px;
+                    background-color: var(--primary-color);
+                    color: white !important;
+                    font-weight: bold;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    transition: .2s ease-in-out;
+                ">
                     {% trans "Activate your account" %}
                 </a>
-                <p class="silent">{% trans "Thank you for signing up to our service." %}</p>
+                <p style="color: #777;">
+                    {% trans "Thank you for signing up to our service." %}
+                </p>
                 <h4>
                     {% trans "Cheers" %}<br />
                     EKBlocks
                 </h4>
             </div>
-            <div id="footer">
+            <div style="
+                border-top: 1px solid #333;
+                width: 100%;
+                margin-top: 30px;
+                padding-top: 10px;
+                text-align: center;
+            ">
                 <p>
-                    {% trans "This email was sent to " %} <span class="primary">{{ email }}</span><br />
+                    {% trans "This email was sent to " %}
+                    <span style="color: var(--primary-color)">{{ email }}</span>
+                    <br />
                     {% trans "Copyright © 2022" %}
-                    <a href="https://www.ekblocks.com/" target="_blank">EKBlocks</a>
+                    <a href="https://www.ekblocks.com/" target="_blank"
+                        style="color: var(--primary-color)">
+                        EKBlocks
+                    </a>
                     {% trans "All rights reserved." %}
                 </p>
             </div>
