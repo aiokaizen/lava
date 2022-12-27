@@ -29,7 +29,6 @@
             font-family: 'Cairo', sans-serif;
         }
         body {
-            --primary-color: #00acc1;
             padding: 0;
             margin: 0;
         }
@@ -49,7 +48,7 @@
             padding: 50px;
             width: 600px;
         ">
-            <img src="{{ protocol }}://{{ domain }}/{{ logo_file_path }}" alt="logo">
+            <img src="{{ protocol }}://{{ domain }}{{ STATIC_URL }}{{ logo_file_path }}" alt="logo">
             <div style="
                 background-color: #fefefe;
                 padding: 10px 20px;
@@ -58,7 +57,7 @@
                 <h1>{% trans "Click the button below to activate your account." %}</h1>
                 <a href="{{ protocol }}://{{ domain }}/{{ url|safe }}" id="action-btn" style="
                     padding: 10px 20px;
-                    background-color: var(--primary-color);
+                    background-color: #00acc1;
                     color: white !important;
                     font-weight: bold;
                     border-radius: 5px;
@@ -84,11 +83,11 @@
             ">
                 <p>
                     {% trans "This email was sent to " %}
-                    <span style="color: var(--primary-color)">{{ email }}</span>
+                    <span style="color: #00acc1">{{ email }}</span>
                     <br />
                     {% trans "Copyright © 2022" %}
                     <a href="https://www.ekblocks.com/" target="_blank"
-                        style="color: var(--primary-color)">
+                        style="color: #00acc1">
                         EKBlocks
                     </a>
                     {% trans "All rights reserved." %}
