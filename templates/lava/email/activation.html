@@ -48,7 +48,7 @@
             padding: 50px;
             width: 600px;
         ">
-            <img src="{{ protocol }}://{{ domain }}{{ STATIC_URL }}{{ logo_file_path }}" alt="logo">
+            <img src="{{ protocol }}://{{ domain }}{% static logo_file_path %}" alt="logo">
             <div style="
                 background-color: #fefefe;
                 padding: 10px 20px;
