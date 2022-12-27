@@ -1,0 +1,80 @@
+{% load static i18n %}
+
+{% block subject %}
+    You have a new email from EKBlocks
+{% endblock %}
+
+{% block text_body %}
+    Email body
+
+    {% trans "Thank you for using our site!" %}
+
+    {% blocktrans %}The {{ site_name }} team{% endblocktrans %}
+{% endblock text_body %}
+
+{% block html_body %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account activation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        #action-btn:hover {
+            background-color: #0abfd5;
+        }
+    </style>
+</head>
+<body>
+    <div style="
+        background-color: #f0f0f0;
+        width: 100%;
+    ">
+        <div style="
+            margin: 50px auto;
+            padding: 50px;
+            width: 600px;
+        ">
+            <img style="height: 80px;" src="{{ protocol }}://{{ domain }}{% static logo_file_path %}" alt="logo">
+            <div style="
+                background-color: #fefefe;
+                padding: 10px 20px;
+                border-radius: 5px;
+            ">
+                {% block main_content %}
+                {%  endblock main_content %}
+
+            </div>
+            <div style="
+                border-top: 1px solid #333;
+                width: 100%;
+                margin-top: 30px;
+                padding-top: 10px;
+                text-align: center;
+            ">
+                <p>
+                    {% trans "This email was sent to " %}
+                    <span style="color: #00acc1">{{ user.email }}</span>
+                    <br />
+                    {% trans "Copyright © 2022" %}
+                    <a href="https://www.ekblocks.com/" target="_blank"
+                       style="color: #00acc1">
+                        EKBlocks
+                    </a>
+                    {% trans "All rights reserved." %}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock html_body %}

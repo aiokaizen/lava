@@ -11,7 +11,6 @@ class ActivationEmail(BaseEmailMessage):
     template_name = "lava/email/activation.html"
 
     def get_context_data(self):
-        # ActivationEmail can be deleted
         context = super().get_context_data()
 
         user = context.get("user")
@@ -19,7 +18,6 @@ class ActivationEmail(BaseEmailMessage):
         context["token"] = default_token_generator.make_token(user)
         context["url"] = settings.ACTIVATION_URL.format(**context)
         context["logo_file_path"] = lava_settings.LOGO_FILE_PATH
-        context["email"] = user.email
         return context
 
 
@@ -31,7 +29,6 @@ class PasswordResetEmail(BaseEmailMessage):
     template_name = "lava/email/password_reset.html"
 
     def get_context_data(self):
-        # PasswordResetEmail can be deleted
         context = super().get_context_data()
 
         user = context.get("user")

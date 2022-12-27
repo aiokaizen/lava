@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% block subject %}
-{% blocktrans %}{{ site_name }} - Your account has been successfully created and activated!{% endblocktrans %}
+{% blocktrans %}EKBlocks - Your account has been successfully activated!{% endblocktrans %}
 {% endblock %}
 
 {% block text_body %}
@@ -13,9 +13,72 @@
 {% endblock text_body %}
 
 {% block html_body %}
-<p>{% trans "Your account has been created and is ready to use!" %}</p>
 
-<p>{% trans "Thanks for using our site!" %}</p>
-
-<p>{% blocktrans %}The {{ site_name }} team{% endblocktrans %}</p>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account activation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Cairo', sans-serif;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        #action-btn:hover {
+            background-color: #0abfd5;
+        }
+    </style>
+</head>
+<body>
+<div style="
+        background-color: #f0f0f0;
+        width: 100%;
+">
+    <div style="
+        margin: 50px auto;
+        padding: 50px;
+        width: 600px;
+    ">
+        <img style="height: 80px;" src="{{ protocol }}://{{ domain }}{% static logo_file_path %}" alt="logo">
+        <div style="
+            background-color: #fefefe;
+            padding: 10px 20px;
+            border-radius: 5px;
+        ">
+            <p>
+                {% trans "Your account has been activated and is ready to use!" %}
+                <br />
+                {% trans "Thank you for signing up to our service." %}<br /><br />
+                {% trans "Cheers" %},<br />
+                EKBlocks
+            </p>
+        </div>
+        <div style="
+            border-top: 1px solid #333;
+            width: 100%;
+            margin-top: 30px;
+            padding-top: 10px;
+            text-align: center;
+        ">
+            <p>
+                {% trans "This email was sent to " %}
+                <span style="color: #00acc1">{{ user.email }}</span>
+                <br />
+                {% trans "Copyright © 2022" %}
+                <a href="https://www.ekblocks.com/" target="_blank"
+                   style="color: #00acc1">
+                    EKBlocks
+                </a>
+                {% trans "All rights reserved." %}
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
 {% endblock html_body %}
