@@ -7,6 +7,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import get_connection, EmailMultiAlternatives
+from django.template.context import make_context
+from django.template.loader import render_to_string
 
 from templated_mail.mail import BaseEmailMessage
 
@@ -130,50 +133,58 @@ def get_user_photo_filename(instance, filename):
     return "{}/profile_picture.{}".format(folder, ext)
 
 
-def handle_excel_file(file, start_row=1, extract_columns=[]):
+def handle_excel_file(file_name, start_row=1, extract_columns=None):
     """
-    file | File like object: The file to extract data from.
+    file_name | string: The target file path.
     start_row | int: the number of row where the header of the file is located.
     extract_columns | List of strings: the names of columns to extract from the file.
     The extract_columns param will be slugified as well as the columns from the excel file,
-    so caps, spaces, and special characters are ignored making it easier to match.
+    so caps, spaces, and special characters are ignored, making it easier to match.
 
     example:
-    >>> with read('file.xlsx', 'r') as f:
-    >>>     start_row = 3
-    >>>     column_names = [
-    >>>         "name", "age", "address"
-    >>>     ]
-    >>>     data = handle_excel_file(f, start_row, column_names)
+    >>> start_row = 1
+    >>> column_names = [
+    >>>     "name", "age", "address"
+    >>> ]
+    >>> data = handle_excel_file("file.xlsx", start_row, column_names)
     """
-    extract_columns = (
-        [slugify(name) for name in extract_columns] if extract_columns else None
-    )
 
-    column_names = []  # This list will be extracted from the file and then slugified.
+    if not extract_columns:
+        return odict()
 
-    for column_name in extract_columns:
-        if column_name not in column_names:
-            raise ValidationError(
-                _("The uploaded file does not contain `email` column.")
-            )
+    if type(start_row) != int or start_row <= 0:
+        raise Exception("'start_row' attribute is invalid!")
 
-    # return odict object with the following format:
-    # {
-    #   'column_names': ['name', 'age', 'email'],
-    #   'column_names_display': ['Name', 'Age', 'Email'],
-    #   'data': [
-    #       odict({"name": "Albert", "age": 39, "email": "albert@mail.com"}),
-    #       odict({"name": "Emily", "age": 26, "email": "emily@mail.com"}),
-    #   ],
-    # }
-    result = odict()
+    with open(file_name, 'r') as f:
 
-    return file
+        # Slugify extract_columns
+        slugified_extract_columns = [slugify(name) for name in extract_columns]
+
+        # Extract columns names from the excel file
+        column_names = []  # This list will be extracted from the file and then slugified.
+
+        for column_name in slugified_extract_columns:
+            if column_name not in column_names:
+                raise ValidationError(
+                    _("The uploaded file does not contain `email` column.")
+                )
+
+        # return odict object with the following format:
+        # {
+        #   'column_names': ['name', 'age', 'email'],
+        #   'column_names_display': ['Name', 'Age', 'Email'],
+        #   'data': [
+        #       odict({"name": "Albert", "age": 39, "email": "albert@mail.com"}),
+        #       odict({"name": "Emily", "age": 26, "email": "emily@mail.com"}),
+        #   ],
+        # }
+        data = odict()
+
+    return data
 
 
 def send_html_email(
-    request, template, recipients, sender=None, context={}, fail_silently=False
+    request, template, recipients, sender=None, context=None, fail_silently=False
 ):
 
     email = BaseEmailMessage(request, context=context, template_name=template)
@@ -181,7 +192,56 @@ def send_html_email(
     email.send(to=recipients, from_email=sender, fail_silently=fail_silently)
 
 
-# Othr things
+def send_mass_html_email(
+    request, template, subject, recipients, sender=None, context=None,
+    user=None, password=None, fail_silently=False, connection=None, datatuple=None
+):
+    """
+    Given a datatuple of (subject, text_content, html_content, from_email,
+    recipient_list), sends each message to each recipient list. Returns the
+    number of emails sent.
+
+    If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
+    If auth_user and auth_password are set, they're used to log in.
+    If auth_user is None, the EMAIL_HOST_USER setting is used.
+    If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
+
+    """
+    connection = connection or get_connection(
+        username=user, password=password, fail_silently=fail_silently
+    )
+
+    datatuple = datatuple or [
+        (
+            subject,
+            "",
+            render_to_string(
+                template,
+                make_context(
+                    BaseEmailMessage(
+                        request, context={**context, 'to': recipient}, template_name=template
+                    ).get_context_data(),
+                    request
+                ).flatten()
+            ),
+            sender,
+            recipient,
+        ) for recipient in recipients
+    ]
+
+    messages = []
+
+    for subject, text, html, from_email, recipient in datatuple:
+        if type(recipient) not in [list, tuple]:
+            recipient = (recipient, )
+        message = EmailMultiAlternatives(subject, text, from_email, recipient)
+        message.attach_alternative(html, "text/html")
+        messages.append(message)
+
+    return connection.send_messages(messages)
+
+
+# Other things
 def get_log_filepath():
     now = datetime.now()
     current_hour = now.strftime("%Y%m%d_%H")

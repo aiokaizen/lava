@@ -65,11 +65,15 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_staff",
     )
 
-    def thumbnail(self, object):
+    actions = [
+        "link_to_payments"
+    ]
+
+    def thumbnail(self, obj):
         url = (
-            object.photo.url
-            if object.photo
-            else ("/static/ektools/assets/img/user_avatar.png")
+            obj.photo.url
+            if obj.photo
+            else "/static/ektools/assets/img/user_avatar.png"
         )
         style = f"""
             width: 30px; height: 30px; border-radius:50%; background-color: #fafafa;
@@ -77,7 +81,6 @@ class UserAdmin(auth_admin.UserAdmin):
             background-size: cover;
         """
         return format_html(f'<div style="{style}"></div>')
-
     thumbnail.short_description = ""
 
     def save_model(self, request, obj, form, change):
@@ -95,6 +98,36 @@ class UserAdmin(auth_admin.UserAdmin):
             result = obj.update(update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
+
+    @admin.action(description='Link to payments')
+    def link_to_payments(self, request, queryset):
+        for user in queryset:
+            result = user.link_payments_app()
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    (
+                        f"The following error rose while trying to link the user '{user}' "
+                        f"to the payments app: \n\t{result.message}"
+                    ),
+                    lvl
+                )
+
+        self.message_user(request, "The selected users were successfully linked to payments.", messages.SUCCESS)
+
+    def delete_queryset(self, request, queryset):
+        for user in queryset:
+            result = user.delete()
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    f"The following error rose while deleting the user '{user}': \n\t{result.message}",
+                    lvl
+                )
+
+        self.message_user(request, "The selected users were successfully deleted.", messages.SUCCESS)
 
 
 # @admin.register(Group)

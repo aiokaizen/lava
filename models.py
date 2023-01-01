@@ -7,8 +7,13 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import AbstractUser, Group, Permission  # as BaseGroup,
+from django.contrib.admin.models import (
+    LogEntry, DELETION, CHANGE, ADDITION
+)
+from django.contrib.admin.options import get_content_type_for_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from firebase_admin import messaging
 
@@ -334,9 +339,17 @@ class User(AbstractUser):
             success=True, message=_("Associated object was updated successfully.")
         )
 
-    def delete(self, *args, **kwargs):
+    def delete(self, user=None, soft_delete=False, *args, **kwargs):
         if not self.id:
             return Result(False, _("User is already deleted"), tag="warning")
+
+        success_message = _("User has been deleted successfully")
+
+        if soft_delete:
+            self.is_active = False
+            self.deleted_at = timezone.now()
+            self.save()
+            return Result(success=True, message=success_message)
 
         # Unlink from payments app
         if hasattr(self, "customer"):
@@ -348,7 +361,19 @@ class User(AbstractUser):
         super().delete()
         if preferences:
             preferences.delete()
-        return Result(success=True, message=_("User has been deleted successfully"))
+
+        # Log the action
+        if user:
+            LogEntry.objects.log_action(
+                user_id=user.pk,
+                content_type_id=get_content_type_for_model(self).pk,
+                object_id=self.pk,
+                object_repr=self.__class__.__name__.upper(),
+                action_flag=DELETION,
+                change_message=f"{str(self)} has been deleted."
+            )
+
+        return Result(success=True, message=success_message)
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
@@ -472,10 +497,10 @@ class Notification(models.Model):
         self.save()
 
         if target_users:
-            self.target_users.set(target_users)
+            self.target_users.set(*target_users)
 
         if target_groups:
-            self.target_groups.set(target_groups)
+            self.target_groups.set(*target_groups)
 
         return Result(True, _("The notification has been created successfully."))
 
