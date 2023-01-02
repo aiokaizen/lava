@@ -26,5 +26,5 @@ class Command(BaseCommand):
                 is_staff=True,
                 is_superuser=True,
             )
-            ekadmin.create(groups=[group], password="admin_pass", force_is_active=True)
+            ekadmin.create(groups=[group], password="admin_pass", force_is_active=True, link_payments_app=False)
             logging.info("ekadmin was created successfully!")

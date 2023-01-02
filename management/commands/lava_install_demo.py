@@ -14,11 +14,19 @@ class Command(BaseCommand):
         This command adds some demo content to invoice app.
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '-num_users',
+            nargs='?',
+            default=25,
+            type=int
+        )
+
     def handle(self, *args, **options):
         # Create some demo content here
 
         # Getting user data
-        number_of_users = args.get("n", 25)
+        number_of_users = options["num_users"]
 
         # Creating groups
         groups = []
@@ -26,13 +34,14 @@ class Command(BaseCommand):
             settings.BASE_DIR, "lava", "demo_content", "groups.json"
         )
         with open(groups_filename, "r") as f:
-            groups = json.load(f.read())
+            data = f.read()
+            groups = json.loads(data)
 
-        for group in groups:
-            try:
-                Group.objects.create(name=group["name"])
-            except:
-                pass
+            for group in groups:
+                try:
+                    Group.objects.get_or_create(name=group["name"])
+                except:
+                    pass
 
         # Creating users
         people = []
@@ -40,12 +49,15 @@ class Command(BaseCommand):
             settings.BASE_DIR, "lava", "demo_content", "people.json"
         )
         with open(people_filename, "r") as f:
-            people = json.load(f.read())
+            data = f.read()
+            people = json.loads(data)
+        
+        groups = Group.objects.all()
 
         for i in range(number_of_users):
             person = random.choice(people)
             people.remove(person)
-            user = User.objects.create(
+            user = User(
                 username=f"emp{i}",
                 first_name=person["first_name"],
                 last_name=person["last_name"],
@@ -58,5 +70,9 @@ class Command(BaseCommand):
                 birth_day=person["birth_day"],
                 job=person["job_title"],
             )
-            user.set_password("user_pass")
-            user.save(update_fields=["password"])
+            user.create(
+                groups=[random.choice(groups)],
+                password="admin_pass",
+                force_is_active=True,
+                link_payments_app=False
+            )
