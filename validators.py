@@ -1,6 +1,7 @@
 from django.core.validators import EmailValidator, URLValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 from lava import settings as lava_settings
 
@@ -46,11 +47,11 @@ class SchemelessURLValidator(URLValidator):
 def validate_notifications_settings(value):
     """Raises a ValidationError if the value is not valid, otherwize, returns None."""
 
+    custom_notification_settings = getattr(settings, "AVAILABLE_NOTIFICATION_SETTINGS", [])
     available_settings = [
-        "allow_notifications",
-        "allow_notifications_from_organiziers",
-        "allow_notifications_from_subscribed_events",
-        "allow_notifications_from_event_with_owned_tickets",
+        "allow_push_notifications",
+        "allow_email_notifications",
+        *custom_notification_settings
     ]
 
     if type(value) != dict:
