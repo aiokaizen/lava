@@ -115,7 +115,7 @@ class User(AbstractUser):
     )
     country = models.CharField(_("Country"), max_length=64, blank=True, default="")
     city = models.CharField(_("City"), max_length=64, blank=True, default="")
-    address = models.TextField(_("Street address"), blank=True, default="")
+    street_address = models.TextField(_("Street address"), blank=True, default="")
     phone_number = models.CharField(
         _("Phone number"), max_length=32, blank=True, default=""
     )

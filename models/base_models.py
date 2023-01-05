@@ -22,9 +22,7 @@ class BaseModel(models.Model):
         abstract = True
 
     created_at = models.DateTimeField(_("Created at"), null=True, blank=True, auto_now_add=True)
-    created_by = models.OneToOneField(
-        'lava.User', on_delete=models.PROTECT, related_name="participant"
-    )
+    created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT)
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
@@ -51,7 +49,7 @@ class BaseModel(models.Model):
 
         if soft_delete:
             self.deleted_at = timezone.now()
-            self.update(user=user, update_fields=['deleted_at'], message="Deleted")
+            self.update(user=user, update_fields=['deleted_at'], message="Soft Delete")
             return Result(True, success_message)
 
         if user:
