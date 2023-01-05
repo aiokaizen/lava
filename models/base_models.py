@@ -27,12 +27,18 @@ class BaseModel(models.Model):
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
     def create(self, user=None):
+        if self.id:
+            return Result(False, _("This object is already created."))
+
         if user:
             self.log_action(user, ADDITION, "Created")
         self.save()
         return Result(True, _("Object created successfully."))
 
     def update(self, user=None, update_fields=None, message=""):
+        if not self.id:
+            return Result(False, _("This object is not yet created."))
+            
         if update_fields:
             self.save(update_fields=update_fields)
         else:
