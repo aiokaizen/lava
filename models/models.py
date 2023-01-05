@@ -15,8 +15,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from firebase_admin import messaging
-
 from lava import settings as lava_settings
 from lava import validators as lava_validators
 from lava.error_codes import UNIMPLEMENTED, UNKNOWN
@@ -27,6 +25,11 @@ from lava.utils import (
     Result,
     generate_password,
 )
+
+try:
+    from firebase_admin import messaging
+except ImportError:
+    messaging = None
 
 
 class Preferences(models.Model):
@@ -78,6 +81,7 @@ class Preferences(models.Model):
 
 
 class User(AbstractUser):
+
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
 
@@ -528,6 +532,9 @@ class Notification(models.Model):
         """
         Send notification via firebase API.
         """
+        if messaging is None:
+            logging.warning("Firebase is not installed.")
+            return Result(False)
         if not lava_settings.FIREBASE_ACTIVATED:
             logging.warning("Firebase is not activated.")
             return Result(False)

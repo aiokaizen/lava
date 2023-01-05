@@ -37,6 +37,8 @@ GROUPS_ASSOCIATED_MODELS = getattr(
     },
 )
 
+HOST = getattr(settings, 'HOST', 'localhost:8000')
+
 DENY_DUPLICATE_EMAILS = getattr(settings, "DENY_DUPLICATE_EMAILS", False)
 EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
     # If `DENY_DUPLICATE_EMAILS` is set to True, it overrides this setting.
@@ -55,7 +57,6 @@ FIREBASE_CREDENTIALS_FILE_PATH = os.path.join(
     settings.BASE_DIR, "firebase-adminsdk-private-key.json"
 )
 FIREBASE_ACTIVATED = False
-
 _init_firebase_result = init_firebase()
 if _init_firebase_result.success:
     FIREBASE_ACTIVATED = True
