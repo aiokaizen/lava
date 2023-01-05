@@ -13,8 +13,11 @@ from django.template.loader import render_to_string
 
 from templated_mail.mail import BaseEmailMessage
 
-import firebase_admin
-from firebase_admin import credentials
+try:
+    import firebase_admin
+    from firebase_admin import credentials
+except ImportError:
+    firebase_admin = None
 
 from lava import settings as lava_settings
 
@@ -298,6 +301,9 @@ def _is_username_valid(username):
 
 def init_firebase():
     creds_file_path = lava_settings.FIREBASE_CREDENTIALS_FILE_PATH
+    if firebase_admin is None:
+        return Result(False, _("Firebase is not installed"))
+        
     if not os.path.exists(creds_file_path):
         logging.error("Firebase credentials file does not exist.")
         return Result(False, _("Firebase credentials file does not exist."))
