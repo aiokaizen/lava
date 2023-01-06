@@ -494,7 +494,7 @@ class Notification(models.Model):
         devices_lists = list(target_users.values_list("device_id_list", flat=True))
         return list(itertools.chain(*devices_lists))
 
-    def create(self, target_users=None, target_groups=None):
+    def create(self, target_users=None, target_groups=None, send_notification=False):
         if not target_users and not target_groups:
             return Result(
                 False, _("You must specify either target users or target groups.")
@@ -507,6 +507,9 @@ class Notification(models.Model):
 
         if target_groups:
             self.target_groups.set(*target_groups)
+        
+        if send_notification:
+            self.send_firebase_notification()
 
         return Result(True, _("The notification has been created successfully."))
 
