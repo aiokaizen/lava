@@ -25,6 +25,7 @@ from lava.utils import (
     Result,
     generate_password,
 )
+from lava.managers import LavaUserManager
 
 try:
     from firebase_admin import messaging
@@ -143,6 +144,7 @@ class User(AbstractUser):
 
     deleted_at = models.DateTimeField(_("Deleted at"), null=True)
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
+    objects = LavaUserManager()
 
     def groups_names(self):
         return self.groups.all().values_list("name", flat=True) if self.id else []

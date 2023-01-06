@@ -39,7 +39,9 @@ GROUPS_ASSOCIATED_MODELS = getattr(
 
 HOST = getattr(settings, 'HOST', 'localhost:8000')
 
-DENY_DUPLICATE_EMAILS = getattr(settings, "DENY_DUPLICATE_EMAILS", False)
+ALLOW_EMAIL_AUTHENTICATION = getattr(settings, "ALLOW_EMAIL_AUTHENTICATION", True)
+ALLOW_USERNAME_AUTHENTICATION = getattr(settings, "ALLOW_USERNAME_AUTHENTICATION", True)
+DENY_DUPLICATE_EMAILS = getattr(settings, "DENY_DUPLICATE_EMAILS", True)
 EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
     # If `DENY_DUPLICATE_EMAILS` is set to True, it overrides this setting.
     settings,

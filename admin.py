@@ -29,7 +29,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "phone_number",
                     "country",
                     "city",
-                    "address",
+                    "street_address",
                     "device_id_list",
                 )
             },
