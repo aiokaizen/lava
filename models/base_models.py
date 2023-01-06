@@ -35,7 +35,7 @@ class BaseModel(models.Model):
         self.save()
         return Result(True, _("Object created successfully."))
 
-    def update(self, user=None, update_fields=None, message=""):
+    def update(self, user=None, update_fields=None, message="Updated"):
         if not self.id:
             return Result(False, _("This object is not yet created."))
             
@@ -45,7 +45,7 @@ class BaseModel(models.Model):
             self.save()
 
         if user:
-            self.log_action(user, CHANGE, message or "Updated")
+            self.log_action(user, CHANGE, message)
 
         return Result(True, _("Object updated successfully."))
 
@@ -71,6 +71,16 @@ class BaseModel(models.Model):
         new._state.adding = True
         new.create(user=user)
         return Result(True, _("Object duplicated successfully."), instance=new)
+    
+    def restore(self, user=None):
+        if not self.deleted_at:
+            return Result(False, _("Object is not deleted!"))
+            
+        self.deleted_at = None
+        result = self.update(user=user, update_fields=['deleted_at'], message="Restored")
+        if result.is_error:
+            return result
+        return Result(True, _("The object has been restored successfully."))
 
     def log_action(self, action_flag, message, user=None):
 
