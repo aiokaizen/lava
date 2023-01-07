@@ -5,7 +5,7 @@ from django.contrib.admin.models import (
     LogEntry, DELETION, CHANGE, ADDITION
 )
 from django.contrib.admin.options import get_content_type_for_model
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from lava import settings as lava_settings

@@ -3,7 +3,7 @@ from django.contrib.auth import admin as auth_admin
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect
 from django.utils.html import format_html
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lava.forms import LavaUserChangeForm
 from lava.models import Notification, Preferences, User, Group, Permission

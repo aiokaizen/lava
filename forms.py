@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserChangeForm
 from django.forms import ValidationError
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from lava import settings as lava_settings
 
