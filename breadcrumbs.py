@@ -45,7 +45,10 @@ def get_page(breadcrumb_id):
 
 
 # Define site structure
-breadcrumbs = {"home": Page(title="Home - Lava", label="Home", is_root=True)}
+breadcrumbs = {
+    "home": Page(title="Home - Lava", label="Home", is_root=True),
+    "login": Page(title="Login - Lava", label="Login", is_root=True),
+}
 
 # breadcrumbs['profile_details'] = Page(title='Profile', label='Profile', parent=breadcrumbs['home'])
 # breadcrumbs['profile_change'] = Page(title='Update Profile', label='Update profile', parent=breadcrumbs['profile_details'])

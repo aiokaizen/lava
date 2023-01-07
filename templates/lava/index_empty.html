@@ -16,11 +16,13 @@
     <link rel="shortcut icon" href={% static 'lava/assets/images/logo/favicon.png' %}>
 
     <!-- page css -->
+    {% block page_css %}
+    {% endblock page_css %}
 
     <!-- Core css -->
     <link href={% static 'lava/assets/css/app.min.css' %} rel="stylesheet">
 
-    <!-- Extra styles -->
+    <!-- Extra /Page styles -->
     {% block extra_css %}
     {% endblock extra_css %}
 
@@ -29,40 +31,17 @@
 <body>
     <div class="app">
         {% block app %}
-            <div class="container-fluid">
-                <div class="d-flex full-height p-v-20 flex-column justify-content-between">
 
-                    <!-- Content Wrapper START -->
-                    <div class="main-content" style="flex: 1">
-                        <!-- Content goes Here -->
-                        {% block main %}
-                        {% endblock main %}
-                    </div>
-                    <!-- Content Wrapper END -->
-
-                    <!-- Footer START -->
-                    <footer class="footer">
-                        <div class="footer-content">
-                            <p class="m-b-0">Copyright © 2022 EKBlocks. All rights reserved.</p>
-                            <!-- <span>
-                                <a href="" class="text-gray m-r-15">Term &amp; Conditions</a>
-                                <a href="" class="text-gray">Privacy &amp; Policy</a>
-                            </span> -->
-                        </div>
-                    </footer>
-                    <!-- Footer END -->
-                </div>
-
-            </div>
         {% endblock app %}
-
     </div>
 
     
     <!-- Core Vendors JS -->
     <script src={% static 'lava/assets/js/vendors.min.js' %}></script>
 
-    <!-- page js -->
+    <!-- Page js -->
+    {% block page_js %}
+    {% endblock page_js %}
 
     <!-- Core JS -->
     <script src={% static 'lava/assets/js/app.min.js' %}></script>

@@ -14,7 +14,13 @@ router.register(r"preferences", api_views.PreferencesViewSet)
 
 
 urlpatterns = [
-    path("", main_views.home, name="home"),
+    path("", main_views.Home.as_view(), name="home"),
+    path("login/", main_views.Login.as_view(), name="login"),
+    path("logout/", main_views.logout, name="logout"),
+    path("signup/", main_views.Signup.as_view(), name="signup"),
+    path("password_reset/", main_views.ResetPassword.as_view(), name="password_reset"),
+    path("notifications/", main_views.Notifications.as_view(), name="notifications"),
+
     path(
         "users/activate/<str:uid>/<str:token>",
         main_views.activate_user,

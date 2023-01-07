@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import UserChangeForm, AuthenticationForm, UserCreationForm
 from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -14,3 +14,11 @@ class LavaUserChangeForm(UserChangeForm):
                 raise ValidationError(_("You can't change the group for this user."))
 
         return self.cleaned_data["groups"]
+
+
+class LoginForm(AuthenticationForm):
+    pass
+
+
+class SignupForm(UserCreationForm):
+    pass
