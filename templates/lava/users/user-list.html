@@ -1,0 +1,88 @@
+{% extends 'lava/index.html' %}
+{% load static %}
+
+{% block page_css %}
+    <link href="{% static 'lava/assets/vendors/datatables/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% endblock page_css %}
+
+{% block main %}
+    <div class="card">
+        <div class="card-body">
+            <table id="data-table" class="table">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email</th>
+                        <th style="width: 80px; text-align: center">Is Active</th>
+                        <th style="width: 80px; text-align: center">Is Staff</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in queryset %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-start">
+                                    {% if user.photo %}
+                                        <div class="avatar avatar-image">
+                                            <img src="{{ user.photo.url }}" alt="{{ user }}">
+                                        </div>
+                                    {% else %}
+                                        <div class="avatar avatar-icon avatar-cyan">
+                                            <i class="anticon anticon-user"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="d-flex flex-column align-items-start ml-3">
+                                        {# <a href="{% url 'lava:user-details' user.id %}"> #}
+                                        <a href="#">
+                                            <strong class="color-dark">
+                                                {{ user.first_name }} {{ user.last_name }}
+                                            </strong>
+                                        </a>
+                                        <p>{{ user }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    {% if user.is_active %}
+                                        <span class="badge badge-pill badge-success" style="width: 26px; height: 26px;">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-danger" style="width: 26px; height: 26px;">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    {% if user.is_staff %}
+                                        <span class="badge badge-pill badge-success" style="width: 26px; height: 26px;">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-pill badge-danger" style="width: 26px; height: 26px;">
+                                            <i class="fas fa-times"></i>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock main %}
+
+{% block page_js %}
+    <script src="{% static 'lava/assets/vendors/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'lava/assets/vendors/datatables/dataTables.bootstrap.min.js' %}"></script>
+{% endblock page_js %}
+
+{% block extra_js %}
+    <script>
+        $('#data-table').DataTable();
+    </script>
+{% endblock extra_js %}

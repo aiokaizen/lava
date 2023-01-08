@@ -1,0 +1,44 @@
+{% extends 'lava/index.html' %}
+{% load static %}
+
+{% block page_css %}
+    <link href="{% static 'lava/assets/vendors/datatables/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+{% endblock page_css %}
+
+{% block main %}
+    <div class="card">
+        <div class="card-body">
+            <table id="data-table" class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group in queryset %}
+                        <tr>
+                            <td>
+                                <strong class="color-dark">
+                                    {{ user.first_name }} {{ user.last_name }}
+                                </strong>
+                            </td>
+                            <td>{{ group.email }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock main %}
+
+{% block page_js %}
+    <script src="{% static 'lava/assets/vendors/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'lava/assets/vendors/datatables/dataTables.bootstrap.min.js' %}"></script>
+{% endblock page_js %}
+
+{% block extra_js %}
+    <script>
+        $('#data-table').DataTable();
+    </script>
+{% endblock extra_js %}

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from lava.forms import LavaUserChangeForm
+from lava.forms.main_forms import LavaUserChangeForm
 from lava.models import Notification, Preferences, User, Group, Permission
 
 

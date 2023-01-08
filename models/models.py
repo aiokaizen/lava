@@ -1,5 +1,6 @@
 import logging
 import itertools
+from datetime import datetime
 
 from django.apps import apps
 from django.db import models
@@ -24,6 +25,7 @@ from lava.utils import (
     get_user_photo_filename,
     Result,
     generate_password,
+    strtobool,
 )
 from lava.managers import LavaUserManager
 
@@ -435,6 +437,47 @@ class User(AbstractUser):
             return Result(
                 success=False, message=_("Invalid password."), errors=e.messages
             )
+    
+    @classmethod
+    def get_filter_params(cls, user=None, kwargs=None):
+
+        filter_params = Q()
+
+        if kwargs is None:
+            kwargs = {}
+
+        if "query" in kwargs:
+            filter_params &= (
+                Q(first_name__icontains=kwargs.get("query")) |
+                Q(last_name__icontains=kwargs.get("query")) |
+                Q(username__icontains=kwargs.get("query"))
+            )
+
+        if "first_name" in kwargs:
+            filter_params &= Q(first_name__icontains=kwargs.get("first_name"))
+
+        if "last_name" in kwargs:
+            filter_params &= Q(last_name__icontains=kwargs.get("last_name"))
+
+        if "is_active" in kwargs:
+            filter_params &= Q(is_active=strtobool(kwargs["is_active"]))
+
+        if "is_staff" in kwargs:
+            filter_params &= Q(is_staff=strtobool(kwargs["is_staff"]))
+
+        if "is_superuser" in kwargs:
+            filter_params &= Q(is_superuser=strtobool(kwargs["is_superuser"]))
+
+        return filter_params
+
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = cls.get_filter_params(user, kwargs)
+        if user and not user.is_superuser:
+            return cls.objects.filter(pk=user.pk)
+
+        return cls.objects.filter(filter_params)
+
 
 
 class Notification(models.Model):

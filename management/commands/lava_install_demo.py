@@ -66,7 +66,7 @@ class Command(BaseCommand):
                 photo=person["avatar"],
                 country=person["country"],
                 city=person["city"],
-                address=person["address"],
+                street_address=person["address"],
                 birth_day=person["birth_day"],
                 job=person["job_title"],
             )

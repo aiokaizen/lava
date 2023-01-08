@@ -1,3 +1,6 @@
+from django.utils.translation import gettext as _
+
+
 class Page:
     def __init__(self, title, label="", url="", parent=None, is_root=False):
         self.title = title
@@ -46,14 +49,23 @@ def get_page(breadcrumb_id):
 
 # Define site structure
 breadcrumbs = {
-    "home": Page(title="Home - Lava", label="Home", is_root=True),
-    "login": Page(title="Login - Lava", label="Login", is_root=True),
+    "home": Page(title=_('Home - Lava'), label=_('Home'), is_root=True),
+    "login": Page(title=_('Login - Lava'), label=_('Login'), is_root=True),
 }
 
-# breadcrumbs['profile_details'] = Page(title='Profile', label='Profile', parent=breadcrumbs['home'])
-# breadcrumbs['profile_change'] = Page(title='Update Profile', label='Update profile', parent=breadcrumbs['profile_details'])
+breadcrumbs['user_list'] = Page(title=_('Users'), label=_('Users'), parent=breadcrumbs['home'])
+breadcrumbs['user_insert'] = Page(title=_('Create new user'), label=_('Create new user'), parent=breadcrumbs['user_list'])
+breadcrumbs['user_details'] = Page(title=_('User Profile'), label=_('User profile'), parent=breadcrumbs['user_list'])
+breadcrumbs['user_change'] = Page(title=_('Update Profile'), label=_('Update profile'), parent=breadcrumbs['user_details'])
 
-# breadcrumbs['invoice_list'] = Page(title='Invoices', label='Invoices', parent=breadcrumbs['home'])
-# breadcrumbs['invoice_add'] = Page(title='New Invoice', label='New invoice', parent=breadcrumbs['invoice_list'])
-# breadcrumbs['invoice_details'] = Page(title='Invoice details', label='Invoice details', parent=breadcrumbs['invoice_list'])
-# breadcrumbs['invoice_change'] = Page(title='Update Invoice', label='Update invoice', parent=breadcrumbs['invoice_details'])
+breadcrumbs['group_list'] = Page(title=_('Groups'), label=_('Groups'), parent=breadcrumbs['home'])
+breadcrumbs['group_insert'] = Page(title=_('Create new group'), label=_('Create new group'), parent=breadcrumbs['group_list'])
+breadcrumbs['group_details'] = Page(title=_('Group details'), label=_('Group details'), parent=breadcrumbs['group_list'])
+breadcrumbs['group_change'] = Page(title=_('Update group'), label=_('Update group'), parent=breadcrumbs['group_details'])
+
+breadcrumbs['permissions_list'] = Page(title=_('Permissions'), label=_('Permissions'), parent=breadcrumbs['home'])
+breadcrumbs['permissions_insert'] = Page(title=_('Create new permission'), label=_('Create new permission'), parent=breadcrumbs['permissions_list'])
+breadcrumbs['permissions_details'] = Page(title=_('Permission details'), label=_('Permission details'), parent=breadcrumbs['permissions_list'])
+breadcrumbs['permissions_change'] = Page(title=_('Update permission'), label=_('Update permission'), parent=breadcrumbs['permissions_details'])
+
+breadcrumbs['logs'] = Page(title=_('Logs'), label=_('Permissions'), parent=breadcrumbs['home'])

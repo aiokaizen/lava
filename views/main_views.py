@@ -20,7 +20,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.http import HttpResponse
 
-from lava.forms import LoginForm, SignupForm
+from lava.forms.main_forms import LoginForm, SignupForm
 
 
 class Home(View):

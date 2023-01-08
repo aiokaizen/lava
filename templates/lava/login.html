@@ -15,7 +15,12 @@
                             </div>
                             {% if form.non_field_errors %}
                                 <div class="alert alert-danger">
-                                    {{ form.non_field_errors.0 }}
+                                    <div class="d-flex align-items-center justify-content-start">
+                                        <span class="alert-icon font-size-30">
+                                            <i class="anticon anticon-close-circle"></i>
+                                        </span>
+                                        <span>{{ form.non_field_errors.0 }}</span>
+                                    </div>
                                 </div>
                             {% endif %}
                             <form method="POST">
