@@ -117,7 +117,7 @@ class UserSerializer(serializers.ModelSerializer):
             "phone_number",
             "country",
             "city",
-            "address",
+            "street_address",
             "cover_picture",
             "is_active",
             "groups_names",
