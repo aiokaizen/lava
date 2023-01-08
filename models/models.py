@@ -199,9 +199,9 @@ class User(AbstractUser):
             if res.is_error:
                 self.delete()
                 return res
-            elif res.error_code == UNIMPLEMENTED:
-                self.delete()
-                raise Exception(res.to_dict())
+            # elif res.error_code == UNIMPLEMENTED:
+            #     self.delete()
+            #     raise Exception(res.to_dict())
 
         # Refresh groups from db in case the groups param was not passed and the groups
         # attribute was already assigned before calling .create() method.
