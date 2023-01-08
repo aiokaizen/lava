@@ -58,7 +58,7 @@ class Command(BaseCommand):
             person = random.choice(people)
             people.remove(person)
             user = User(
-                username=f"emp{i}",
+                username=f"user{i + 1}",
                 first_name=person["first_name"],
                 last_name=person["last_name"],
                 email=person["email"],
