@@ -15,6 +15,22 @@ This application is the base for all our django projects. It contains the core f
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "corsheaders",
+```
+* Add 
+```'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+```
+to your `MIDDLEWARE`s list.
+* Add the following settings to your settings file:
+```
+CORS_ALLOWED_ORIGINS = [
+    # "https://ekblocks.com",
+    # "https://example.com",
+    # "http://localhost:8000",
+    # "http://127.0.0.1:9431",
+]
+CORS_ALLOW_ALL_ORIGINS = True
 ```
 
 
