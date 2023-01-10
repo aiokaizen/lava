@@ -1,12 +1,18 @@
 import json
+import mimetypes
 import os
 import random
+import shutil
+import requests
+import wget
+from datetime import datetime
 
 from django.core.management.base import BaseCommand
-from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.files import File
 
 from lava.models import User, Group
+from lava.utils import get_user_photo_filename
 
 
 class Command(BaseCommand):
@@ -25,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Create some demo content here
 
-        # Getting user data
+        # Getting user input
         number_of_users = options["num_users"]
 
         # Creating groups
@@ -38,10 +44,7 @@ class Command(BaseCommand):
             groups = json.loads(data)
 
             for group in groups:
-                try:
-                    Group.objects.get_or_create(name=group["name"])
-                except:
-                    pass
+                Group.objects.get_or_create(name=group["name"])
 
         # Creating users
         people = []
@@ -52,18 +55,38 @@ class Command(BaseCommand):
             data = f.read()
             people = json.loads(data)
         
+        today_str = datetime.now().strftime("%Y%m%d")
+        download_path = os.path.join(
+            settings.TMP_ROOT, f'tmp_user_avatars_{today_str}'
+        )
+        if not os.path.exists(download_path):
+            os.makedirs(download_path)
+        
         groups = Group.objects.all()
 
         for i in range(number_of_users):
             person = random.choice(people)
             people.remove(person)
+
+            # Download avatar
+            avatar = person["avatar"]
+            filename = None
+            if avatar:
+                response = requests.get(avatar)
+                if response.status_code == 200:
+                    content_type = response.headers['content-type']
+                    ext = mimetypes.guess_extension(content_type)
+                    now_str = datetime.now().strftime("%H%M%S%f")
+                    filename = os.path.join(download_path, f"{now_str}{ext}")
+                    with open(filename, 'wb') as fp:
+                        fp.write(response.content)
+
             user = User(
                 username=f"user{i + 1}",
                 first_name=person["first_name"],
                 last_name=person["last_name"],
                 email=person["email"],
                 gender=person["gender"],
-                photo=person["avatar"],
                 country=person["country"],
                 city=person["city"],
                 street_address=person["address"],
@@ -76,3 +99,14 @@ class Command(BaseCommand):
                 force_is_active=True,
                 link_payments_app=False
             )
+            if filename:
+                with open(filename, 'rb') as f:
+                    user.photo.save(
+                        get_user_photo_filename(user, filename),
+                        File(f)
+                    )
+                    user.update(update_fields=['photo'])
+            
+        print(f'User {user.username} has been created.')
+        
+        shutil.rmtree(download_path, )
