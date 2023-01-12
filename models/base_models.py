@@ -26,16 +26,23 @@ class BaseModel(models.Model):
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
-    def create(self, user=None):
+    def create(self, user=None, m2m_fields=None):
         if self.id:
             return Result(False, _("This object is already created."))
 
+        self.save()
+
+        if m2m_fields:
+            for attr, value in m2m_fields:
+                field = getattr(self, attr)
+                field.set(value)
+
         if user:
             self.log_action(user, ADDITION, "Created")
-        self.save()
+            
         return Result(True, _("Object created successfully."))
 
-    def update(self, user=None, update_fields=None, message="Updated"):
+    def update(self, user=None, update_fields=None, m2m_fields=None, message="Updated"):
         if not self.id:
             return Result(False, _("This object is not yet created."))
             
@@ -43,6 +50,11 @@ class BaseModel(models.Model):
             self.save(update_fields=update_fields)
         else:
             self.save()
+
+        if m2m_fields:
+            for attr, value in m2m_fields:
+                field = getattr(self, attr)
+                field.set(value)
 
         if user:
             self.log_action(user, CHANGE, message)
@@ -82,10 +94,12 @@ class BaseModel(models.Model):
             return result
         return Result(True, _("The object has been restored successfully."))
 
-    def log_action(self, action_flag, message, user=None):
+    def log_action(self, user, action_flag, message):
 
         if not user:
             return
+        
+        print('USER:', user)
 
         LogEntry.objects.log_action(
             user_id=user.pk,
