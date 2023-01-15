@@ -4,7 +4,7 @@ import os
 import random
 import shutil
 import requests
-import wget
+import logging
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
@@ -22,10 +22,23 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-num_users',
+            '-num-users',
             nargs='?',
             default=25,
-            type=int
+            type=int,
+            help="Number of users to create, defaults to 25."
+        )
+        parser.add_argument(
+            '--skip-avatars',
+            action='store_true',
+            help='If this argument is set, the users will be created without profile pictures.',
+        )
+        parser.add_argument(
+            '-suffix',
+            nargs='?',
+            default='user',
+            type=str,
+            help="The username suffix, defaults to user. eg: user1, user2, ..."
         )
 
     def handle(self, *args, **options):
@@ -33,6 +46,15 @@ class Command(BaseCommand):
 
         # Getting user input
         number_of_users = options["num_users"]
+        skip_avatars = options["skip_avatars"]
+        username_suffix = options["suffix"]
+
+        logging.info(
+            "Start importing demo content with the following parameters:\n"
+            f"\t-num_users={number_of_users}\n"
+            f"\t-skip_avatars={skip_avatars}\n"
+            f"\t-suffix={username_suffix}\n"
+        )
 
         # Creating groups
         groups = []
@@ -63,16 +85,16 @@ class Command(BaseCommand):
             os.makedirs(download_path)
         
         groups = Group.objects.all()
+        user_avatar = "https://i.pravatar.cc/150"
 
         for i in range(number_of_users):
             person = random.choice(people)
             people.remove(person)
 
             # Download avatar
-            avatar = person["avatar"]
             filename = None
-            if avatar:
-                response = requests.get(avatar)
+            if not skip_avatars:
+                response = requests.get(user_avatar)
                 if response.status_code == 200:
                     content_type = response.headers['content-type']
                     ext = mimetypes.guess_extension(content_type)
@@ -82,7 +104,7 @@ class Command(BaseCommand):
                         fp.write(response.content)
 
             user = User(
-                username=f"user{i + 1}",
+                username=f"{username_suffix}_{i + 1}",
                 first_name=person["first_name"],
                 last_name=person["last_name"],
                 email=person["email"],
@@ -107,6 +129,6 @@ class Command(BaseCommand):
                     )
                     user.update(update_fields=['photo'])
             
-        print(f'User {user.username} has been created.')
+            print(f'User {user.username} has been created.')
         
         shutil.rmtree(download_path, )

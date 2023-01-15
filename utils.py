@@ -2,6 +2,9 @@ import os
 import random
 import logging
 from datetime import datetime
+import unicodedata
+
+import openpyxl
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -55,6 +58,11 @@ class odict(dict):
         dict.__init__(self, *args, **kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
+    
+    def __setitem__(self, __key, __value):
+        key = slugify(__key).replace('-', '_')
+        setattr(self, key, __value)
+        return super().__setitem__(__key, __value)
 
 
 def strtobool(val:str):
@@ -70,6 +78,19 @@ def strtobool(val:str):
         return False
     else:
         raise ValueError(_("invalid truth value %r") % (val,))
+
+
+def contains_arabic_chars(val:str):
+    """
+    Returns True if the string in the argument contains any arabic characters.
+    Otherwise, it returns False
+    """
+    for c in val:
+        unicode_name = unicodedata.name(c).lower()
+        if 'arabic' in unicode_name:
+            return True
+    
+    return False
 
 
 class Result(imdict):
@@ -151,13 +172,14 @@ def get_user_photo_filename(instance, filename):
     return "{}/profile_picture.{}".format(folder, ext)
 
 
-def handle_excel_file(file_name, start_row=1, extract_columns=None):
+def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None):
     """
-    file_name | string: The target file path.
+    file_name | string: The path to open or a File like object
     start_row | int: the number of row where the header of the file is located.
     extract_columns | List of strings: the names of columns to extract from the file.
     The extract_columns param will be slugified as well as the columns from the excel file,
     so caps, spaces, and special characters are ignored, making it easier to match.
+    target_sheet | string: Name of the target sheet
 
     example:
     >>> start_row = 1
@@ -167,38 +189,89 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None):
     >>> data = handle_excel_file("file.xlsx", start_row, column_names)
     """
 
-    if not extract_columns:
-        return odict()
-
     if type(start_row) != int or start_row <= 0:
         raise Exception("'start_row' attribute is invalid!")
+    start_row -= 1
 
-    with open(file_name, 'r') as f:
+    try:
 
         # Slugify extract_columns
-        slugified_extract_columns = [slugify(name) for name in extract_columns]
+        if not extract_columns:
+            extract_columns = []
+            slugified_extract_columns = []
+        else:
+            slugified_extract_columns = [slugify(name) for name in extract_columns]
+
+        wb = openpyxl.load_workbook(file_name)
+        worksheet = wb[target_sheet]
 
         # Extract columns names from the excel file
-        column_names = []  # This list will be extracted from the file and then slugified.
+        column_names = []
+        columns_indexes = []
 
+        fill_extract_columns = False if slugified_extract_columns else True
+
+        for index, row in enumerate(worksheet.iter_rows()):
+            if index != start_row:
+                continue
+            
+            exit_on_null = False
+            for col_index, cell in enumerate(row):
+                value = cell.value
+                if value:
+                    slugified_value = slugify(str(value))
+                    if fill_extract_columns:
+                        extract_columns.append(str(value))
+                        slugified_extract_columns.append(slugified_value)
+                    column_names.append(slugified_value)
+                    columns_indexes.append(col_index)
+                    exit_on_null = True
+                elif exit_on_null:
+                    break 
+        
+        extract_columns_indexes = []
+        # Check if all extract_columns exist in the excel file.
         for column_name in slugified_extract_columns:
             if column_name not in column_names:
                 raise ValidationError(
-                    _("The uploaded file does not contain `email` column.")
+                    _(
+                        "The uploaded file does not contain a column named '%s'." %
+                        (column_name, )
+                    )
                 )
+        
+        for index, column_name in enumerate(column_names):
+            if column_name in slugified_extract_columns:
+                extract_columns_indexes.append(index)
+        
+        excel_data = list()
+        # iterating over the rows and
+        # getting value from each cell in row
+        for index, row in enumerate(worksheet.iter_rows()):
+            if index <= start_row:
+                continue
+
+            is_row_empty = True
+            row_data = odict()
+            for col_index, cell in enumerate(row):
+                if col_index in extract_columns_indexes:
+                    row_data[column_names[col_index]] = cell.value
+                    if cell.value:
+                        is_row_empty = False
+            
+            if not is_row_empty:
+                excel_data.append(row_data)
 
         # return odict object with the following format:
-        # {
-        #   'column_names': ['name', 'age', 'email'],
-        #   'column_names_display': ['Name', 'Age', 'Email'],
-        #   'data': [
-        #       odict({"name": "Albert", "age": 39, "email": "albert@mail.com"}),
-        #       odict({"name": "Emily", "age": 26, "email": "emily@mail.com"}),
-        #   ],
-        # }
-        data = odict()
+        return odict(
+            column_names=slugified_extract_columns,
+            column_names_display=extract_columns,
+            data=excel_data
+        )
 
-    return data
+    except Exception as e:
+        logging.error(e)
+        return None
 
 
 def send_html_email(
