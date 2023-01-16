@@ -95,6 +95,9 @@ class UserAdmin(auth_admin.UserAdmin):
                 # Remove groups from changed_data because .save() method does not accept related fields
                 # to be passed in the update_fields parameter.
                 form.changed_data.remove("groups")
+            if 'user_permissions' in form.changed_data:
+                form.changed_data.remove('user_permissions')
+
             result = obj.update(update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
