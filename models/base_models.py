@@ -104,8 +104,6 @@ class BaseModel(models.Model):
         if not user:
             return
         
-        print('USER:', user)
-
         LogEntry.objects.log_action(
             user_id=user.pk,
             content_type_id=get_content_type_for_model(self).pk,

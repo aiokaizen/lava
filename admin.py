@@ -217,7 +217,7 @@ class BaseModelAdmin(admin.ModelAdmin):
 
     def delete_queryset(self, request, queryset):
         for obj in queryset:
-            result = obj.delete(user=request.user)
+            result = obj.delete(user=request.user, soft_delete=False)
             if not result.success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
