@@ -20,7 +20,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         m2m_field_names = getattr(self, 'm2m_field_names', [])
-        m2m_fields = []
+        m2m_fields = [] if m2m_field_names else None
 
         ModelClass = self.Meta.model
         instance = ModelClass()
@@ -31,7 +31,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
             else:
                 setattr(instance, attr, value)
 
-        result = instance.create(self.user, m2m_fields=m2m_fields)
+        result = instance.create(user=self.user, m2m_fields=m2m_fields)
         if result.is_error:
             raise serializers.ValidationError(result.message)
         return self.instance
