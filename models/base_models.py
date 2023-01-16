@@ -21,7 +21,7 @@ class BaseModel(models.Model):
         verbose_name_plural = "Base Models"
         abstract = True
 
-    created_at = models.DateTimeField(_("Created at"), null=True, blank=True, auto_now_add=True)
+    created_at = models.DateTimeField(_("Created at"), null=True, blank=True)
     created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
@@ -31,6 +31,9 @@ class BaseModel(models.Model):
             return Result(False, _("This object is already created."))
         
         self.created_by = user
+
+        if not self.created_at:
+            self.created_at = timezone.now()
 
         self.save()
 
@@ -63,7 +66,7 @@ class BaseModel(models.Model):
 
         return Result(True, _("Object updated successfully."))
 
-    def delete(self, user=None, soft_delete=False):
+    def delete(self, user=None, soft_delete=True):
 
         success_message = _("The object was deleted successfully.")
 
@@ -75,7 +78,7 @@ class BaseModel(models.Model):
         if user:
             self.log_action(user, DELETION, "Deleted")
 
-        self.delete()
+        super().delete()
         return Result(True, success_message)
 
     def duplicate(self, user=None):

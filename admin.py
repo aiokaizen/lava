@@ -130,6 +130,105 @@ class UserAdmin(auth_admin.UserAdmin):
         self.message_user(request, "The selected users were successfully deleted.", messages.SUCCESS)
 
 
+class BaseModelAdmin(admin.ModelAdmin):
+
+    fieldsets = (
+        (
+            _("Base attributes"),
+            {
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "last_updated_at",
+                    "deleted_at"
+                ),
+            },
+        ),
+    )
+
+    readonly_fields = [
+        "created_at",
+        "created_by",
+        "last_updated_at",
+        "deleted_at"
+    ]
+
+    actions = [
+        "soft_delete",
+        "restore"
+    ]
+
+    def save_model(self, request, obj, form, change):
+        if not change:  # Creation
+            result = obj.create()
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    result.message,
+                    lvl
+                )
+        elif obj is not None:  # Modification
+            result = obj.update(update_fields=form.changed_data)
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    result.message,
+                    lvl
+                )
+
+    @admin.action(description=_('Soft delete'))
+    def soft_delete(self, request, queryset):
+        for obj in queryset:
+            result = obj.soft_delete(user=request.user)
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    _(
+                        "The following error rose while trying "
+                        "to delete '%s': \n\t%s" % (obj, result.message)
+                    ),
+                    lvl
+                )
+
+        self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
+
+    @admin.action(description=_('Restore'))
+    def restore(self, request, queryset):
+        for obj in queryset:
+            result = obj.restore(user=request.user)
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    _(
+                        "The following error rose while trying "
+                        "to restore '%s': \n\t%s" % (obj, result.message)
+                    ),
+                    lvl
+                )
+
+        self.message_user(
+            request, _("The selected objects were successfully restored."),
+            messages.SUCCESS
+        )
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            result = obj.delete(user=request.user)
+            if not result.success:
+                lvl = messages.ERROR if result.is_error else messages.WARNING
+                self.message_user(
+                    request,
+                    _("The following error rose while deleting '%s': \n\t%s" % (obj, result.message)),
+                    lvl
+                )
+
+        self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
+
+
 # @admin.register(Group)
 # class GroupAdmin(admin.ModelAdmin):
 #     pass
