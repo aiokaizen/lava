@@ -174,6 +174,12 @@ def get_user_photo_filename(instance, filename):
     return "{}/profile_picture.{}".format(folder, ext)
 
 
+def get_group_photo_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    folder = "group/{}".format(instance.id)
+    return "{}/photo.{}".format(folder, ext)
+
+
 def get_or_create(klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs):
     try:
         instance = klass.objects.get(*args, **kwargs)

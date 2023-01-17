@@ -82,12 +82,6 @@ class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class GroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Group
-        fields = ["name"]
-
-
 class ChangePasswordFormSerializer(serializers.ModelSerializer):
 
     old_password = serializers.CharField(

@@ -7,7 +7,9 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.models import AbstractUser, Group, Permission  # as BaseGroup,
+from django.contrib.auth.models import (
+    AbstractUser, Permission, GroupManager
+)
 from django.contrib.admin.models import (
     LogEntry, DELETION, CHANGE, ADDITION
 )
@@ -19,10 +21,13 @@ from django.utils import timezone
 from lava import settings as lava_settings
 from lava import validators as lava_validators
 from lava.error_codes import UNIMPLEMENTED, UNKNOWN
-from lava.messages import UNKNOWN_ERROR_MESSAGE
+from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE
+from lava.models.base_models import BaseModel
+from lava.services.permissions import can_add_group, can_change_group, can_delete_group, can_list_group, can_soft_delete_group
 from lava.utils import (
     get_user_cover_filename,
     get_user_photo_filename,
+    get_group_photo_filename,
     Result,
     generate_password,
     strtobool,
@@ -79,8 +84,81 @@ class Preferences(models.Model):
         return super().__str__()
 
 
-# class Group(BaseGroup):
-#     pass
+class Group(BaseModel):
+
+    class Meta(BaseModel.Meta):
+        verbose_name = _('Group')
+        verbose_name_plural = _('Groups')
+        permissions = (
+            ('add_group', "Can add group"),
+            ('change_group', "Can update group"),
+            ('delete_group', "Can delete group"),
+            ('soft_delete_group', "Can soft delete group"),
+            ('view_group', "Can view group"),
+            ('list_group', "Can view group list"),
+            ('view_trash_group', "Can view deleted groups"),
+            ('restore_group', "Can restore group"),
+        )
+
+    name = models.CharField(_('Name'), max_length=150, unique=True)
+    description = models.TextField(_('Description'), default='', blank=True)
+    image = models.ImageField(
+        _("Image"),
+        upload_to=get_group_photo_filename,
+        null=True,
+        blank=True
+    )
+    parent = models.ForeignKey(
+        'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
+        related_name="sub_groups", null=True, blank=True
+    )
+
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('Permissions'),
+        related_name='lava_groups',
+        blank=True,
+    )
+
+    objects = GroupManager()
+
+    def __str__(self):
+        return self.name
+
+    def natural_key(self):
+        return (self.name,)
+    
+    def create(self, user=None, m2m_fields=None):
+        if user and not can_add_group(user):
+            return Result(False, FORBIDDEN_MESSAGE)
+        return super().create(user=user, m2m_fields=m2m_fields)
+    
+    def update(self, user=None, update_fields=None, m2m_fields=None, message="Updated"):
+        if user and not can_change_group(user):
+            return Result(False, FORBIDDEN_MESSAGE)
+        return super().update(user, update_fields, m2m_fields, message)
+    
+    def delete(self, user=None, soft_delete=True):
+        if user:
+            if soft_delete and not can_soft_delete_group(user):
+                return Result(False, FORBIDDEN_MESSAGE)
+            elif not soft_delete and not can_delete_group(user):
+                return Result(False, FORBIDDEN_MESSAGE)
+        return super().delete(user, soft_delete)
+    
+    @classmethod
+    def get_filter_params(cls, user=None, kwargs=None):
+        filter_params = Q()
+        return filter_params
+    
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = cls.get_filter_params(user, kwargs)
+        queryset = cls.objects.filter(filter_params)
+        if user and not can_list_group(user):
+            return queryset.none()
+
+        return queryset
 
 
 class User(AbstractUser):
@@ -146,6 +224,7 @@ class User(AbstractUser):
 
     deleted_at = models.DateTimeField(_("Deleted at"), null=True)
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
+
     objects = LavaUserManager()
 
     def groups_names(self):

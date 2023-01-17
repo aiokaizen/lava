@@ -232,9 +232,9 @@ class BaseModelAdmin(admin.ModelAdmin):
         self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
 
 
-# @admin.register(Group)
-# class GroupAdmin(admin.ModelAdmin):
-#     pass
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(Permission)

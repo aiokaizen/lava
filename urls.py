@@ -1,64 +1,72 @@
+import sys
+
 from django.urls import path
 
 from rest_framework import routers
 
-from lava.views import main_views, api_views
-from lava.views import user_views
+from lava import views
 
 
 app_name = "lava"
 
 
-router = routers.SimpleRouter()
-router.register(r"notifications", api_views.NotificationViewSet)
-router.register(r"preferences", api_views.PreferencesViewSet)
+api_router = routers.SimpleRouter()
+activate_api_urls = 'rest_framework' in sys.modules
+api_urlpatterns = []
+
 
 base_urlpatterns = [
-    path("", main_views.Home.as_view(), name="home"),
-    path("login/", main_views.Login.as_view(), name="login"),
-    path("logout/", main_views.logout, name="logout"),
-    path("signup/", main_views.Signup.as_view(), name="signup"),
-    path("password_reset/", main_views.ResetPassword.as_view(), name="password_reset"),
-    path("notifications/", main_views.Notifications.as_view(), name="notifications"),
+    path("", views.Home.as_view(), name="home"),
+    path("login/", views.Login.as_view(), name="login"),
+    path("logout/", views.logout, name="logout"),
+    path("signup/", views.Signup.as_view(), name="signup"),
+    path("password_reset/", views.ResetPassword.as_view(), name="password_reset"),
+    path("notifications/", views.Notifications.as_view(), name="notifications"),
     path(
         "users/activate/<str:uid>/<str:token>",
-        main_views.activate_user,
+        views.activate_user,
         name="user-activate",
     ),
     path(
         "users/password/reset/confirm/<str:uid>/<str:token>",
-        main_views.ResetPasswordConfirm.as_view(),
+        views.ResetPasswordConfirm.as_view(),
         name="user-reset-pwd-confirm",
     ),
     path(
         "users/update_device_id/",
-        api_views.update_device_id,
+        views.update_device_id,
         name="user-update-device-id",
     ),
 
-
     # User management urls
     path(
-        "users/", user_views.UserListView.as_view(), name="user-list",
+        "users/", views.UserListView.as_view(), name="user-list",
     ),
-    
 ]
+
+if activate_api_urls:
+    api_router.register(r"notifications", views.NotificationViewSet)
+    api_router.register(r"preferences", views.PreferencesViewSet)
+    api_router.register(r"groups", views.GroupAPIViewSet)
+    # api_router.register(r"users", views.PreferencesViewSet)
+
+    api_urlpatterns = [
+        path("api/users/", views.UserListCreate.as_view(), name="api-user-list"),
+        path(
+            "api/users/<int:pk>/",
+            views.UserRetrieveUpdateDestroy.as_view(),
+            name="api-user-detail",
+        ),
+        path(
+            "api/users/<int:pk>/change_pwd",
+            views.change_password,
+            name="api-user-change-pwd",
+        ),
+        path("api/maintenance", views.maintenance, name="api-maintenance"),
+    ]
 
 urlpatterns = [
     *base_urlpatterns,
-
-    path("api/users/", api_views.UserListCreate.as_view(), name="api-user-list"),
-    path(
-        "api/users/<int:pk>/",
-        api_views.UserRetrieveUpdateDestroy.as_view(),
-        name="api-user-detail",
-    ),
-    path(
-        "api/users/<int:pk>/change_pwd",
-        api_views.change_password,
-        name="api-user-change-pwd",
-    ),
-    path("api/maintenance", api_views.maintenance, name="api-maintenance"),
+    *api_urlpatterns,
+    *api_router.urls
 ]
-
-urlpatterns.extend(router.urls)
