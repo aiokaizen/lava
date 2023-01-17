@@ -16,6 +16,8 @@ from django.template.loader import render_to_string
 
 from templated_mail.mail import BaseEmailMessage
 
+from lava.exceptions import LavaBaseException
+
 try:
     import firebase_admin
     from firebase_admin import credentials
@@ -170,6 +172,20 @@ def get_user_photo_filename(instance, filename):
     ext = filename.split(".")[-1]
     folder = "user/{}".format(mask_number(instance.id))
     return "{}/profile_picture.{}".format(folder, ext)
+
+
+def get_or_create(klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs):
+    try:
+        instance = klass.objects.get(*args, **kwargs)
+    except klass.DoesNotExist:
+        default_value = default_value or {}
+        create_parmas = create_parmas or {}
+        instance = klass(**default_value)
+        result = instance.create(user=action_user, **create_parmas)
+        if not result:
+            raise LavaBaseException(result)
+    
+    return instance
 
 
 def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None):
