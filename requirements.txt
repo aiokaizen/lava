@@ -5,3 +5,4 @@ requests==2.27.1
 djoser==2.1.0
 django-cors-headers==3.13.0
 openpyxl==3.0.10
+django-admin-interface==0.24.2
