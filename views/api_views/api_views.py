@@ -62,7 +62,7 @@ def update_device_id(request):
 @permission_classes([permissions.IsAuthenticated])
 def get_user_permissions(request):
     user = request.user
-    perms = user.permissions.all().values_list('codename', flat=True)
+    perms = user.get_all_permissions()
     return Response(perms)
 
 
