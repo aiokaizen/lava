@@ -58,6 +58,14 @@ def update_device_id(request):
     return Response(result.to_dict())
 
 
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_permissions(request):
+    user = request.user
+    perms = user.permissions.all().values_list('codename', flat=True)
+    return Response(perms)
+
+
 class PreferencesViewSet(mixins.ListModelMixin, GenericViewSet):
     queryset = Preferences.objects.none()
     serializer_class = PreferencesSerializer

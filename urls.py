@@ -63,6 +63,7 @@ if activate_api_urls:
             name="api-user-change-pwd",
         ),
         path("api/maintenance", views.maintenance, name="api-maintenance"),
+        path("api/user_permissions", views.get_user_permissions, name="api-get-user-permissions"),
     ]
 
 urlpatterns = [

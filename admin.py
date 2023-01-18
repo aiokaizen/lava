@@ -139,6 +139,7 @@ class BaseModelAdmin(admin.ModelAdmin):
         (
             _("Base attributes"),
             {
+                "classes": ("collapse", "expanded"),
                 "fields": (
                     "created_at",
                     "created_by",
