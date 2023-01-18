@@ -10,8 +10,6 @@ class GroupListSerializer(ReadOnlyModelSerializer):
         fields = [
             "id",
             "name",
-            "description",
-            "image",
         ]
 
 
@@ -21,9 +19,6 @@ class GroupGetSerializer(ReadOnlyModelSerializer):
         fields = [
             "id",
             "name",
-            "description",
-            "image",
-            "parent",
             "permissions"
         ]
 
@@ -33,8 +28,5 @@ class GroupCreateUpdateSerializer(BaseModelSerializer):
         model = Group
         fields = [
             "name",
-            "description",
-            "image",
-            "parent",
             "permissions"
         ]
