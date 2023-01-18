@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import (
-    AbstractUser, Permission, GroupManager
+    AbstractUser, Permission, Group as BaseGroupModel
 )
 from django.contrib.admin.models import (
     LogEntry, DELETION, CHANGE, ADDITION
@@ -84,11 +84,13 @@ class Preferences(models.Model):
         return super().__str__()
 
 
-class Group(BaseModel):
+class Group(BaseGroupModel):
 
     class Meta(BaseModel.Meta):
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
+        ordering = ("name", )
+        proxy = True
         permissions = (
             ('add_group', "Can add group"),
             ('change_group', "Can update group"),
@@ -100,43 +102,60 @@ class Group(BaseModel):
             ('restore_group', "Can restore group"),
         )
 
-    name = models.CharField(_('Name'), max_length=150, unique=True)
-    description = models.TextField(_('Description'), default='', blank=True)
-    image = models.ImageField(
-        _("Image"),
-        upload_to=get_group_photo_filename,
-        null=True,
-        blank=True
-    )
-    parent = models.ForeignKey(
-        'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
-        related_name="sub_groups", null=True, blank=True
-    )
-
-    permissions = models.ManyToManyField(
-        Permission,
-        verbose_name=_('Permissions'),
-        related_name='lava_groups',
-        blank=True,
-    )
-
-    objects = GroupManager()
-
-    def __str__(self):
-        return self.name
-
-    def natural_key(self):
-        return (self.name,)
+    # description = models.TextField(_('Description'), default='', blank=True)
+    # image = models.ImageField(
+    #     _("Image"),
+    #     upload_to=get_group_photo_filename,
+    #     null=True,
+    #     blank=True
+    # )
+    # parent = models.ForeignKey(
+    #     'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
+    #     related_name="sub_groups", null=True, blank=True
+    # )
     
     def create(self, user=None, m2m_fields=None):
         if user and not can_add_group(user):
             return Result(False, FORBIDDEN_MESSAGE)
-        return super().create(user=user, m2m_fields=m2m_fields)
+        
+        if self.id:
+            return Result(False, _("This object is already created."))
+        
+        self.created_by = user
+
+        self.save()
+
+        if m2m_fields:
+            for attr, value in m2m_fields:
+                field = getattr(self, attr)
+                field.set(value)
+
+        if user:
+            self.log_action(user, ADDITION, "Created")
+            
+        return Result(True, _("Group created successfully."))
     
     def update(self, user=None, update_fields=None, m2m_fields=None, message="Updated"):
         if user and not can_change_group(user):
             return Result(False, FORBIDDEN_MESSAGE)
-        return super().update(user, update_fields, m2m_fields, message)
+            
+        if not self.id:
+            return Result(False, _("This object is not yet created."))
+            
+        if update_fields:
+            self.save(update_fields=update_fields)
+        else:
+            self.save()
+
+        if m2m_fields:
+            for attr, value in m2m_fields:
+                field = getattr(self, attr)
+                field.set(value)
+
+        if user:
+            self.log_action(user, CHANGE, message)
+
+        return Result(True, _("Group updated successfully."))
     
     def delete(self, user=None, soft_delete=True):
         if user:

@@ -34,7 +34,7 @@ class BaseModel(models.Model):
             ('restore_object', f"Can restore {_class_name}"),
         )
 
-    created_at = models.DateTimeField(_("Created at"), null=True, blank=True)
+    created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
     created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
@@ -44,9 +44,6 @@ class BaseModel(models.Model):
             return Result(False, _("This object is already created."))
         
         self.created_by = user
-
-        if not self.created_at:
-            self.created_at = timezone.now()
 
         self.save()
 

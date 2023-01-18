@@ -17,11 +17,7 @@ class Command(BaseCommand):
         try:
             group = Group.objects.get(name="ADMINS")
         except Group.DoesNotExist:
-            group = Group(
-                name='ADMINS',
-                description="Admins have access to all available permissions in the system.",
-                image=None
-            )
+            group = Group(name='ADMINS')
             group.create()
 
         # Add all available permissions to group ADMINS
@@ -29,8 +25,23 @@ class Command(BaseCommand):
 
         # Create the superadmin and the `ADMINS` group if they don't exist
         try:
+            eksuperuser = User.objects.get(username="eksuperuser")
+            logging.warning("superuser eksuperuser already exists!")
+        except User.DoesNotExist:
+            eksuperuser = User(
+                username="eksuperuser",
+                email="admin@ekblocks.com",
+                first_name="EKBlocks",
+                last_name="SuperUser",
+                is_staff=True,
+                is_superuser=True,
+            )
+            eksuperuser.create(groups=[group], password="admin_super_pass", force_is_active=True, link_payments_app=False)
+            logging.info("eksuperuser was created successfully!")
+
+        try:
             ekadmin = User.objects.get(username="ekadmin")
-            logging.warning("superuser ekadmin already exists!")
+            logging.warning("admin user ekadmin already exists!")
         except User.DoesNotExist:
             ekadmin = User(
                 username="ekadmin",
@@ -38,7 +49,6 @@ class Command(BaseCommand):
                 first_name="EKBlocks",
                 last_name="Administrator",
                 is_staff=True,
-                is_superuser=True,
             )
             ekadmin.create(groups=[group], password="admin_pass", force_is_active=True, link_payments_app=False)
             logging.info("ekadmin was created successfully!")

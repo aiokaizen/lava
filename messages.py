@@ -16,3 +16,5 @@ FORBIDDEN_MESSAGE = _(
     "You don't have the necessary permessions to execute this action!"
 )
 HTTP_403_MESSAGE = {"detail": FORBIDDEN_MESSAGE}
+
+INVALID_FORMAT_MESSAGE = _("Invalid format.")
