@@ -44,3 +44,10 @@ def can_restore_group(user):
 
 
 # User permissions
+
+
+# Permission permissions
+def can_export_permissions(user):
+    return True
+    # has_perm = user.has_perm('lava.export_permissions')
+    # return has_perm

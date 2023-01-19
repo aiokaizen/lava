@@ -19,6 +19,11 @@ class Command(BaseCommand):
         except Group.DoesNotExist:
             group = Group(name='ADMINS')
             group.create()
+    
+        # Create static permissions
+        # export_permissions_permission = Permission.objects.create(
+
+        # )
 
         # Add all available permissions to group ADMINS
         group.permissions.add(*Permission.objects.all().values_list('id', flat=True))

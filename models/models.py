@@ -84,6 +84,10 @@ class Preferences(models.Model):
         return super().__str__()
 
 
+# class Permission(models.Model):
+#     pass
+
+
 class Group(BaseGroupModel):
 
     class Meta(BaseModel.Meta):

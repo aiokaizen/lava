@@ -79,3 +79,15 @@ class CanRestoreGroup(IsAuthenticated):
         is_authenticated = super().has_permission(request, view)
         user = request.user
         return is_authenticated and can_restore_group(user)
+
+
+# Permission Permissions
+class CanExportPermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to create a group.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_export_permissions(user)
