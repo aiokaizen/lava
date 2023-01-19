@@ -27,9 +27,9 @@ class ExportPermissions(APIView):
         
         filename = result.instance
 
-        xlfile = open(filename, 'rb')
+        with open(filename, 'rb') as xlfile:
 
-        response = HttpResponse(xlfile, content_type='application/xlsx')
-        response["content-disposition"] = f"attachment; filename=permissions.xlsx"
+            response = HttpResponse(xlfile, content_type='application/xlsx')
+            response["content-disposition"] = f"attachment; filename=permissions.xlsx"
 
-        return response
+            return response

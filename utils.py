@@ -95,6 +95,20 @@ def contains_arabic_chars(val:str):
     return False
 
 
+def get_tmp_root():
+    tmp_root = settings.TMP_ROOT
+    if not os.path.exists(tmp_root):
+        os.makedirs(tmp_root)
+    return tmp_root
+
+
+def get_log_root():
+    log_root = settings.LOG_ROOT
+    if not os.path.exists(log_root):
+        os.makedirs(log_root)
+    return log_root
+
+
 class Result(imdict):
     """
     An immutable Result object representing
