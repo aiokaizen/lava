@@ -1,6 +1,8 @@
 import logging
+from datetime import datetime
 
 from django.db import models
+from django.db.models import Q
 from django.contrib.admin.models import (
     LogEntry, DELETION, CHANGE, ADDITION
 )
@@ -9,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from lava import settings as lava_settings
+from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.utils import (
     Result,
 )
@@ -38,6 +41,9 @@ class BaseModel(models.Model):
     created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
+
+    objects = DefaultBaseModelManager()
+    trash = TrashBaseModelManager()
 
     def create(self, user=None, m2m_fields=None):
         if self.id:
@@ -123,3 +129,56 @@ class BaseModel(models.Model):
             change_message=message
         )
 
+    @classmethod
+    def get_filter_params(cls, user, kwargs=None):
+
+        filter_params = Q()
+        if kwargs is None:
+            kwargs = {}
+
+        if "created_by" in kwargs:
+            filter_params &= Q(created_by=kwargs["created_by"])
+
+        if "created_at" in kwargs:
+            date = datetime.strptime(kwargs["created_at"], "%m-%d-%Y")
+            filter_params &= Q(created_at__date=date)
+
+        if "created_after" in kwargs:
+            date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
+            filter_params &= Q(created_at__date__gte=date)
+
+        if "created_before" in kwargs:
+            date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
+            filter_params &= Q(created_at__date__lte=date)
+
+        if "last_updated_at" in kwargs:
+            date = datetime.strptime(kwargs["last_updated_at"], "%m-%d-%Y")
+            filter_params &= Q(last_updated_at__date=date)
+
+        if "last_updated_after" in kwargs:
+            date = datetime.strptime(kwargs["last_updated_after"], "%m-%d-%Y")
+            filter_params &= Q(last_updated_at__date__gte=date)
+
+        if "last_updated_before" in kwargs:
+            date = datetime.strptime(kwargs["last_updated_before"], "%m-%d-%Y")
+            filter_params &= Q(last_updated_at__date__lte=date)
+
+        if "deleted_at" in kwargs:
+            date = datetime.strptime(kwargs["deleted_at"], "%m-%d-%Y")
+            filter_params &= Q(deleted_at__date=date)
+
+        if "deleted_after" in kwargs:
+            date = datetime.strptime(kwargs["deleted_after"], "%m-%d-%Y")
+            filter_params &= Q(deleted_at__date__gte=date)
+
+        if "deleted_before" in kwargs:
+            date = datetime.strptime(kwargs["deleted_before"], "%m-%d-%Y")
+            filter_params &= Q(deleted_at__date__lte=date)
+
+        return filter_params
+
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = cls.get_filter_params(user, kwargs)
+        queryset = cls.objects.filter(filter_params)
+        return queryset
