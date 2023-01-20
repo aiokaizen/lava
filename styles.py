@@ -28,6 +28,7 @@ class XLSXStyles:
         # Borders
         default_side = Side(color="000000", style="thin")
         header_side = Side(color="000000", style="thin")
+        white_side = Side(color="ffffff", style="thin")
         default_border = Border(
             left=default_side, right=default_side,
             top=default_side, bottom=default_side, diagonal=default_side
@@ -36,9 +37,14 @@ class XLSXStyles:
             left=header_side, right=header_side, top=header_side,
             bottom=header_side, diagonal=header_side
         )
+        white_border = Border(
+            left=white_side, right=white_side, top=white_side,
+            bottom=white_side, diagonal=white_side
+        )
         self.borders = odict(
             default=default_border,
             header=header_border,
+            white=white_border,
         )
 
         # Alignments
@@ -58,6 +64,7 @@ class XLSXStyles:
         self.base_style = NamedStyle(
             name="base",
             font=copy(self.fonts.default),
+            border=copy(self.borders.white),
             alignment=self.alignments.topleft,
             fill=PatternFill(fill_type="solid", fgColor="ffffff"),
         )
