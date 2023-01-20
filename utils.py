@@ -169,6 +169,10 @@ def mask_number(n):
     return n
 
 
+def map_interval(value, min1, max1, min2, max2):
+    return (value - min1) / (max1 - min1) * (max2 - min2) + min2
+
+
 def unmask_number(mask):
     if isinstance(mask, int):
         return mask - 747251
