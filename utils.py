@@ -95,15 +95,17 @@ def contains_arabic_chars(val:str):
     return False
 
 
-def get_tmp_root():
+def get_tmp_root(dirname=None):
     tmp_root = settings.TMP_ROOT
+    tmp_root = os.path.join(tmp_root, dirname) if dirname else tmp_root
     if not os.path.exists(tmp_root):
         os.makedirs(tmp_root)
     return tmp_root
 
 
-def get_log_root():
+def get_log_root(dirname=None):
     log_root = settings.LOG_ROOT
+    log_root = os.path.join(log_root, dirname) if dirname else log_root
     if not os.path.exists(log_root):
         os.makedirs(log_root)
     return log_root

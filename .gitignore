@@ -2,3 +2,4 @@
 node-modules/
 local_settings.py
 *.ignore
+**/.DS_Store
