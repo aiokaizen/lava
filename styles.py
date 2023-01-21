@@ -29,6 +29,7 @@ class XLSXStyles:
         default_side = Side(color="000000", style="thin")
         header_side = Side(color="000000", style="thin")
         white_side = Side(color="ffffff", style="thin")
+
         default_border = Border(
             left=default_side, right=default_side,
             top=default_side, bottom=default_side, diagonal=default_side
@@ -61,20 +62,26 @@ class XLSXStyles:
         )
 
         # Named styles
-        self.base_style = NamedStyle(
-            name="base",
+        self.white_style = NamedStyle(
+            name="white",
             font=copy(self.fonts.default),
             border=copy(self.borders.white),
             alignment=self.alignments.topleft,
             fill=PatternFill(fill_type="solid", fgColor="ffffff"),
         )
 
-        self.default_style = NamedStyle(
-            name="default",
+        self.colored_style = NamedStyle(
+            name="colored",
             font=copy(self.fonts.default),
             border=copy(self.borders.default),
             alignment=self.alignments.centerleft,
             fill=PatternFill(fill_type="solid", fgColor="e5f3f1"),
+        )
+
+        self.default_style = NamedStyle(
+            name="default",
+            font=copy(self.fonts.default),
+            alignment=self.alignments.topleft,
         )
 
         self.header_style = NamedStyle(
@@ -89,5 +96,4 @@ class XLSXStyles:
             name="title",
             font=copy(self.fonts.title),
             alignment=self.alignments.centerleft,
-            fill=PatternFill(fill_type="solid", fgColor="ffffff"),
         )

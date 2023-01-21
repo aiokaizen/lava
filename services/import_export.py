@@ -1,13 +1,8 @@
 import os
-from copy import copy
 from datetime import datetime
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-
-from lava.utils import Result, get_tmp_root, map_interval
-from lava.models import Permission, Group
-from lava.styles import XLSXStyles
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -15,6 +10,10 @@ from openpyxl.writer import excel
 from openpyxl.styles.alignment import Alignment
 from openpyxl.drawing.image import Image
 from PIL import Image as PILImage
+
+from lava.utils import Result, get_tmp_root, map_interval
+from lava.models import Permission, Group
+from lava.styles import XLSXStyles
 
 
 def add_margin_to_image(pil_img, top, right, bottom, left, color):
@@ -68,7 +67,6 @@ def get_image(image_path, target_width=None, target_height=None, margin=None, co
 
 
 def get_cell_str(col, row):
-    print('cell:', f"{get_column_letter(col)}{row}")
     return f"{get_column_letter(col)}{row}"
 
 
@@ -83,20 +81,23 @@ def export_permissions():
     logo_filepath = os.path.join(settings.BASE_DIR, 'lava/static/lava/assets/images/logo/logo.png')
     styles = XLSXStyles()
 
-    start_file_header_row = 3
+    start_file_header_row = 1
     start_file_header_col = 2
 
     start_row_index = start_file_header_row + 3
     start_col_index = start_file_header_col
 
     permissions = Permission.objects.all()
+    perms_count = permissions.count()
     groups = Group.objects.all().order_by("name")
+    groups_count = groups.count()
 
     try:
         # Workbook initialization
         wb = Workbook()
-        wb.add_named_style(styles.base_style)
+        wb.add_named_style(styles.white_style)
         wb.add_named_style(styles.default_style)
+        wb.add_named_style(styles.colored_style)
         wb.add_named_style(styles.header_style)
         wb.add_named_style(styles.title_style)
 
@@ -109,51 +110,34 @@ def export_permissions():
         ws.row_dimensions[start_file_header_row + 1].height = 40
         ws.row_dimensions[start_row_index - 1].height = 30
 
-        # ws.freeze_panes(
-        #     # ws.cell(row=start_row_index, column=start_col_index)
-        #     (start_row_index, start_col_index)
-        # )
+        # Freeze the table header
+        ws.freeze_panes = ws.cell(row=start_row_index + 1, column=1)
 
-        if start_file_header_col > 1:
-            ws.merge_cells(
-                f'{get_cell_str(1, 1)}:'
-                f'{get_cell_str(start_file_header_col - 1, permissions.count() + start_row_index)}'
-            )
-            ws.cell(row=1, column=1).style = 'base'
+        last_col_index = max(start_file_header_col + groups_count + 15, start_file_header_col + 25)
+        last_row_index = start_row_index + perms_count
+        title_length = 7
 
-        # for pre_row_index in range(1, start_file_header_row):
-        if start_file_header_row > 1:
-            ws.merge_cells(
-                f'{get_cell_str(start_file_header_col, 1)}:'
-                f'{get_cell_str(groups.count() + start_col_index, start_file_header_row - 1)}'
-            )
-            ws.cell(row=1, column=start_file_header_col).style = 'base'
-        
-        ws.merge_cells(
-            f'{get_cell_str(start_file_header_col + 8, start_file_header_row)}:'
-            f'{get_cell_str(start_file_header_col + groups.count(), start_file_header_row + 1)}'
-        )
-        ws.cell(row=start_file_header_row, column=start_file_header_col + 8).style = 'base'
+        # Remove cell borders
+        for col in range(1, last_col_index):
+            for row in range(1, last_row_index):
+                ws.cell(row=row, column=col).style = 'white'
 
-        ws.merge_cells(
-            f'{get_cell_str(start_col_index, start_row_index - 1)}:'
-            f'{get_cell_str(start_file_header_col + groups.count(), start_row_index - 1)}'
-        )
-        ws.cell(row=start_file_header_row, column=start_file_header_col + 8).style = 'base'
-
+        # Logo cell
         ws.merge_cells(
             f'{get_cell_str(start_file_header_col, start_file_header_row)}:'
             f'{get_cell_str(start_file_header_col, start_file_header_row + 1)}'
         )
-        ws.cell(row=start_file_header_row, column=start_file_header_col).style = 'base'
-        ws.cell(row=start_file_header_row + 1, column=start_file_header_col).style = 'base'
+
+        # Title cell
         ws.merge_cells(
             f'{get_cell_str(start_file_header_col + 1, start_file_header_row)}:'
-            f'{get_cell_str(start_file_header_col + 7, start_file_header_row)}'
+            f'{get_cell_str(start_file_header_col + title_length, start_file_header_row)}'
         )
+
+        # Description cell
         ws.merge_cells(
             f'{get_cell_str(start_file_header_col + 1, start_file_header_row + 1)}:'
-            f'{get_cell_str(start_file_header_col + 7, start_file_header_row + 1)}'
+            f'{get_cell_str(start_file_header_col + title_length, start_file_header_row + 1)}'
         )
 
         start_cell = ws.cell(row=start_row_index, column=start_col_index, value="Permissions")
@@ -161,7 +145,7 @@ def export_permissions():
 
         start_col_name = get_column_letter(start_col_index)
         start_column = ws.column_dimensions[start_col_name]
-        start_column.width = get_col_width(start_cell.value, styles.fonts.header.sz)
+        start_column.width = max(get_col_width(start_cell.value, styles.fonts.header.sz), 37)
 
         title_cell = ws.cell(
             row=start_file_header_row, column=start_file_header_col + 1,
@@ -173,12 +157,10 @@ def export_permissions():
             row=start_file_header_row + 1, column=start_file_header_col + 1,
             value=str(_(
                 "HOW TO USE: Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto sed "
-                "delectus iure, rerum laboriosam sit aliquid! Eaque fuga incidunt sapiente ab "
-                "consectetur eos provident saepe, odio obcaecati? Quibusdam quos perferendis neque. "
-                "Inventore hic mollitia quam minus deleniti. Quibusdam, quaerat deleniti?"
+                "delectus iure, rerum laboriosam sit aliquid!"
             ))
         )
-        description_cell.style = 'base'
+        description_cell.style = 'default'
         
         logo = get_image(logo_filepath, target_width=250, margin=(20, 0, 20, 0))
         ws.add_image(Image(logo), get_cell_str(start_file_header_col, start_file_header_row))
@@ -206,7 +188,7 @@ def export_permissions():
                 has_perm = permission in group.permissions.all()
                 value = 'X' if has_perm else ''
                 cell = ws.cell(row=row + start_row_index + 1 , column=col + start_col_index + 1, value=value)
-                cell.style = 'default'
+                cell.style = 'colored'
                 cell.alignment = Alignment(horizontal="center", vertical="center")
     
         filename = f'permissions_{int(datetime.now().strftime("%Y%m%d%H%M%S"))}.xlsx'
