@@ -1,20 +1,32 @@
 import logging
+import json
 from datetime import datetime
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, ForeignObjectRel, ForeignKey, ManyToManyField
 from django.contrib.admin.models import (
-    LogEntry, DELETION, CHANGE, ADDITION
+    LogEntry as BaseLogEntryModel, DELETION, CHANGE, ADDITION
 )
 from django.contrib.admin.options import get_content_type_for_model
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from lava import settings as lava_settings
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.utils import (
     Result,
 )
+
+
+class LogEntry(BaseLogEntryModel):
+
+    class Meta:
+        verbose_name = _('Log entry')
+        verbose_name_plural = _('Log entries')
+        ordering = ['-action_time']
+        permissions = (
+            ('list_log_entry', f"Can view log entry journal"),
+            ('export_log_entry', f"Can export log entry journal"),
+        )
 
 
 class BaseModel(models.Model):
@@ -59,13 +71,16 @@ class BaseModel(models.Model):
                 field.set(value)
 
         if user:
-            self.log_action(user, ADDITION, "Created")
+            self.log_action(user, ADDITION)
             
         return Result(True, _("Object created successfully."))
 
-    def update(self, user=None, update_fields=None, m2m_fields=None, message="Updated"):
+    def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.id:
             return Result(False, _("This object is not yet created."))
+
+        if not message:
+            message = self.get_changed_message()
             
         if update_fields:
             self.save(update_fields=update_fields)
@@ -92,7 +107,7 @@ class BaseModel(models.Model):
             return Result(True, success_message)
 
         if user:
-            self.log_action(user, DELETION, "Deleted")
+            self.log_action(user, DELETION)
 
         super().delete()
         return Result(True, success_message)
@@ -115,18 +130,39 @@ class BaseModel(models.Model):
             return result
         return Result(True, _("The object has been restored successfully."))
 
-    def log_action(self, user, action_flag, message):
+    def get_changed_message(self):
+        changed_message = {"fields": {}}
+        klass = self.__class__
+        old_self = klass.objects.get(pk=self.pk)
+        for field in klass._meta.get_fields(include_parents=True):
+            field_name = field.name
+            old_value = getattr(old_self, field_name)
+            new_value = getattr(self, field_name)
+            if type(field) in [ForeignKey, ForeignObjectRel]:
+                old_value = f"{old_value.id}|{old_value}" if old_value else None
+                new_value = f"{new_value.id}|{new_value}" if new_value else None
+            if type(field) == ManyToManyField:
+                old_value = list(old_value.all().values_list("pk", flat=True))
+                new_value = list(new_value.all().values_list("pk", flat=True))
+            if old_value != new_value:
+                changed_message["fields"][field_name] = {
+                    "old_value": old_value,
+                    "new_value": new_value
+                }
+        return json.dumps(changed_message, ensure_ascii=False)
+
+    def log_action(self, user, action_flag, change_message=None):
 
         if not user:
             return
-        
+
         LogEntry.objects.log_action(
             user_id=user.pk,
             content_type_id=get_content_type_for_model(self).pk,
             object_id=self.pk,
-            object_repr=self.__class__.__name__.upper(),
+            object_repr=str(self),
             action_flag=action_flag,
-            change_message=message
+            change_message=change_message
         )
 
     @classmethod

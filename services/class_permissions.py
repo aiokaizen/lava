@@ -84,10 +84,22 @@ class CanRestoreGroup(IsAuthenticated):
 # Permission Permissions
 class CanExportPermissions(IsAuthenticated):
     """
-    Checks if a user has the permission to create a group.
+    Checks if a user has the permission to export the list of permissions.
     """
 
     def has_permission(self, request, view):
         is_authenticated = super().has_permission(request, view)
         user = request.user
         return is_authenticated and can_export_permissions(user)
+
+
+# Activity Journal Permissions
+class CanExportActivityJournal(IsAuthenticated):
+    """
+    Checks if a user has the permission to export the activity journal.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_export_activity_journal(user)

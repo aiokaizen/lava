@@ -22,7 +22,7 @@ from lava.utils.utils import (
 
 class ExportDataType(imdict):
 
-    def __init__(self, row_titles:list, col_titles:list, data:list):
+    def __init__(self, col_titles:list, data:list, row_titles:list=None):
         self.row_titles = row_titles
         self.col_titles = col_titles
         self.data = data
@@ -182,7 +182,7 @@ def export_xlsx(
     start_col_index = start_file_header_col
 
     row_titles = data.row_titles
-    data_rows_count = len(row_titles)
+    data_rows_count = len(row_titles) if row_titles else 0
     col_titles = data.col_titles
     data_cols_count = len(col_titles)
 
@@ -261,21 +261,25 @@ def export_xlsx(
             else:
                 column.width = get_col_width(col_title, cell.font.sz)
 
-        for index, row_title in enumerate(row_titles):
-            cell = ws.cell(row=index + start_row_index + 1, column=start_col_index, value=row_title)
-            cell.style = 'header'
-            cell.alignment = Alignment(horizontal="left", vertical="center")
+        if row_titles:
+            for index, row_title in enumerate(row_titles):
+                cell = ws.cell(row=index + start_row_index + 1, column=start_col_index, value=row_title)
+                cell.style = 'header'
+                cell.alignment = Alignment(horizontal="left", vertical="center")
 
-            col_width = get_col_width(row_title, cell.font.sz)
-            if col_width > start_column.width:
-                print('Column width: old:', start_column.width, ' | new:', col_width)
-                start_column.width = col_width
+                col_width = get_col_width(row_title, cell.font.sz)
+                if col_width > start_column.width:
+                    print('Column width: old:', start_column.width, ' | new:', col_width)
+                    start_column.width = col_width
 
+        start_data_col_index = start_col_index
+        if row_titles:
+            start_data_col_index += 1
         for row_index, row in enumerate(data.data):
             for col_index, value in enumerate(row):
                 cell = ws.cell(
                     row=row_index + start_row_index + 1,
-                    column=col_index + start_col_index + 1,
+                    column=col_index + start_data_col_index,
                     value=value
                 )
                 cell.style = 'colored'

@@ -65,6 +65,7 @@ if activate_api_urls:
         path("api/maintenance", views.maintenance, name="api-maintenance"),
         path("api/user_permissions", views.get_user_permissions, name="api-get-user-permissions"),
         path("api/export_user_permissions/", views.ExportPermissions.as_view() , name="api-export-user-permissions"),
+        path("api/export_activity_journal/", views.ExportActivityJournal.as_view() , name="api-export-activity-journal"),
     ]
 
 urlpatterns = [
