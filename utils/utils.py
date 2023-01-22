@@ -4,10 +4,9 @@ import logging
 from datetime import datetime
 import unicodedata
 
-import openpyxl
+from PIL import Image as PILImage
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
@@ -171,14 +170,14 @@ def mask_number(n):
     return n
 
 
-def map_interval(value, min1, max1, min2, max2):
-    return (value - min1) / (max1 - min1) * (max2 - min2) + min2
-
-
 def unmask_number(mask):
     if isinstance(mask, int):
         return mask - 747251
     return mask
+
+
+def map_interval(value, min1, max1, min2, max2):
+    return (value - min1) / (max1 - min1) * (max2 - min2) + min2
 
 
 # Handle Uploaded file names
@@ -212,108 +211,6 @@ def get_or_create(klass, action_user=None, default_value=None, create_parmas=Non
             raise LavaBaseException(result)
     
     return instance
-
-
-def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None):
-    """
-    file_name | string: The path to open or a File like object
-    start_row | int: the number of row where the header of the file is located.
-    extract_columns | List of strings: the names of columns to extract from the file.
-    The extract_columns param will be slugified as well as the columns from the excel file,
-    so caps, spaces, and special characters are ignored, making it easier to match.
-    target_sheet | string: Name of the target sheet
-
-    example:
-    >>> start_row = 1
-    >>> column_names = [
-    >>>     "name", "age", "address"
-    >>> ]
-    >>> data = handle_excel_file("file.xlsx", start_row, column_names)
-    """
-
-    if type(start_row) != int or start_row <= 0:
-        raise Exception("'start_row' attribute is invalid!")
-    start_row -= 1
-
-    try:
-
-        # Slugify extract_columns
-        if not extract_columns:
-            extract_columns = []
-            slugified_extract_columns = []
-        else:
-            slugified_extract_columns = [slugify(name) for name in extract_columns]
-
-        wb = openpyxl.load_workbook(file_name)
-        worksheet = wb[target_sheet]
-
-        # Extract columns names from the excel file
-        column_names = []
-        columns_indexes = []
-
-        fill_extract_columns = False if slugified_extract_columns else True
-
-        for index, row in enumerate(worksheet.iter_rows()):
-            if index != start_row:
-                continue
-            
-            exit_on_null = False
-            for col_index, cell in enumerate(row):
-                value = cell.value
-                if value:
-                    slugified_value = slugify(str(value))
-                    if fill_extract_columns:
-                        extract_columns.append(str(value))
-                        slugified_extract_columns.append(slugified_value)
-                    column_names.append(slugified_value)
-                    columns_indexes.append(col_index)
-                    exit_on_null = True
-                elif exit_on_null:
-                    break 
-        
-        extract_columns_indexes = []
-        # Check if all extract_columns exist in the excel file.
-        for column_name in slugified_extract_columns:
-            if column_name not in column_names:
-                raise ValidationError(
-                    _(
-                        "The uploaded file does not contain a column named '%s'." %
-                        (column_name, )
-                    )
-                )
-        
-        for index, column_name in enumerate(column_names):
-            if column_name in slugified_extract_columns:
-                extract_columns_indexes.append(index)
-        
-        excel_data = list()
-        # iterating over the rows and
-        # getting value from each cell in row
-        for index, row in enumerate(worksheet.iter_rows()):
-            if index <= start_row:
-                continue
-
-            is_row_empty = True
-            row_data = odict()
-            for col_index, cell in enumerate(row):
-                if col_index in extract_columns_indexes:
-                    row_data[column_names[col_index]] = cell.value
-                    if cell.value:
-                        is_row_empty = False
-            
-            if not is_row_empty:
-                excel_data.append(row_data)
-
-        # return odict object with the following format:
-        return odict(
-            column_names=slugified_extract_columns,
-            column_names_display=extract_columns,
-            data=excel_data
-        )
-
-    except Exception as e:
-        logging.error(e)
-        return None
 
 
 def send_html_email(
@@ -383,6 +280,45 @@ def get_log_filepath():
     if not os.path.exists(settings.LOG_ROOT):
         os.makedirs(settings.LOG_ROOT)
     return filepath
+
+
+def add_margin_to_image(pil_img, top, right, bottom, left, color):
+    width, height = pil_img.size
+    new_width = width + right + left
+    new_height = height + top + bottom
+    result = PILImage.new(pil_img.mode, (new_width, new_height), color)
+    result.paste(pil_img, (left, top))
+    return result
+
+
+def get_image(image_path, target_width=None, target_height=None, margin=None, color="#00000000"):
+    """ margin: tuple (top, right, bottom, left)"""
+
+    image = PILImage.open(image_path)
+    tmp_image_filename = os.path.join(get_tmp_root(), f"tmp_image.png")
+    save_image = False
+
+    if target_width and target_width != image.width:
+        target_height = int(image.height * target_width / image.width)
+        image = image.resize(size=(target_width, target_height))
+        save_image = True
+
+    elif target_height and target_height != image.height:
+        target_width = int(image.width * target_height / image.height)
+        image = image.resize(size=(target_width, target_width))
+        save_image = True
+
+    if margin:
+        image = add_margin_to_image(image, *margin, color)
+        save_image = True
+
+    if save_image:
+        image.save(tmp_image_filename)
+        image.close()
+        image = PILImage.open(tmp_image_filename)
+    
+    return image
+
 
 
 def generate_password(length=8, include_special_characters=True):
