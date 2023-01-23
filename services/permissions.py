@@ -87,7 +87,10 @@ def can_export_permissions(user):
 
 
 # ActivityJournal permissions
-def can_export_activity_journal(user):
-    return True
-    # has_perm = user.has_perm('lava.export_permissions')
-    # return has_perm
+def can_list_log_entry(user):
+    has_perm = user.has_perm('lava.list_log_entry')
+    return has_perm
+
+def can_export_log_entry(user):
+    has_perm = user.has_perm('lava.export_log_entry')
+    return has_perm

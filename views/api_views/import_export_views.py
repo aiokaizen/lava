@@ -42,7 +42,7 @@ class ExportActivityJournal(APIView):
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
         if self.request.method == 'GET':
-            permission_classes = [lava_permissions.CanExportActivityJournal]
+            permission_classes = [lava_permissions.CanExportLogEntry]
         return [permission() for permission in permission_classes]
     
     def get(self, request, *args, **kwargs):

@@ -171,8 +171,19 @@ class CanExportPermissions(IsAuthenticated):
         return is_authenticated and can_export_permissions(user)
 
 
-# Activity Journal Permissions
-class CanExportActivityJournal(IsAuthenticated):
+# Log Entry Permissions
+class CanListLogEntry(IsAuthenticated):
+    """
+    Checks if a user has the permission to view the activity journal.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_list_log_entry(user)
+
+
+class CanExportLogEntry(IsAuthenticated):
     """
     Checks if a user has the permission to export the activity journal.
     """
@@ -180,4 +191,4 @@ class CanExportActivityJournal(IsAuthenticated):
     def has_permission(self, request, view):
         is_authenticated = super().has_permission(request, view)
         user = request.user
-        return is_authenticated and can_export_activity_journal(user)
+        return is_authenticated and can_export_log_entry(user)
