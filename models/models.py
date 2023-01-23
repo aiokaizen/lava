@@ -9,7 +9,9 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.models import (
-    AbstractUser, Permission, Group as BaseGroupModel
+    AbstractUser,
+    Permission as BasePermissionModel,
+    Group as BaseGroupModel
 )
 from django.contrib.admin.models import (
     LogEntry, DELETION, CHANGE, ADDITION
@@ -85,8 +87,20 @@ class Preferences(models.Model):
         return super().__str__()
 
 
-# class Permission(models.Model):
-#     pass
+class Permission(BasePermissionModel):
+
+    class Meta:
+        verbose_name = _('permission')
+        verbose_name_plural = _('permissions')
+        ordering = ['content_type__app_label', 'content_type__model', 'codename']
+        proxy = True
+        default_permissions = ()
+        permissions = (
+            ('set_permission', "Can set permissions"),
+            ('add_permission', "Can add permissions"),
+            ('change_permission', "Can update permissions"),
+            ('list_permission', "Can view permissions list"),
+        )
 
 
 class Group(BaseGroupModel):
@@ -302,7 +316,9 @@ class User(AbstractUser):
         elif generate_tmp_password:
             password = generate_password(12)
             self.tmp_pwd = password
-        self.set_password(password)
+
+        if password:
+            self.set_password(password)
 
         if force_is_active:
             self.is_active = True

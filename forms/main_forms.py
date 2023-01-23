@@ -6,6 +6,7 @@ from lava import settings as lava_settings
 
 
 class LavaUserChangeForm(UserChangeForm):
+
     def clean_groups(self):
         if "groups" in self.changed_data and self.instance.groups.all().count() == 1:
             group = self.instance.groups.all().first()

@@ -1,12 +1,17 @@
 from django.contrib import admin, messages
 from django.contrib.auth import admin as auth_admin
-from django.forms import ValidationError
-from django.http import HttpResponseRedirect
+from django.contrib.auth.models import (
+    Group as BaseGroupModel
+)
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from admin_interface.models import Theme
+
 from lava.forms.main_forms import LavaUserChangeForm
-from lava.models import Notification, Preferences, User, Group, Permission
+from lava.models import (
+    Notification, Preferences, User, Group
+)
 
 
 @admin.register(User)
@@ -244,11 +249,6 @@ class GroupAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Permission)
-class PermissionAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     icon_name = "notifications"
@@ -257,3 +257,8 @@ class NotificationAdmin(admin.ModelAdmin):
 @admin.register(Preferences)
 class PreferencesAdmin(admin.ModelAdmin):
     pass
+
+
+# Unregister models
+admin.site.unregister(Theme)
+admin.site.unregister(BaseGroupModel)
