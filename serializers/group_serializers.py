@@ -28,7 +28,7 @@ class GroupGetSerializer(ReadOnlyModelSerializer):
 
 class GroupCreateUpdateSerializer(BaseModelSerializer):
 
-    permissions = PermissionSerializer(many=True)
+    permissions = PermissionSerializer(many=True, required=False)
 
     class Meta:
         model = Group

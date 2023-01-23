@@ -107,7 +107,7 @@ class BaseModelMixin:
                 }
         return json.dumps(changed_message, ensure_ascii=False)
 
-    def log_action(self, user, action_flag, change_message=None):
+    def log_action(self, user, action_flag, change_message=""):
 
         if not user:
             return
