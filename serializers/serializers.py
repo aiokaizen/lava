@@ -8,6 +8,7 @@ from rest_framework.fields import empty
 
 from lava import settings as lava_settings
 from lava.models import Notification, Preferences, User, Group
+from lava.models.models import Permission
 from lava.validators import validate_email
 
 
@@ -300,3 +301,20 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return self.user.send_notification(**validated_data)
+
+
+class PermissionSerializer(serializers.ModelSerializer):
+
+    codename = serializers.SerializerMethodField(
+        label=_("Code name")
+    )
+
+    class Meta:
+        model = Permission
+        fields = [
+            "name",
+            "codename"
+        ]
+    
+    def get_codename(self, obj):
+        return f"{obj.content_type.app_label}.{obj.content_type.model}.{obj.codename}"

@@ -4,115 +4,17 @@ from datetime import datetime
 from django.db import models
 from django.db.models import Q, ForeignObjectRel, ForeignKey, ManyToManyField
 from django.contrib.admin.models import (
-    LogEntry as BaseLogEntryModel, DELETION, CHANGE, ADDITION
+    DELETION, CHANGE, ADDITION
 )
 from django.contrib.admin.options import get_content_type_for_model
-from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
-from lava.utils import (
-    Result,
-)
+from lava.utils import Result
 
 
-class LogEntry(BaseLogEntryModel):
-
-    class Meta:
-        verbose_name = _('Log entry')
-        verbose_name_plural = _('Log entries')
-        ordering = ['-action_time']
-        default_permissions = ()
-        permissions = (
-            ('list_log_entry', f"Can view log entry journal"),
-            ('export_log_entry', f"Can export log entry journal"),
-        )
-
-    @classmethod
-    def get_filter_params(cls, kwargs=None):
-
-        filters = Q()
-        filter_params = Q()
-        if kwargs is None:
-            kwargs = {}
-        
-        if "user" in kwargs:
-            filters |= Q(user=kwargs.get("user"))
-
-        if "action_type" in kwargs:
-            filters |= Q(action_flag=kwargs["action_type"])
-
-        if "content_type" in kwargs:
-            app_name, model = kwargs["content_type"].split('.')
-            filters |= (
-                Q(content_type__app_label=app_name) &
-                Q(content_type__model=model)
-            )
-
-        if "action_time" in kwargs:
-            date = datetime.strptime(kwargs["action_time"], "%m-%d-%Y")
-            filter_params &= Q(action_time__date=date)
-
-        if "created_after" in kwargs:
-            date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
-            filter_params &= Q(action_time__date__gte=date)
-
-        if "created_before" in kwargs:
-            date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
-            filter_params &= Q(action_time__date__lte=date)
-
-        return filter_params
-
-    @classmethod
-    def filter(cls, user=None, kwargs=None, include_admin_entries=False):
-        filter_params = cls.get_filter_params(kwargs)
-        exclude_params = {}
-
-        User = get_user_model()
-        admin_users = User.objects.filter(username__in=['ekadmin', 'eksuperuser'])
-        if user not in admin_users:
-            exclude_params["user__in"] = admin_users
-
-        base_queryset = cls.objects.none()
-        if include_admin_entries:
-            base_queryset = BaseLogEntryModel.objects.filter(filter_params).exclude(
-                **exclude_params
-            )
-
-        queryset = cls.objects.filter(filter_params).exclude(
-            **exclude_params
-        )
-        return queryset | base_queryset
-
-
-class BaseModel(models.Model):
-
-    class Meta:
-        verbose_name = "Base Model"
-        verbose_name_plural = "Base Models"
-        abstract = True
-        ordering = ('-created_at', )
-        default_permissions = ()
-        # _class_name = label_lower.split('.')[1]
-        _class_name = "object"
-        permissions = (
-            ('add_object', f"Can add {_class_name}"),
-            ('change_object', f"Can update {_class_name}"),
-            ('delete_object', f"Can delete {_class_name}"),
-            ('soft_delete_object', f"Can soft delete {_class_name}"),
-            ('view_object', f"Can view {_class_name}"),
-            ('list_object', f"Can view {_class_name}"),
-            ('restore_object', f"Can restore {_class_name}"),
-        )
-
-    created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
-    created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
-    last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
-    deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
-
-    objects = DefaultBaseModelManager()
-    trash = TrashBaseModelManager()
+class BaseModelMixin:
 
     def create(self, user=None, m2m_fields=None):
         if self.id:
@@ -209,6 +111,8 @@ class BaseModel(models.Model):
 
         if not user:
             return
+        
+        from lava.models.models import LogEntry
 
         LogEntry.objects.log_action(
             user_id=user.pk,
@@ -220,7 +124,7 @@ class BaseModel(models.Model):
         )
 
     @classmethod
-    def get_filter_params(cls, user, kwargs=None):
+    def get_filter_params(cls, user=None, kwargs=None):
 
         filter_params = Q()
         if kwargs is None:
@@ -272,3 +176,32 @@ class BaseModel(models.Model):
         filter_params = cls.get_filter_params(user, kwargs)
         queryset = cls.objects.filter(filter_params)
         return queryset
+
+
+class BaseModel(models.Model, BaseModelMixin):
+
+    class Meta:
+        verbose_name = "Base Model"
+        verbose_name_plural = "Base Models"
+        abstract = True
+        ordering = ('-created_at', )
+        default_permissions = ()
+        # _class_name = label_lower.split('.')[1]
+        _class_name = "object"
+        permissions = (
+            ('add_object', f"Can add {_class_name}"),
+            ('change_object', f"Can update {_class_name}"),
+            ('delete_object', f"Can delete {_class_name}"),
+            ('soft_delete_object', f"Can soft delete {_class_name}"),
+            ('view_object', f"Can view {_class_name}"),
+            ('list_object', f"Can view {_class_name}"),
+            ('restore_object', f"Can restore {_class_name}"),
+        )
+
+    created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
+    created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
+    last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
+    deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
+
+    objects = DefaultBaseModelManager()
+    trash = TrashBaseModelManager()

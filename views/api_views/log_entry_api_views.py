@@ -7,7 +7,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 from lava.serializers.log_entry_serializer import (
     LogEntrySerializer
 )
-from lava.models.base_models import LogEntry
+from lava.models.models import LogEntry
 from lava.services import class_permissions as lava_permissions
 from lava.utils import Result
 from lava.messages import HTTP_403_MESSAGE

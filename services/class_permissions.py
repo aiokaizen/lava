@@ -160,6 +160,72 @@ class CanRestoreUser(IsAuthenticated):
 
 
 # Permission Permissions
+class CanAddPermission(IsAuthenticated):
+    """
+    Checks if a user has the permission to add new permissions.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_add_permission(user)
+
+
+class CanChangePermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to update permissions.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_change_permission(user)
+
+
+class CanDeletePermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to delete permissions.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_delete_permission(user)
+
+
+class CanSetPermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to set permissions for other users.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_set_permission(user)
+
+
+class CanViewPermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to view permissions details.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_view_permission(user)
+
+
+class CanListPermissions(IsAuthenticated):
+    """
+    Checks if a user has the permission to view permissions list.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_list_permission(user)
+
+
 class CanExportPermissions(IsAuthenticated):
     """
     Checks if a user has the permission to export the list of permissions.
@@ -168,7 +234,7 @@ class CanExportPermissions(IsAuthenticated):
     def has_permission(self, request, view):
         is_authenticated = super().has_permission(request, view)
         user = request.user
-        return is_authenticated and can_export_permissions(user)
+        return is_authenticated and can_export_permission(user)
 
 
 # Log Entry Permissions
@@ -180,7 +246,7 @@ class CanListLogEntry(IsAuthenticated):
     def has_permission(self, request, view):
         is_authenticated = super().has_permission(request, view)
         user = request.user
-        return is_authenticated and can_list_log_entry(user)
+        return is_authenticated and can_list_logentry(user)
 
 
 class CanExportLogEntry(IsAuthenticated):
@@ -191,4 +257,4 @@ class CanExportLogEntry(IsAuthenticated):
     def has_permission(self, request, view):
         is_authenticated = super().has_permission(request, view)
         user = request.user
-        return is_authenticated and can_export_log_entry(user)
+        return is_authenticated and can_export_logentry(user)

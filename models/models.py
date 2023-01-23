@@ -14,7 +14,8 @@ from django.contrib.auth.models import (
     Group as BaseGroupModel
 )
 from django.contrib.admin.models import (
-    LogEntry, DELETION, CHANGE, ADDITION
+    LogEntry as BaseLogEntryModel,
+    ADDITION, CHANGE, DELETION
 )
 from django.contrib.admin.options import get_content_type_for_model
 from django.core.exceptions import ValidationError
@@ -25,12 +26,13 @@ from lava import settings as lava_settings
 from lava import validators as lava_validators
 from lava.error_codes import UNIMPLEMENTED, UNKNOWN
 from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE
-from lava.models.base_models import BaseModel
-from lava.services.permissions import can_add_group, can_change_group, can_delete_group, can_list_group, can_soft_delete_group
+from lava.models.base_models import BaseModel, BaseModelMixin
+from lava.services.permissions import (
+    can_add_group, can_change_group, can_delete_group, can_list_group,
+)
 from lava.utils import (
     get_user_cover_filename,
     get_user_photo_filename,
-    get_group_photo_filename,
     Result,
     generate_password,
     strtobool,
@@ -87,7 +89,75 @@ class Preferences(models.Model):
         return super().__str__()
 
 
-class Permission(BasePermissionModel):
+class LogEntry(BaseLogEntryModel):
+
+    class Meta:
+        verbose_name = _('Log entry')
+        verbose_name_plural = _('Log entries')
+        ordering = ['-action_time']
+        default_permissions = ()
+        permissions = (
+            ('list_logentry', f"Can view activity journal"),
+            ('export_logentry', f"Can export activity journal"),
+        )
+
+    @classmethod
+    def get_filter_params(cls, kwargs=None):
+
+        filters = Q()
+        filter_params = Q()
+        if kwargs is None:
+            kwargs = {}
+        
+        if "user" in kwargs:
+            filters |= Q(user=kwargs.get("user"))
+
+        if "action_type" in kwargs:
+            filters |= Q(action_flag=kwargs["action_type"])
+
+        if "content_type" in kwargs:
+            app_name, model = kwargs["content_type"].split('.')
+            filters |= (
+                Q(content_type__app_label=app_name) &
+                Q(content_type__model=model)
+            )
+
+        if "action_time" in kwargs:
+            date = datetime.strptime(kwargs["action_time"], "%m-%d-%Y")
+            filter_params &= Q(action_time__date=date)
+
+        if "created_after" in kwargs:
+            date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
+            filter_params &= Q(action_time__date__gte=date)
+
+        if "created_before" in kwargs:
+            date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
+            filter_params &= Q(action_time__date__lte=date)
+
+        return filter_params
+
+    @classmethod
+    def filter(cls, user=None, kwargs=None, include_admin_entries=False):
+        filter_params = cls.get_filter_params(kwargs)
+        exclude_params = {}
+
+        admin_users = User.objects.filter(username__in=['ekadmin', 'eksuperuser'])
+        if user not in admin_users:
+            exclude_params["user__in"] = admin_users
+
+        base_queryset = cls.objects.none()
+        if include_admin_entries:
+            base_queryset = BaseLogEntryModel.objects.filter(filter_params).exclude(
+                **exclude_params
+            )
+
+        queryset = cls.objects.filter(filter_params).exclude(
+            **exclude_params
+        )
+        return queryset | base_queryset
+
+
+class Permission(BasePermissionModel, BaseModelMixin):
 
     class Meta:
         verbose_name = _('permission')
@@ -96,20 +166,51 @@ class Permission(BasePermissionModel):
         proxy = True
         default_permissions = ()
         permissions = (
-            ('set_permission', "Can set permissions"),
             ('add_permission', "Can add permissions"),
+            ('view_permission', "Can view permission details"),
             ('change_permission', "Can update permissions"),
+            ('delete_permission', "Can delete permissions"),
             ('list_permission', "Can view permissions list"),
+            ('set_permission', "Can set permissions"),
+            ('export_permissions', "Can export permissions"),
         )
 
+    def create(self, user=None):
+        
+        result = self.create(user=user)
+        if result.is_error:
+            return result
+        return Result(True, _("The permission has been created successfully."))
 
-class Group(BaseGroupModel):
+    def update(self, user=None, update_fields=None):
+        
+        # TODO: Check if the deleted permission is defined in default_permissions
+        # or permissions attributes of any registered model.
+        
+        result = self.update(user=user, update_fields=update_fields)
+        if result.is_error:
+            return result
+        return Result(True, _("The permission has been updated successfully."))
+    
+    def delete(self, user=None):
+        
+        # TODO: Check if the deleted permission is defined in default_permissions
+        # or permissions attributes of any registered model.
+        
+        result = super().delete(user=user, soft_delete=False)
+        if result.is_error:
+            return result
+        return Result(True, _("The permission has been deleted successfully."))
 
-    class Meta(BaseModel.Meta):
+
+class Group(BaseGroupModel, BaseModelMixin):
+
+    class Meta:
         verbose_name = _('Group')
         verbose_name_plural = _('Groups')
         ordering = ("name", )
         proxy = True
+        default_permissions = ()
         permissions = (
             ('add_group', "Can add group"),
             ('change_group', "Can update group"),
@@ -137,52 +238,36 @@ class Group(BaseGroupModel):
         if user and not can_add_group(user):
             return Result(False, FORBIDDEN_MESSAGE)
         
-        if self.id:
-            return Result(False, _("This object is already created."))
-        
-        self.created_by = user
-
-        self.save()
-
-        if m2m_fields:
-            for attr, value in m2m_fields:
-                field = getattr(self, attr)
-                field.set(value)
-
-        if user:
-            self.log_action(user, ADDITION)
+        result = super().create(user=user, m2m_fields=m2m_fields)
+        if result.is_error:
+            return result
             
         return Result(True, _("Group created successfully."))
     
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if user and not can_change_group(user):
             return Result(False, FORBIDDEN_MESSAGE)
-            
-        if not self.id:
-            return Result(False, _("This object is not yet created."))
-            
-        if update_fields:
-            self.save(update_fields=update_fields)
-        else:
-            self.save()
-
-        if m2m_fields:
-            for attr, value in m2m_fields:
-                field = getattr(self, attr)
-                field.set(value)
-
-        if user:
-            self.log_action(user, CHANGE, message)
+        
+        result = super().update(
+            user=user,
+            update_fields=update_fields,
+            m2m_fields=m2m_fields,
+            message=message
+        )
+        if result.is_error:
+            return result
 
         return Result(True, _("Group updated successfully."))
     
-    def delete(self, user=None, soft_delete=True):
-        if user:
-            if soft_delete and not can_soft_delete_group(user):
-                return Result(False, FORBIDDEN_MESSAGE)
-            elif not soft_delete and not can_delete_group(user):
-                return Result(False, FORBIDDEN_MESSAGE)
-        return super().delete(user, soft_delete)
+    def delete(self, user=None):
+        if user and not can_delete_group(user):
+            return Result(False, FORBIDDEN_MESSAGE)
+
+        result = super().delete(user=user, soft_delete=False)
+        if result.is_error:
+            return result
+
+        return Result(True, _("The group has been deleted successfully."))
     
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
@@ -192,7 +277,8 @@ class Group(BaseGroupModel):
     @classmethod
     def filter(cls, user=None, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
-        queryset = cls.objects.filter(filter_params)
+        queryset = super().filter(user=user, kwargs=kwargs)
+        queryset = queryset.filter(filter_params)
         if user and not can_list_group(user):
             return queryset.none()
 

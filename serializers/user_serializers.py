@@ -7,7 +7,7 @@ from rest_framework import serializers
 
 from lava.models import User
 from lava import settings as lava_settings
-from lava.serializers.serializers import BaseModelSerializer, ReadOnlyModelSerializer
+from lava.serializers.serializers import BaseModelSerializer, PermissionSerializer, ReadOnlyModelSerializer
 from lava.serializers.group_serializers import GroupListSerializer
 from lava.validators import validate_email
 
@@ -34,6 +34,7 @@ class UserListSerializer(ReadOnlyModelSerializer):
 class UserGetSerializer(ReadOnlyModelSerializer):
 
     groups = GroupListSerializer(many=True)
+    user_permissions = PermissionSerializer(many=True)
 
     class Meta:
         model = User
@@ -56,6 +57,7 @@ class UserGetSerializer(ReadOnlyModelSerializer):
             "is_staff",
             "is_superuser",
             "groups",
+            "user_permissions",
             "last_login",
             "date_joined",
         ]
@@ -67,6 +69,8 @@ class UserGetSerializer(ReadOnlyModelSerializer):
 
 
 class UserCreateUpdateSerializer(BaseModelSerializer):
+
+    user_permissions = PermissionSerializer(many=True)
 
     class Meta :
         model = User
@@ -87,6 +91,7 @@ class UserCreateUpdateSerializer(BaseModelSerializer):
             "is_active",
             "is_staff",
             "groups",
+            "user_permissions",
             "last_login",
             "date_joined",
             "password",
