@@ -1,5 +1,6 @@
 import logging
 import itertools
+import json
 from datetime import datetime
 
 from django.apps import apps
@@ -32,7 +33,7 @@ from lava.utils import (
     generate_password,
     strtobool,
 )
-from lava.managers import LavaUserManager
+from lava.managers import LavaUserManager, TrashBaseModelManager
 
 try:
     from firebase_admin import messaging
@@ -135,11 +136,11 @@ class Group(BaseGroupModel):
                 field.set(value)
 
         if user:
-            self.log_action(user, ADDITION, "Created")
+            self.log_action(user, ADDITION)
             
         return Result(True, _("Group created successfully."))
     
-    def update(self, user=None, update_fields=None, m2m_fields=None, message="Updated"):
+    def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if user and not can_change_group(user):
             return Result(False, FORBIDDEN_MESSAGE)
             
@@ -188,6 +189,16 @@ class User(AbstractUser):
 
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
+        default_permissions = ()
+        permissions = (
+            ('add_user', _("Can add user")),
+            ('change_user', _("Can change user")),
+            ('delete_user', _("Can delete user")),
+            ('soft_delete_user', _("Can soft delete user")),
+            ('view_user', _("Can view user")),
+            ('list_user', _("Can view users list")),
+            ('restore_user', _("Can restore user")),
+        )
 
     user_permissions = models.ManyToManyField(
         Permission,
@@ -249,12 +260,14 @@ class User(AbstractUser):
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
     objects = LavaUserManager()
+    trash = TrashBaseModelManager()
 
     def groups_names(self):
         return self.groups.all().values_list("name", flat=True) if self.id else []
 
     def create(
         self,
+        user=None,
         photo=None,
         cover=None,
         groups=None,
@@ -297,6 +310,10 @@ class User(AbstractUser):
             self.is_active = False
 
         self.save()
+
+        # Log the action
+        if user:
+            self.log_action(user, ADDITION)
 
         if link_payments_app:
             res = self.link_payments_app()
@@ -406,7 +423,7 @@ class User(AbstractUser):
             success=True, message=_("Associated object was created successfully.")
         )
 
-    def update(self, update_fields=None, extra_attributes=None):
+    def update(self, user=None, update_fields=None, extra_attributes=None, message=''):
         groups = self.groups.all()
         if extra_attributes and groups and groups.count() == 1:
             try:
@@ -417,6 +434,10 @@ class User(AbstractUser):
                 return Result(success=False, message=str(e))
 
         self.save(update_fields=update_fields)
+
+        if user:
+            self.log_action(user=user, action_flag=CHANGE, change_message=message)
+
         return Result(success=True, message=_("User has been updated successfully."))
 
     def update_associated_objects(self, associated_object_attributes=None):
@@ -456,9 +477,9 @@ class User(AbstractUser):
         success_message = _("User has been deleted successfully")
 
         if soft_delete:
-            self.is_active = False
+            # self.is_active = False
             self.deleted_at = timezone.now()
-            self.save()
+            self.update(user=user, update_fields=['deleted_at'], message="Soft Delete")
             return Result(success=True, message=success_message)
 
         # Unlink from payments app
@@ -474,16 +495,55 @@ class User(AbstractUser):
 
         # Log the action
         if user:
-            LogEntry.objects.log_action(
-                user_id=user.pk,
-                content_type_id=get_content_type_for_model(self).pk,
-                object_id=self.pk,
-                object_repr=self.__class__.__name__.upper(),
-                action_flag=DELETION,
-                change_message=f"{str(self)} has been deleted."
-            )
+            self.log_action(user, DELETION)
 
         return Result(success=True, message=success_message)
+    
+    def restore(self, user=None):
+        if not self.deleted_at:
+            return Result(False, _("User is not deleted!"), tag='warning')
+
+        # self.is_active = True
+        self.deleted_at = None
+        result = self.update(user=user, update_fields=['deleted_at'], message="Restored")
+        if result.is_error:
+            return result
+        return Result(True, _("The user has been restored successfully."))
+
+    def get_changed_message(self):
+        changed_message = {"fields": {}}
+        klass = self.__class__
+        old_self = klass.objects.get(pk=self.pk)
+        for field in klass._meta.get_fields(include_parents=True):
+            field_name = field.name
+            old_value = getattr(old_self, field_name)
+            new_value = getattr(self, field_name)
+            if type(field) in [models.ForeignKey, models.ForeignObjectRel]:
+                old_value = f"{old_value.id}|{old_value}" if old_value else None
+                new_value = f"{new_value.id}|{new_value}" if new_value else None
+            if type(field) == models.ManyToManyField:
+                old_value = list(old_value.all().values_list("pk", flat=True))
+                new_value = list(new_value.all().values_list("pk", flat=True))
+            if old_value != new_value:
+                changed_message["fields"][field_name] = {
+                    "old_value": old_value,
+                    "new_value": new_value
+                }
+        return json.dumps(changed_message, ensure_ascii=False)
+
+    def log_action(self, user, action_flag, change_message=""):
+
+        if not user:
+            return
+
+        LogEntry.objects.log_action(
+            user_id=user.pk,
+            content_type_id=get_content_type_for_model(User).pk,
+            object_id=self.pk,
+            object_repr=str(self),
+            action_flag=action_flag,
+            change_message=change_message
+        )
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
@@ -575,11 +635,12 @@ class User(AbstractUser):
     @classmethod
     def filter(cls, user=None, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
-        if user and not user.is_superuser:
-            return cls.objects.filter(pk=user.pk)
+
+        admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
+        if user and user not in admin_users:
+            return cls.objects.exclude(pk__in=admin_users)
 
         return cls.objects.filter(filter_params)
-
 
 
 class Notification(models.Model):

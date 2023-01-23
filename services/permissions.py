@@ -44,6 +44,39 @@ def can_restore_group(user):
 
 
 # User permissions
+def can_add_user(user):
+    has_perm = user.has_perm('lava.add_user')
+    return has_perm
+
+
+def can_change_user(user):
+    has_perm = user.has_perm('lava.change_user')
+    return has_perm
+
+
+def can_delete_user(user):
+    has_perm = user.has_perm('lava.delete_user')
+    return has_perm
+
+
+def can_soft_delete_user(user):
+    has_perm = user.has_perm('lava.soft_delete_user')
+    return has_perm
+
+
+def can_view_user(user):
+    has_perm = user.has_perm('lava.view_user')
+    return has_perm
+
+
+def can_list_user(user):
+    has_perm = user.has_perm('lava.list_user')
+    return has_perm
+
+
+def can_restore_user(user):
+    has_perm = user.has_perm('lava.restore_user')
+    return has_perm
 
 
 # Permission permissions

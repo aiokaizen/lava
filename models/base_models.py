@@ -82,10 +82,7 @@ class BaseModel(models.Model):
         if not message:
             message = self.get_changed_message()
             
-        if update_fields:
-            self.save(update_fields=update_fields)
-        else:
-            self.save()
+        self.save(update_fields=update_fields)
 
         if m2m_fields:
             for attr, value in m2m_fields:

@@ -52,9 +52,9 @@ class UserAdmin(auth_admin.UserAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
     )
-    readonly_fields = ["tmp_pwd"]
+    readonly_fields = ["tmp_pwd", "last_login", "date_joined", "deleted_at"]
 
     list_display = (
         "thumbnail",
@@ -87,7 +87,7 @@ class UserAdmin(auth_admin.UserAdmin):
         if not change:  # Creation
             photo = obj.photo
             cover = obj.cover_picture
-            result = obj.create(photo, cover)
+            result = obj.create(user=request.user, photo=photo, cover=cover)
             if not result.success:
                 raise Exception(result.message)
         elif obj is not None:  # Modification
@@ -98,7 +98,7 @@ class UserAdmin(auth_admin.UserAdmin):
             if 'user_permissions' in form.changed_data:
                 form.changed_data.remove('user_permissions')
 
-            result = obj.update(update_fields=form.changed_data)
+            result = obj.update(user=request.user, update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
 
@@ -131,6 +131,9 @@ class UserAdmin(auth_admin.UserAdmin):
                 )
 
         self.message_user(request, "The selected users were successfully deleted.", messages.SUCCESS)
+
+    def get_queryset(self, request):
+        return User.filter(user=request.user, kwargs=request.GET)
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -231,6 +234,9 @@ class BaseModelAdmin(admin.ModelAdmin):
                 )
 
         self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
+
+    def get_queryset(self, request):
+        return self.model.filter(user=request.user, kwargs=request.GET)
 
 
 @admin.register(Group)
