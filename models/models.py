@@ -665,6 +665,13 @@ class User(AbstractUser, BaseModel):
                 success=False, message=_("Invalid password."), errors=e.messages
             )
     
+    def set_password(self, raw_password, user=None):
+        super().set_password(raw_password)
+        result = self.update(user=user, update_fields=["password"])
+        if result.is_error:
+            return result
+        return Result(True, _("Password has been changed successfully."))
+    
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
 

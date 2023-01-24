@@ -31,7 +31,7 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         required=True, label=_("New password"), write_only=True
     )
     confirm_password = serializers.CharField(
-        required=False, label=_("Confirm new password"), write_only=True
+        required=True, label=_("Confirm new password"), write_only=True
     )
 
     class Meta:
@@ -39,7 +39,8 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         fields = ("old_password", "new_password", "confirm_password")
 
     # Overriding the __init__ method just to make instance mandatory for this serializer
-    def __init__(self, instance, data=empty, **kwargs):
+    def __init__(self, instance, data=empty, user=None, **kwargs):
+        self.user = user
         super().__init__(instance, data, **kwargs)
 
     def validate_old_password(self, value):
@@ -61,7 +62,13 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
-        instance.update_password(validated_data["new_password"])
+        result = instance.set_password(
+            user=self.user, raw_password=validated_data["new_password"]
+        )
+        if result.is_error:
+            raise serializers.ValidationError(
+                result.errors or result.to_dict()
+            )
         return instance
 
 

@@ -18,7 +18,6 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        args = tuple(args[1:])  # Remove the view from args
         serializer = serializer_class(*args, user=self.user, **kwargs)
         return serializer
 
@@ -48,7 +47,6 @@ class BaseModelViewSet(ModelViewSet):
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        args = tuple(args[1:])  # Remove the view from args
         serializer = serializer_class(*args, user=self.user, **kwargs)
         return serializer
 

@@ -95,17 +95,6 @@ class PreferencesViewSet(mixins.ListModelMixin, GenericViewSet):
         return Response(serializer.data)
 
 
-@api_view(("PUT",))
-@permission_classes((permissions.IsAdminUser,))
-def change_password(request, pk):
-    instance = get_object_or_404(User, pk=pk)
-    serializer = ChangePasswordFormSerializer(instance, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"ok": _("Password has been changed successfully!")})
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class NotificationViewSet(ReadOnlyModelViewSet):
 
     permission_classes = [permissions.IsAuthenticated]

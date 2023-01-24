@@ -6,24 +6,22 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
+from lava.serializers import ChangePasswordFormSerializer
 from lava.serializers.user_serializers import (
     UserListSerializer, UserGetSerializer, UserCreateSerializer,
     UserUpdateSerializer, UserDeleteSerializer
 )
 from lava.models import User
-from lava.utils import Result
 from lava.services import class_permissions as lava_permissions
+from lava.views.api_views.base_api_views import BaseModelViewSet
 
 
-class UserAPIViewSet(ModelViewSet):
+class UserAPIViewSet(BaseModelViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserListSerializer
     queryset = User.objects.none()
 
-    def get_queryset(self):
-        return User.filter(user=self.user, kwargs=self.request.GET)
-    
     def get_serializer(self, *args, **kwargs):
         if self.action == 'retrieve':
             self.serializer_class = UserGetSerializer
@@ -33,46 +31,22 @@ class UserAPIViewSet(ModelViewSet):
             self.serializer_class = UserUpdateSerializer
         elif self.action == 'destroy':
             self.serializer_class = UserDeleteSerializer
-
-        serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-        return serializer_class(*args, user=self.user, **kwargs)
+        return super().get_serializer(*args, **kwargs)
 
     def get_permissions(self):
-        permission_classes = [permissions.IsAuthenticated]
         if self.action == 'create':
-            permission_classes = [lava_permissions.CanAddUser]
+            self.permission_classes = [lava_permissions.CanAddUser]
         if self.action == 'update':
-            permission_classes = [lava_permissions.CanChangeUser]
+            self.permission_classes = [lava_permissions.CanChangeUser]
         if self.action == 'destroy':
-            permission_classes = [lava_permissions.CanSoftDeleteUser]
+            self.permission_classes = [lava_permissions.CanSoftDeleteUser]
         if self.action == 'retrieve':
-            permission_classes = [lava_permissions.CanViewUser]
+            self.permission_classes = [lava_permissions.CanViewUser]
         if self.action == 'list':
-            permission_classes = [lava_permissions.CanListUser]
+            self.permission_classes = [lava_permissions.CanListUser]
         if self.action == 'restore':
-            permission_classes = [lava_permissions.CanRestoreUser]
-        return [permission() for permission in permission_classes]
-
-    def list(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().list(request, *args, **kwargs)
-
-    def retrieve(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().retrieve(request, *args, **kwargs)
-    
-    def create(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().create(request, *args, **kwargs)
-    
-    def update(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().update(request, *args, **kwargs)
-    
-    def partial_update(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().partial_update(request, *args, **kwargs)
+            self.permission_classes = [lava_permissions.CanRestoreUser]
+        return super().get_permissions()
     
     def destroy(self, request, *args, **kwargs):
         self.user = request.user
@@ -87,14 +61,16 @@ class UserAPIViewSet(ModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["POST"])
-    def restore(self, request, pk):
+    def change_pwd(self, request, pk):
         self.user = request.user
-        user = get_object_or_404(User.trash.all(), pk=pk)
-        result = user.restore(user=self.user)
-        if result.is_error:
-            return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
-        return Response(result.to_dict(), status=status.HTTP_200_OK)
-
-    @action(detail=True, methods=["POST"])
-    def change_password(self, request, pk):
-        pass
+        instance = self.get_object()
+        serializer = ChangePasswordFormSerializer(
+            instance, data=request.data, user=self.user
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "success": True,
+                "message": _("Password has been changed successfully!")
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
