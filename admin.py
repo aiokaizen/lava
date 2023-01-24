@@ -60,8 +60,8 @@ class UserAdmin(auth_admin.UserAdmin):
         (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
     )
     readonly_fields = [
-        "tmp_pwd", "last_login", "date_joined", "deleted_at"
-        "id_superuser"
+        "tmp_pwd", "last_login", "date_joined", "deleted_at",
+        "is_superuser"
     ]
 
     list_display = (

@@ -2,7 +2,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from lava.models.models import LogEntry
-from lava.serializers.serializers import ReadOnlyModelSerializer, UserExerptSerializer
+from lava.serializers.base_serializers import ReadOnlyModelSerializer
+from lava.serializers.user_serializers import UserExerptSerializer
 
 
 class LogEntrySerializer(ReadOnlyModelSerializer):

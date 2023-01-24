@@ -7,7 +7,10 @@ from rest_framework import serializers
 
 from lava.models import User, Group
 from lava import settings as lava_settings
-from lava.serializers.serializers import BaseModelSerializer, PermissionSerializer, ReadOnlyModelSerializer
+from lava.serializers.serializers import PermissionSerializer
+from lava.serializers.base_serializers import (
+    BaseModelSerializer, ReadOnlyModelSerializer
+)
 from lava.serializers.group_serializers import GroupListSerializer
 from lava.validators import validate_email
 
@@ -186,6 +189,25 @@ class UserUpdateSerializer(BaseModelSerializer):
         if not result.success:
             raise serializers.ValidationError(result.as_dict())
         return instance
+
+
+class UserDeleteSerializer(ReadOnlyModelSerializer):
+
+    password = serializers.CharField(label="Password", required=True)
+    
+    class Meta:
+        model = User
+        fields = [
+            "password",
+        ]
+
+    def validate_password(self, value):
+        if not self.user.check_password(value):
+            raise serializers.ValidationError(
+                _("Incorrect password, please verify that 'All caps' is disabled.")
+            )
+        return value
+
 
 
 class UserSerializer(serializers.ModelSerializer):

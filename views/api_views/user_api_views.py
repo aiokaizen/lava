@@ -7,7 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
 from lava.serializers.user_serializers import (
-    UserListSerializer, UserGetSerializer, UserCreateUpdateSerializer
+    UserListSerializer, UserGetSerializer, UserCreateSerializer,
+    UserUpdateSerializer, UserDeleteSerializer
 )
 from lava.models import User
 from lava.utils import Result
@@ -26,8 +27,12 @@ class UserAPIViewSet(ModelViewSet):
     def get_serializer(self, *args, **kwargs):
         if self.action == 'retrieve':
             self.serializer_class = UserGetSerializer
-        elif self.action in ['create', 'update', 'partial_update']:
-            self.serializer_class = UserCreateUpdateSerializer
+        elif self.action == 'create':
+            self.serializer_class = UserCreateSerializer
+        elif self.action in ['update', 'partial_update']:
+            self.serializer_class = UserUpdateSerializer
+        elif self.action == 'destroy':
+            self.serializer_class = UserDeleteSerializer
 
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
@@ -39,7 +44,7 @@ class UserAPIViewSet(ModelViewSet):
             permission_classes = [lava_permissions.CanAddUser]
         if self.action == 'update':
             permission_classes = [lava_permissions.CanChangeUser]
-        if self.action == 'delete':
+        if self.action == 'destroy':
             permission_classes = [lava_permissions.CanSoftDeleteUser]
         if self.action == 'retrieve':
             permission_classes = [lava_permissions.CanViewUser]
@@ -71,15 +76,8 @@ class UserAPIViewSet(ModelViewSet):
     
     def destroy(self, request, *args, **kwargs):
         self.user = request.user
-
-        user_password = request.data.get('password')
-        if not user_password:
-            result = Result(False, _("Please enter your password and try again."))
-            return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
-
-        if not self.user.check_password(user_password):
-            result = Result(False, _("Incorrect password, please verify that 'All caps' is disabled."))
-            return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         user = self.get_object()
         result = user.delete(user=self.user, soft_delete=True)
