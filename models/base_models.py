@@ -38,9 +38,6 @@ class BaseModelMixin:
         if not self.id:
             return Result(False, _("This object is not yet created."))
 
-        if not message:
-            message = self.get_changed_message()
-            
         self.save(update_fields=update_fields)
 
         if m2m_fields:
@@ -49,6 +46,7 @@ class BaseModelMixin:
                 field.set(value)
 
         if user:
+            message = message or self.get_changed_message()
             self.log_action(user, CHANGE, message)
 
         return Result(True, _("Object updated successfully."))
@@ -59,7 +57,7 @@ class BaseModelMixin:
 
         if soft_delete:
             self.deleted_at = timezone.now()
-            self.update(user=user, update_fields=['deleted_at'], message="Soft Delete")
+            self.update(user=user, update_fields=['deleted_at'], message="Deletion")
             return Result(True, success_message)
 
         if user:
@@ -67,13 +65,22 @@ class BaseModelMixin:
 
         super().delete()
         return Result(True, success_message)
+    
+    def delete_alias(self, user=None, soft_delete=True):
+        """
+        This method is used in case of multi-inheritance, using super().delete()
+        in that case may call models.Model.delete() instead.
+        """
+        return self.delete(user=user, soft_delete=soft_delete)
 
     def duplicate(self, user=None):
         klass = self.__class__
         new = klass.objects.get(pk=self.pk)
         new.pk = None
         new._state.adding = True
-        new.create(user=user)
+        result = new.create(user=user)
+        if result.is_error:
+            return result
         return Result(True, _("Object duplicated successfully."), instance=new)
     
     def restore(self, user=None):
@@ -81,7 +88,7 @@ class BaseModelMixin:
             return Result(False, _("Object is not deleted!"))
             
         self.deleted_at = None
-        result = self.update(user=user, update_fields=['deleted_at'], message="Restored")
+        result = self.update(user=user, update_fields=['deleted_at'], message="Restoration")
         if result.is_error:
             return result
         return Result(True, _("The object has been restored successfully."))

@@ -285,7 +285,7 @@ class Group(BaseGroupModel, BaseModelMixin):
         return queryset
 
 
-class User(AbstractUser):
+class User(AbstractUser, BaseModel):
 
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
@@ -360,7 +360,6 @@ class User(AbstractUser):
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
 
     objects = LavaUserManager()
-    trash = TrashBaseModelManager()
 
     def groups_names(self):
         return self.groups.all().values_list("name", flat=True) if self.id else []
@@ -385,19 +384,9 @@ class User(AbstractUser):
         if not hasattr(self, "preferences"):
             self.preferences = Preferences.objects.create()
 
-        if photo or cover or groups:
-            self.save()
-            # FileInputs and ManyToMany fields must be saved after
-            # the object has been already created
-            self.photo = photo
-            self.cover_picture = cover
-            if groups is not None:
-                self.groups.set(groups)
-
         if password is not None:
             result = self.validate_password(password)
             if not result.success:
-                self.delete()
                 return result
         elif generate_tmp_password:
             password = generate_password(12)
@@ -411,35 +400,46 @@ class User(AbstractUser):
         elif settings.DJOSER["SEND_ACTIVATION_EMAIL"]:
             self.is_active = False
 
-        self.save()
+        # We log the action manually on success
+        result = super().create(user=None)
+        if result.is_error:
+            return result
 
-        # Log the action
-        if user:
-            self.log_action(user, ADDITION)
+        update_fields = []
+        if photo:
+            self.photo = photo
+            update_fields.append("photo")
+        if cover:
+            self.cover_picture = cover
+            update_fields.append("cover_picture")
+        if groups is not None:
+            self.groups.set(groups)
+        
+        result = self.update(user=None, update_fields=update_fields)
 
         if link_payments_app:
             res = self.link_payments_app()
             if res.is_error:
-                self.delete()
+                self.delete(soft_delete=False)
                 return res
             # elif res.error_code == UNIMPLEMENTED:
-            #     self.delete()
+            #     self.delete(soft_delete=False)
             #     raise Exception(res.to_dict())
 
-        # Refresh groups from db in case the groups param was not passed and the groups
-        # attribute was already assigned before calling .create() method.
-        groups = self.groups.all()
-        if groups and groups.count() == 1 and create_associated_objects:
+        if len(groups) == 1 and create_associated_objects:
             try:
                 result = self.create_associated_objects(extra_attributes)
                 if not result.success:
-                    self.delete()
+                    self.delete(soft_delete=False)
                     return result
             except Exception as e:
-                self.delete()
+                self.delete(soft_delete=False)
                 logging.error(e)
                 return Result(success=False, message=UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN)
 
+        if user:
+            self.log_action(user, ADDITION)
+            
         return Result(
             success=True,
             message=_("User has been created successfully."),
@@ -527,7 +527,7 @@ class User(AbstractUser):
 
     def update(self, user=None, update_fields=None, extra_attributes=None, message=''):
         groups = self.groups.all()
-        if extra_attributes and groups and groups.count() == 1:
+        if extra_attributes and groups.count() == 1:
             try:
                 result = self.update_associated_objects(extra_attributes)
                 if not result.success:
@@ -535,10 +535,9 @@ class User(AbstractUser):
             except Exception as e:
                 return Result(success=False, message=str(e))
 
-        self.save(update_fields=update_fields)
-
-        if user:
-            self.log_action(user=user, action_flag=CHANGE, change_message=message)
+        result = super().update(user=user, update_fields=update_fields, message=message)
+        if result.is_error:
+            return result
 
         return Result(success=True, message=_("User has been updated successfully."))
 
@@ -572,7 +571,7 @@ class User(AbstractUser):
             success=True, message=_("Associated object was updated successfully.")
         )
 
-    def delete(self, user=None, soft_delete=False, *args, **kwargs):
+    def delete(self, user=None, soft_delete=True):
         if not self.id:
             return Result(False, _("User is already deleted"), tag="warning")
 
@@ -591,7 +590,9 @@ class User(AbstractUser):
             self.account.delete()
 
         preferences = self.preferences
-        super().delete()
+        result = super().delete_alias(user=user, soft_delete=soft_delete)
+        if result.is_error:
+            return result
         if preferences:
             preferences.delete()
 
@@ -602,50 +603,12 @@ class User(AbstractUser):
         return Result(success=True, message=success_message)
     
     def restore(self, user=None):
-        if not self.deleted_at:
-            return Result(False, _("User is not deleted!"), tag='warning')
 
-        # self.is_active = True
-        self.deleted_at = None
-        result = self.update(user=user, update_fields=['deleted_at'], message="Restored")
+        result = super().restore(user=user)
         if result.is_error:
             return result
+
         return Result(True, _("The user has been restored successfully."))
-
-    def get_changed_message(self):
-        changed_message = {"fields": {}}
-        klass = self.__class__
-        old_self = klass.objects.get(pk=self.pk)
-        for field in klass._meta.get_fields(include_parents=True):
-            field_name = field.name
-            old_value = getattr(old_self, field_name)
-            new_value = getattr(self, field_name)
-            if type(field) in [models.ForeignKey, models.ForeignObjectRel]:
-                old_value = f"{old_value.id}|{old_value}" if old_value else None
-                new_value = f"{new_value.id}|{new_value}" if new_value else None
-            if type(field) == models.ManyToManyField:
-                old_value = list(old_value.all().values_list("pk", flat=True))
-                new_value = list(new_value.all().values_list("pk", flat=True))
-            if old_value != new_value:
-                changed_message["fields"][field_name] = {
-                    "old_value": old_value,
-                    "new_value": new_value
-                }
-        return json.dumps(changed_message, ensure_ascii=False)
-
-    def log_action(self, user, action_flag, change_message=""):
-
-        if not user:
-            return
-
-        LogEntry.objects.log_action(
-            user_id=user.pk,
-            content_type_id=get_content_type_for_model(User).pk,
-            object_id=self.pk,
-            object_repr=str(self),
-            action_flag=action_flag,
-            change_message=change_message
-        )
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
