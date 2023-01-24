@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 
-from lava.models import User
+from lava.models import User, Group
 from lava import settings as lava_settings
 from lava.serializers.serializers import BaseModelSerializer, PermissionSerializer, ReadOnlyModelSerializer
 from lava.serializers.group_serializers import GroupListSerializer
