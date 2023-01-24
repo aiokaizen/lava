@@ -98,19 +98,23 @@ class BaseModelMixin:
         klass = self.__class__
         old_self = klass.objects.get(pk=self.pk)
         for field in klass._meta.get_fields(include_parents=True):
+        
             field_name = field.name
-            old_value = getattr(old_self, field_name)
-            new_value = getattr(self, field_name)
-            if type(field) in [ForeignKey, ForeignObjectRel]:
+            old_value = getattr(old_self, field_name, None)
+            new_value = getattr(self, field_name, None)
+
+            if type(field) == ForeignKey:
                 old_value = f"{old_value.id}|{old_value}" if old_value else None
                 new_value = f"{new_value.id}|{new_value}" if new_value else None
+
             if type(field) == ManyToManyField:
                 old_value = list(old_value.all().values_list("pk", flat=True))
                 new_value = list(new_value.all().values_list("pk", flat=True))
+
             if old_value != new_value:
                 changed_message["fields"][field_name] = {
-                    "old_value": old_value,
-                    "new_value": new_value
+                    "old_value": str(old_value),
+                    "new_value": str(new_value)
                 }
         return json.dumps(changed_message, ensure_ascii=False)
 
