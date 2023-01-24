@@ -193,21 +193,20 @@ class UserUpdateSerializer(BaseModelSerializer):
 
 class UserDeleteSerializer(ReadOnlyModelSerializer):
 
-    password = serializers.CharField(label="Password", required=True)
+    current_password = serializers.CharField(label="Password", required=True)
     
     class Meta:
         model = User
         fields = [
-            "password",
+            "current_password",
         ]
 
-    def validate_password(self, value):
+    def validate_current_password(self, value):
         if not self.user.check_password(value):
             raise serializers.ValidationError(
                 _("Incorrect password, please verify that 'All caps' is disabled.")
             )
         return value
-
 
 
 class UserSerializer(serializers.ModelSerializer):

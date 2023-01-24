@@ -189,7 +189,7 @@ class BaseModelMixin:
         return queryset
 
 
-class BaseModel(models.Model, BaseModelMixin):
+class BaseModel(BaseModelMixin, models.Model):
 
     class Meta:
         verbose_name = "Base Model"
