@@ -525,7 +525,7 @@ class User(AbstractUser, BaseModel):
             success=True, message=_("Associated object was created successfully.")
         )
 
-    def update(self, user=None, update_fields=None, extra_attributes=None, message=''):
+    def update(self, user=None, update_fields=None, extra_attributes=None, message='', *args, **kwargs):
         groups = self.groups.all()
         if extra_attributes and groups.count() == 1:
             try:
@@ -535,7 +535,7 @@ class User(AbstractUser, BaseModel):
             except Exception as e:
                 return Result(success=False, message=str(e))
 
-        result = super().update(user=user, update_fields=update_fields, message=message)
+        result = super().update(user=user, update_fields=update_fields, message=message, *args, **kwargs)
         if result.is_error:
             return result
 
