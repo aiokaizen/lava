@@ -1,6 +1,5 @@
 import logging
 import itertools
-import json
 from datetime import datetime
 
 from django.apps import apps
@@ -8,6 +7,7 @@ from django.db import models
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import (
     AbstractUser,
     Permission as BasePermissionModel,
@@ -602,6 +602,14 @@ class User(AbstractUser, BaseModel):
 
         return Result(success=True, message=success_message)
     
+    def set_password(self, raw_password, user=None):
+        self.password = make_password(raw_password)
+        self._password = raw_password
+        result = self.update(user=user, update_fields=["password"], message="Password Change")
+        if result.is_error:
+            return result
+        return Result(True, _("Password has been changed successfully."))
+    
     def restore(self, user=None):
 
         result = super().restore(user=user)
@@ -664,13 +672,6 @@ class User(AbstractUser, BaseModel):
             return Result(
                 success=False, message=_("Invalid password."), errors=e.messages
             )
-    
-    def set_password(self, raw_password, user=None):
-        super().set_password(raw_password)
-        result = self.update(user=user, update_fields=["password"])
-        if result.is_error:
-            return result
-        return Result(True, _("Password has been changed successfully."))
     
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
