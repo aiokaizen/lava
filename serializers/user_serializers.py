@@ -132,6 +132,7 @@ class UserCreateSerializer(BaseModelSerializer):
 class UserUpdateSerializer(BaseModelSerializer):
 
     user_permissions = PermissionSerializer(many=True)
+    m2m_field_names = ['groups', 'user_permissions']
 
     class Meta :
         model = User
