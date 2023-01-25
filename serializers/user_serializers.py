@@ -182,15 +182,6 @@ class UserUpdateSerializer(BaseModelSerializer):
             _("You can not create a user using this serializer.")
         )
 
-    def update(self, instance, validated_data):
-        update_fields = validated_data.keys()
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        result = instance.update(user=self.user, update_fields=update_fields)
-        if not result.success:
-            raise serializers.ValidationError(result.as_dict())
-        return instance
-
 
 class UserDeleteSerializer(ReadOnlyModelSerializer):
 
