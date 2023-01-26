@@ -782,10 +782,10 @@ class Notification(models.Model):
         self.save()
 
         if target_users:
-            self.target_users.set(*target_users)
+            self.target_users.set(target_users)
 
         if target_groups:
-            self.target_groups.set(*target_groups)
+            self.target_groups.set(target_groups)
         
         if send_notification:
             self.send_firebase_notification()
