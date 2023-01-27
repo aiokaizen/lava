@@ -142,50 +142,100 @@ class BaseModelMixin:
             kwargs = {}
 
         if "created_by" in kwargs:
-            filter_params &= Q(created_by=kwargs["created_by"])
+            try:
+               created_by_id = int(kwargs["created_by"])
+               filter_params &= Q(created_by=created_by_id)
+            except ValueError:
+                pass
 
         if "created_at" in kwargs:
-            date = datetime.strptime(kwargs["created_at"], "%m-%d-%Y")
-            filter_params &= Q(created_at__date=date)
+            try:
+                date = datetime.strptime(kwargs["created_at"], "%m-%d-%Y")
+                filter_params &= Q(created_at__date=date)
+            except ValueError:
+                pass
 
         if "created_after" in kwargs:
-            date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
-            filter_params &= Q(created_at__date__gte=date)
+            try:
+                date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
+                filter_params &= Q(created_at__date__gte=date)
+            except ValueError:
+                pass
 
         if "created_before" in kwargs:
-            date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
-            filter_params &= Q(created_at__date__lte=date)
+            try:
+               date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
+               filter_params &= Q(created_at__date__lte=date)
+            except ValueError:
+                pass
 
         if "last_updated_at" in kwargs:
-            date = datetime.strptime(kwargs["last_updated_at"], "%m-%d-%Y")
-            filter_params &= Q(last_updated_at__date=date)
+            try:
+                date = datetime.strptime(kwargs["last_updated_at"], "%m-%d-%Y")
+                filter_params &= Q(last_updated_at__date=date)
+            except ValueError:
+                pass
 
         if "last_updated_after" in kwargs:
-            date = datetime.strptime(kwargs["last_updated_after"], "%m-%d-%Y")
-            filter_params &= Q(last_updated_at__date__gte=date)
+            try:
+                date = datetime.strptime(kwargs["last_updated_after"], "%m-%d-%Y")
+                filter_params &= Q(last_updated_at__date__gte=date)
+            except ValueError:
+                pass
 
         if "last_updated_before" in kwargs:
-            date = datetime.strptime(kwargs["last_updated_before"], "%m-%d-%Y")
-            filter_params &= Q(last_updated_at__date__lte=date)
+            try:
+                date = datetime.strptime(kwargs["last_updated_before"], "%m-%d-%Y")
+                filter_params &= Q(last_updated_at__date__lte=date)
+            except ValueError:
+                pass
 
         if "deleted_at" in kwargs:
-            date = datetime.strptime(kwargs["deleted_at"], "%m-%d-%Y")
-            filter_params &= Q(deleted_at__date=date)
+            try:
+                date = datetime.strptime(kwargs["deleted_at"], "%m-%d-%Y")
+                filter_params &= Q(deleted_at__date=date)
+            except ValueError:
+                pass
 
         if "deleted_after" in kwargs:
-            date = datetime.strptime(kwargs["deleted_after"], "%m-%d-%Y")
-            filter_params &= Q(deleted_at__date__gte=date)
+            try:
+                date = datetime.strptime(kwargs["deleted_after"], "%m-%d-%Y")
+                filter_params &= Q(deleted_at__date__gte=date)
+            except ValueError:
+                pass
 
         if "deleted_before" in kwargs:
-            date = datetime.strptime(kwargs["deleted_before"], "%m-%d-%Y")
-            filter_params &= Q(deleted_at__date__lte=date)
+            try:
+                date = datetime.strptime(kwargs["deleted_before"], "%m-%d-%Y")
+                filter_params &= Q(deleted_at__date__lte=date)
+            except ValueError:
+                pass
 
         return filter_params
+    
+    @classmethod
+    def get_ordering_params(cls, kwargs):
+
+        ordering = []
+
+        if "order_by" in kwargs:
+            order_params = kwargs.getlist('order_by')
+            object = cls()
+            for param in order_params:
+                param = param.lower()
+                field_name = param if not param.startswith('-') else param[1:]
+                if hasattr(object, field_name):
+                    ordering.append(param)
+
+        return ordering
 
     @classmethod
     def filter(cls, user=None, kwargs=None):
-        filter_params = cls.get_filter_params(user, kwargs)
+        filter_params = BaseModelMixin.get_filter_params(user, kwargs)
+        ordering = cls.get_ordering_params(kwargs)
         queryset = cls.objects.filter(filter_params)
+        if ordering:
+            queryset = queryset.order_by(*ordering)
         return queryset
 
 

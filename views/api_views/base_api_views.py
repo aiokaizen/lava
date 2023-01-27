@@ -6,9 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
+from lava.pagination import LavaPageNumberPagination
+
 
 class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
 
+    pagination_class = LavaPageNumberPagination
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -39,6 +42,8 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
    
 
 class BaseModelViewSet(ModelViewSet):
+
+    pagination_class = LavaPageNumberPagination
 
     def get_queryset(self):
         ActiveModel = self.queryset.model

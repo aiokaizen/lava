@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.db import models
 
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -22,7 +23,10 @@ class BaseModelSerializer(serializers.ModelSerializer):
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
             else:
-                setattr(instance, attr, value)
+                if isinstance(value, models.Model):
+                    setattr(instance, attr, value.id)
+                else:
+                    setattr(instance, attr, value)
 
         result = instance.create(user=self.user, m2m_fields=m2m_fields)
         if result.is_error:
@@ -39,7 +43,10 @@ class BaseModelSerializer(serializers.ModelSerializer):
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
             else:
-                setattr(instance, attr, value)
+                if isinstance(value, models.Model):
+                    setattr(instance, attr, value.id)
+                else:
+                    setattr(instance, attr, value)
                 update_fields.append(attr)
 
         result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields)
