@@ -83,6 +83,8 @@ class UserGetSerializer(ReadOnlyModelSerializer):
 
 class UserCreateSerializer(BaseModelSerializer):
 
+    confirm_password = serializers.CharField(label=_("Password confirmation"), required=True)
+
     class Meta:
         model = User
         fields = [

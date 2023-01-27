@@ -392,9 +392,6 @@ class User(AbstractUser, BaseModel):
             password = generate_password(12)
             self.tmp_pwd = password
 
-        if password:
-            self.set_password(password)
-
         if force_is_active:
             self.is_active = True
         elif settings.DJOSER["SEND_ACTIVATION_EMAIL"]:
@@ -404,6 +401,9 @@ class User(AbstractUser, BaseModel):
         result = super().create(user=None)
         if result.is_error:
             return result
+
+        if password:
+            self.set_password(password)
 
         update_fields = []
         if photo:
