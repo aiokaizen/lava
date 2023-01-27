@@ -31,6 +31,10 @@ class UserAPIViewSet(BaseModelViewSet):
             self.serializer_class = UserUpdateSerializer
         elif self.action == 'destroy':
             self.serializer_class = UserDeleteSerializer
+        elif self.action == 'metadata' and self.detail :
+            self.serializer_class = UserUpdateSerializer
+        elif self.action == 'metadata' and not self.detail :
+            self.serializer_class = UserCreateSerializer
         return super().get_serializer(*args, **kwargs)
 
     def get_permissions(self):
