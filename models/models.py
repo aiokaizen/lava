@@ -426,7 +426,7 @@ class User(AbstractUser, BaseModel):
             #     self.delete(soft_delete=False)
             #     raise Exception(res.to_dict())
 
-        if len(groups) == 1 and create_associated_objects:
+        if groups and len(groups) == 1 and create_associated_objects:
             try:
                 result = self.create_associated_objects(extra_attributes)
                 if not result.success:

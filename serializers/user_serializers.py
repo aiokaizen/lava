@@ -83,7 +83,9 @@ class UserGetSerializer(ReadOnlyModelSerializer):
 
 class UserCreateSerializer(BaseModelSerializer):
 
-    confirm_password = serializers.CharField(label=_("Password confirmation"), required=True)
+    confirm_password = serializers.CharField(
+        label=_("Password confirmation"), required=False
+    )
 
     class Meta:
         model = User
@@ -106,7 +108,7 @@ class UserCreateSerializer(BaseModelSerializer):
     def validate(self, data):
         validated_data = super().validate(data)
         pwd1 = validated_data["password"]
-        pwd2 = validated_data["confirm_password"]
+        pwd2 = validated_data.get("confirm_password")
 
         if pwd1 != pwd2:
             raise serializers.ValidationError(
@@ -117,6 +119,7 @@ class UserCreateSerializer(BaseModelSerializer):
     def create(self, validated_data):
         photo = validated_data.pop("photo", None)
         password = validated_data.pop("password", None)
+        validated_data.pop("confirm_password", None)
         instance = User(**validated_data)
         result = instance.create(
             user=self.user, photo=photo, password=password
