@@ -157,7 +157,8 @@ class Result(imdict):
             type = "warning"
 
         res_dict = {
-            "type": type,
+            "class": 'lava.utils.Result',
+            "result": type,
             "message": self.message
         }
 
