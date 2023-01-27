@@ -28,9 +28,9 @@ class BaseModelSerializer(serializers.ModelSerializer):
                 else:
                     setattr(instance, attr, value)
 
-        result = instance.create(user=self.user, m2m_fields=m2m_fields)
-        if result.is_error:
-            raise serializers.ValidationError(result.errors or result.message)
+        self.result = instance.create(user=self.user, m2m_fields=m2m_fields)
+        if self.result.is_error:
+            raise serializers.ValidationError(self.result.errors or self.result.message)
         return instance
     
     def update(self, instance, validated_data):
@@ -49,10 +49,10 @@ class BaseModelSerializer(serializers.ModelSerializer):
                     setattr(instance, attr, value)
                 update_fields.append(attr)
 
-        result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields)
-        if result.is_error:
-            raise serializers.ValidationError(result.errors or result.message)
-        return self.instance
+        self.result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields)
+        if self.result.is_error:
+            raise serializers.ValidationError(self.result.errors or self.result.message)
+        return instance
 
 
 class ReadOnlyModelSerializer(BaseModelSerializer):

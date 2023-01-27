@@ -121,11 +121,13 @@ class UserCreateSerializer(BaseModelSerializer):
         password = validated_data.pop("password", None)
         validated_data.pop("confirm_password", None)
         instance = User(**validated_data)
-        result = instance.create(
+        self.result = instance.create(
             user=self.user, photo=photo, password=password
         )
-        if not result.success:
-            raise serializers.ValidationError(result.to_dict())
+        if not self.result.success:
+            raise serializers.ValidationError(
+                self.result.errors or self.result.message
+            )
         return instance
 
     def update(self, instance, validated_data):

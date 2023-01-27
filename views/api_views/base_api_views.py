@@ -14,11 +14,22 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
     pagination_class = LavaPageNumberPagination
     permission_classes = [permissions.IsAuthenticated]
 
+    list_serializer_class = None
+    retrieve_serializer_class = None
+
     def get_queryset(self):
         ActiveModel = self.queryset.model
         return ActiveModel.filter(user=self.user, kwargs=self.request.GET)
     
     def get_serializer(self, *args, **kwargs):
+        self.serializer_class = self.list_serializer_class or self.serializer_class
+        if self.action == 'retrieve' and self.retrieve_serializer_class:
+            self.serializer_class = self.retrieve_serializer_class
+        elif self.action == 'metadata' and self.detail:
+            serializer_class = self.get_serializer_class
+        elif self.action == 'metadata':
+            serializer_class = self.list_serializer_class
+
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
         serializer = serializer_class(*args, user=self.user, **kwargs)
@@ -45,15 +56,50 @@ class BaseModelViewSet(ModelViewSet):
 
     pagination_class = LavaPageNumberPagination
 
+    list_serializer_class = None
+    retrieve_serializer_class = None
+    create_serializer_class = None
+    update_serializer_class = None
+    delete_serializer_class = None
+
     def get_queryset(self):
         ActiveModel = self.queryset.model
         return ActiveModel.filter(user=self.user, kwargs=self.request.GET)
     
     def get_serializer(self, *args, **kwargs):
+        self.serializer_class = self.list_serializer_class or self.serializer_class
+        if self.action == 'retrieve' and self.retrieve_serializer_class:
+            self.serializer_class = self.retrieve_serializer_class
+        elif self.action == 'create' and self.create_serializer_class:
+            self.serializer_class = self.create_serializer_class
+        elif self.action in ['update', 'partial_update'] and self.update_serializer_class:
+            self.serializer_class = self.update_serializer_class
+        elif self.action == 'destroy' and self.delete_serializer_class:
+            self.serializer_class = self.delete_serializer_class
+        elif self.action == 'metadata':
+            self.serializer_class = self.get_metadata_serializer_class()
+
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
         serializer = serializer_class(*args, user=self.user, **kwargs)
         return serializer
+
+    def get_metadata_serializer_class(self):
+        serializer_class = None
+        display_mode = self.request.GET.get("mode") == 'display'
+
+        if self.detail:
+            if display_mode:
+                serializer_class = self.get_serializer_class
+            else:
+                serializer_class = self.update_serializer_class
+        else:
+            if display_mode:
+                serializer_class = self.list_serializer_class
+            else:
+                serializer_class = self.create_serializer_class
+        
+        return serializer_class
 
     def get_permissions(self):
         permission_classes = self.permission_classes
@@ -69,15 +115,30 @@ class BaseModelViewSet(ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         self.user = request.user
-        return super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        if hasattr(serializer, 'result'):
+            return Response(serializer.result.to_dict(), headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
         self.user = request.user
-        return super().update(request, *args, **kwargs)
-    
-    def partial_update(self, request, *args, **kwargs):
-        self.user = request.user
-        return super().partial_update(request, *args, **kwargs)
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        if hasattr(serializer, 'result'):
+            return Response(serializer.result.to_dict())
+        return Response(serializer.data)
     
     def destroy(self, request, *args, **kwargs):
         self.user = request.user

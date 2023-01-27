@@ -152,11 +152,15 @@ class Result(imdict):
         )
 
     def to_dict(self):
+        type = "success" if self.success else "error"
+        if self.is_warning:
+            type = "warning"
+
         res_dict = {
-            "success": self.success,
-            "tag": self.tag,
+            "type": type,
             "message": self.message
         }
+
         if not self.success:
             res_dict["errors"] = self.errors or []
             res_dict["error_code"] = self.error_code

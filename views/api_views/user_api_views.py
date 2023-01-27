@@ -19,23 +19,14 @@ from lava.views.api_views.base_api_views import BaseModelViewSet
 class UserAPIViewSet(BaseModelViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = UserListSerializer
-    queryset = User.objects.none()
 
-    def get_serializer(self, *args, **kwargs):
-        if self.action == 'retrieve':
-            self.serializer_class = UserGetSerializer
-        elif self.action == 'create':
-            self.serializer_class = UserCreateSerializer
-        elif self.action in ['update', 'partial_update']:
-            self.serializer_class = UserUpdateSerializer
-        elif self.action == 'destroy':
-            self.serializer_class = UserDeleteSerializer
-        elif self.action == 'metadata' and self.detail :
-            self.serializer_class = UserUpdateSerializer
-        elif self.action == 'metadata' and not self.detail :
-            self.serializer_class = UserCreateSerializer
-        return super().get_serializer(*args, **kwargs)
+    list_serializer_class = UserListSerializer
+    retrieve_serializer_class = UserGetSerializer
+    create_serializer_class = UserCreateSerializer
+    update_serializer_class = UserUpdateSerializer
+    delete_serializer_class = UserDeleteSerializer
+
+    queryset = User.objects.none()
 
     def get_permissions(self):
         if self.action == 'create':
