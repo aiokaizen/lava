@@ -80,10 +80,9 @@ class UserAPIViewSet(BaseModelViewSet):
         self.is_me = True
         kwargs = {"pk": user.pk}
         if request.method == 'GET':
-            return self.retrieve(request=request, **kwargs)
+            return self.retrieve(request=request, pk=user.pk)
         elif request.method in ["PUT", "PATCH"]:
-            if request.method == "PATCH":
-                kwargs['partial'] = True
-            return self.update(request=request, **kwargs)
+            partial = True if request.method == "PATCH" else False
+            return self.update(request=request, pk=user.pk, partial=partial)
         else:
-            return self.destroy(request=request, **kwargs)
+            return self.destroy(request=request, pk=user.pk)
