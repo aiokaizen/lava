@@ -6,6 +6,7 @@ from rest_framework.fields import empty
 
 from lava.models import Preferences, User
 from lava.models.models import Permission
+from lava.serializers.base_serializers import BaseModelSerializer
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
@@ -72,7 +73,7 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
         return instance
 
 
-class PermissionSerializer(serializers.ModelSerializer):
+class PermissionSerializer(BaseModelSerializer):
 
     codename = serializers.SerializerMethodField(
         label=_("Code name")
