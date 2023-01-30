@@ -171,7 +171,7 @@ class CanAddPermission(IsAuthenticated):
         return is_authenticated and can_add_permission(user)
 
 
-class CanChangePermissions(IsAuthenticated):
+class CanChangePermission(IsAuthenticated):
     """
     Checks if a user has the permission to update permissions.
     """
@@ -182,7 +182,7 @@ class CanChangePermissions(IsAuthenticated):
         return is_authenticated and can_change_permission(user)
 
 
-class CanDeletePermissions(IsAuthenticated):
+class CanDeletePermission(IsAuthenticated):
     """
     Checks if a user has the permission to delete permissions.
     """
@@ -193,7 +193,7 @@ class CanDeletePermissions(IsAuthenticated):
         return is_authenticated and can_delete_permission(user)
 
 
-class CanSetPermissions(IsAuthenticated):
+class CanSetPermission(IsAuthenticated):
     """
     Checks if a user has the permission to set permissions for other users.
     """
@@ -204,7 +204,7 @@ class CanSetPermissions(IsAuthenticated):
         return is_authenticated and can_set_permission(user)
 
 
-class CanViewPermissions(IsAuthenticated):
+class CanViewPermission(IsAuthenticated):
     """
     Checks if a user has the permission to view permissions details.
     """
@@ -215,7 +215,7 @@ class CanViewPermissions(IsAuthenticated):
         return is_authenticated and can_view_permission(user)
 
 
-class CanListPermissions(IsAuthenticated):
+class CanListPermission(IsAuthenticated):
     """
     Checks if a user has the permission to view permissions list.
     """

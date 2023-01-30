@@ -49,6 +49,7 @@ if activate_api_urls:
     api_router.register(r"api/preferences", views.PreferencesViewSet)
     api_router.register(r"api/groups", views.GroupAPIViewSet)
     api_router.register(r"api/users", views.UserAPIViewSet)
+    api_router.register(r"api/permissions", views.PermissionAPIViewSet)
     api_router.register(r"api/activity_journal", views.LogEntryAPIViewSet)
 
     api_urlpatterns = [
