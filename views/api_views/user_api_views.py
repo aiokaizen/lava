@@ -42,7 +42,7 @@ class UserAPIViewSet(BaseModelViewSet):
         elif self.action == 'restore':
             self.permission_classes = [lava_permissions.CanRestoreUser]
 
-        if self.action == 'me' or getattr(self, 'is_me'):
+        if self.action == 'me' or getattr(self, 'is_me', False):
             self.permission_classes = [permissions.IsAuthenticated]
 
         return super().get_permissions()
