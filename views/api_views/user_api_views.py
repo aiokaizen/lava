@@ -31,16 +31,20 @@ class UserAPIViewSet(BaseModelViewSet):
     def get_permissions(self):
         if self.action == 'create':
             self.permission_classes = [lava_permissions.CanAddUser]
-        if self.action == 'update':
+        elif self.action == 'update':
             self.permission_classes = [lava_permissions.CanChangeUser]
-        if self.action == 'destroy':
+        elif self.action == 'destroy':
             self.permission_classes = [lava_permissions.CanSoftDeleteUser]
-        if self.action == 'retrieve':
+        elif self.action == 'retrieve':
             self.permission_classes = [lava_permissions.CanViewUser]
-        if self.action == 'list':
+        elif self.action == 'list':
             self.permission_classes = [lava_permissions.CanListUser]
-        if self.action == 'restore':
+        elif self.action == 'restore':
             self.permission_classes = [lava_permissions.CanRestoreUser]
+
+        if self.action == 'me' or getattr(self, 'is_me'):
+            self.permission_classes = [permissions.IsAuthenticated]
+
         return super().get_permissions()
     
     def destroy(self, request, *args, **kwargs):
@@ -69,3 +73,17 @@ class UserAPIViewSet(BaseModelViewSet):
                 "message": _("Password has been changed successfully!")
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["GET", "PUT", "PATCH", "DELETE"])
+    def me(self, request):
+        user = request.user
+        self.is_me = True
+        kwargs = {"pk": user.pk}
+        if request.method == 'GET':
+            return self.retrieve(request=request, **kwargs)
+        elif request.method in ["PUT", "PATCH"]:
+            if request.method == "PATCH":
+                kwargs['partial'] = True
+            return self.update(request=request, **kwargs)
+        else:
+            return self.destroy(request=request, **kwargs)

@@ -707,13 +707,14 @@ class User(AbstractUser, BaseModel):
 
     @classmethod
     def filter(cls, user=None, kwargs=None):
-        filter_params = cls.get_filter_params(user, kwargs)
+        filter_params = User.get_filter_params(user, kwargs)
 
+        base_queryset = super().filter(user=user, kwargs=kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
         if user and user not in admin_users:
-            return cls.objects.exclude(pk__in=admin_users)
+            return base_queryset.exclude(pk__in=admin_users)
 
-        return cls.objects.filter(filter_params)
+        return base_queryset.filter(filter_params)
 
 
 class Notification(models.Model):
