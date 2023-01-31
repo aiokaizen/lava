@@ -298,6 +298,10 @@ class User(AbstractUser, BaseModel):
             ('view_user', _("Can view user")),
             ('list_user', _("Can view users list")),
             ('restore_user', _("Can restore user")),
+
+            ('change_current_user', _("Can change user profile")),
+            ('delete_current_user', _("Can delete user profile")),
+            ('soft_delete_current_user', _("Can soft delete user profile")),
         )
 
     user_permissions = models.ManyToManyField(
@@ -363,6 +367,11 @@ class User(AbstractUser, BaseModel):
 
     def groups_names(self):
         return self.groups.all().values_list("name", flat=True) if self.id else []
+
+    def get_all_permissions(self):
+        user_perms_ids = self.user_permissions.all().values_list("id", flat=True)
+        groups_perms_ids = self.groups.all().values_list('permissions__id', flat=True)
+        return Permission.objects.filter(pk__in=[*user_perms_ids, *groups_perms_ids])
 
     def create(
         self,
@@ -605,6 +614,13 @@ class User(AbstractUser, BaseModel):
     def set_password(self, raw_password, user=None):
         self.password = make_password(raw_password)
         self._password = raw_password
+
+        if not self.username:
+            # We do this to fix an error where if the user is not found on login
+            # Django calls User().set_password(rp) to increase request time span
+            # for some reason?
+            return super().set_password(raw_password)
+
         result = self.update(user=user, update_fields=["password"], message="Password Change")
         if result.is_error:
             return result

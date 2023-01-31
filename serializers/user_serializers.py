@@ -47,7 +47,8 @@ class UserListSerializer(ReadOnlyModelSerializer):
 class UserGetSerializer(ReadOnlyModelSerializer):
 
     groups = GroupListSerializer(many=True)
-    user_permissions = PermissionSerializer(many=True)
+    # user_permissions = PermissionSerializer(many=True)
+    permissions = PermissionSerializer(many=True, source="get_all_permissions")
 
     class Meta:
         model = User
@@ -70,7 +71,8 @@ class UserGetSerializer(ReadOnlyModelSerializer):
             "is_staff",
             "is_superuser",
             "groups",
-            "user_permissions",
+            # "user_permissions",
+            "permissions",
             "last_login",
             "date_joined",
         ]

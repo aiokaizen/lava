@@ -53,6 +53,7 @@ if activate_api_urls:
     api_router.register(r"api/activity_journal", views.LogEntryAPIViewSet)
 
     api_urlpatterns = [
+        path("api/users/me/", views.UserMeAPIView.as_view(), name="api-user-me"),
         path("api/settings/", views.SettingsList.as_view(), name="api-settings"),
         path("api/maintenance/", views.maintenance, name="api-maintenance"),
         path("api/auth_user_permissions/", views.get_user_permissions, name="api-get-user-permissions"),

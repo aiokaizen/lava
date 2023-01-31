@@ -79,6 +79,22 @@ def can_restore_user(user):
     return has_perm
 
 
+# User Profile permissions
+def can_change_current_user(user):
+    has_perm = user.has_perm('lava.change_current_user')
+    return has_perm
+
+
+def can_delete_current_user(user):
+    has_perm = user.has_perm('lava.delete_current_user')
+    return has_perm
+
+
+def can_soft_delete_current_user(user):
+    has_perm = user.has_perm('lava.soft_delete_current_user')
+    return has_perm
+
+
 # Permission permissions
 def can_add_permission(user):
     has_perm = user.has_perm('lava.add_permission')

@@ -159,6 +159,40 @@ class CanRestoreUser(IsAuthenticated):
         return is_authenticated and can_restore_user(user)
 
 
+# Connected user permissions
+class CanChangeCurrentUser(IsAuthenticated):
+    """
+    Checks if a user has the permission to change a user.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_change_current_user(user)
+
+
+class CanDeleteCurrentUser(IsAuthenticated):
+    """
+    Checks if a user has the permission to delete a user.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_delete_current_user(user)
+
+
+class CanSoftDeleteCurrentUser(IsAuthenticated):
+    """
+    Checks if a user has the permission to soft delete a user.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_soft_delete_current_user(user)
+
+
 # Permission Permissions
 class CanAddPermission(IsAuthenticated):
     """

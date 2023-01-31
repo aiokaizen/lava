@@ -73,16 +73,3 @@ class UserAPIViewSet(BaseModelViewSet):
                 "message": _("Password has been changed successfully!")
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=["GET", "PUT", "PATCH", "DELETE"])
-    def me(self, request):
-        user = request.user
-        self.is_me = True
-        kwargs = {"pk": user.pk}
-        if request.method == 'GET':
-            return self.retrieve(request=request, pk=user.pk)
-        elif request.method in ["PUT", "PATCH"]:
-            partial = True if request.method == "PATCH" else False
-            return self.update(request=request, pk=user.pk, partial=partial)
-        else:
-            return self.destroy(request=request, pk=user.pk)
