@@ -23,10 +23,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
             else:
-                if isinstance(value, models.Model):
-                    setattr(instance, attr, value.id)
-                else:
-                    setattr(instance, attr, value)
+                setattr(instance, attr, value)
 
         self.result = instance.create(user=self.user, m2m_fields=m2m_fields)
         if self.result.is_error:
@@ -43,10 +40,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
             else:
-                if isinstance(value, models.Model):
-                    setattr(instance, attr, value.id)
-                else:
-                    setattr(instance, attr, value)
+                setattr(instance, attr, value)
                 update_fields.append(attr)
 
         self.result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields)

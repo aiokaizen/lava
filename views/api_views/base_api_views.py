@@ -66,7 +66,7 @@ class BaseModelViewSet(ModelViewSet):
         ActiveModel = self.queryset.model
         return ActiveModel.filter(user=self.user, kwargs=self.request.GET)
     
-    def get_serializer(self, *args, **kwargs):
+    def get_serializer_class(self):
         self.serializer_class = self.list_serializer_class or self.serializer_class
         if self.action == 'retrieve' and self.retrieve_serializer_class:
             self.serializer_class = self.retrieve_serializer_class
@@ -78,19 +78,21 @@ class BaseModelViewSet(ModelViewSet):
             self.serializer_class = self.delete_serializer_class
         elif self.action == 'metadata':
             self.serializer_class = self.get_metadata_serializer_class()
-
+        return self.serializer_class
+    
+    def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
         serializer = serializer_class(*args, user=self.user, **kwargs)
         return serializer
 
     def get_metadata_serializer_class(self):
-        serializer_class = None
+        serializer_class = self.list_serializer_class
         display_mode = self.request.GET.get("mode") == 'display'
 
         if self.detail:
             if display_mode:
-                serializer_class = self.get_serializer_class
+                serializer_class = self.retrieve_serializer_class
             else:
                 serializer_class = self.update_serializer_class
         else:
@@ -99,7 +101,7 @@ class BaseModelViewSet(ModelViewSet):
             else:
                 serializer_class = self.create_serializer_class
         
-        return serializer_class
+        return serializer_class or self.serializer_class
 
     def get_permissions(self):
         permission_classes = self.permission_classes
