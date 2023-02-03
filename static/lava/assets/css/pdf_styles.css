@@ -1,23 +1,50 @@
 @font-face {
-    font-family: "Poppins Normal";
-    src: url("../fonts/poppins/Poppins-Regular.ttf");
-    font-weight: 400; /* same as normal */
+    font-family: "Cairo Light";
+    src: url("../fonts/cairo/Cairo-Light.ttf");
+    font-weight: 400;
 }
 @font-face {
-    font-family: "Poppins Bold";
-    src: url("../fonts/poppins/Poppins-Bold.ttf");
-    font-weight: 700; /* same as bold */
+    font-family: "Cairo Normal";
+    src: url("../fonts/cairo/Cairo-Regular.ttf");
+    font-weight: 400;
 }
 @font-face {
-    font-family: "Poppins Black";
-    src: url("../fonts/poppins/Poppins-Black.ttf");
+    font-family: "Cairo Bold";
+    src: url("../fonts/cairo/Cairo-Bold.ttf");
+    font-weight: 700;
+}
+@font-face {
+    font-family: "Cairo Black";
+    src: url("../fonts/cairo/Cairo-Black.ttf");
     font-weight: 900;
 }
 
+@font-face {
+    font-family: "Lexend Normal";
+    src: url("../fonts/lexend/Lexend-Regular.ttf");
+    font-weight: 400;
+}
+@font-face {
+    font-family: "Lexend Bold";
+    src: url("../fonts/lexend/Lexend-Bold.ttf");
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: "Noto Arabic Normal";
+    src: url("../fonts/noto_arabic/NotoNaskhArabic-Regular.ttf");
+    font-weight: 400;
+}
+@font-face {
+    font-family: "Noto Arabic Bold";
+    src: url("../fonts/noto_arabic/NotoNaskhArabic-Bold.ttf");
+    font-weight: 700;
+}
+
 body {
-    height: 336.9px;
-    color: white;
-    font-family: "Cairo Normal";
+    font-family: "Lexend Normal";
+    color: #11123a;
+    /* --accent-color: #1cab98; */
 }
 
 table,
@@ -27,77 +54,26 @@ th {
     border-spacing: 0;
 }
 
+h1, h2, h3 {
+    font-family: "Cairo Black";
+    text-transform: uppercase;
+    /* color: var(--accent-color); */
+}
+
+h4, h5, h6 {
+    font-family: "Lexend Bold";
+}
+
 .thin-text {
-    font-family: "Poppins Extra Light";
+    font-family: "Cairo Light";
     font-weight: 300;
-    text-transform: uppercase;
 }
 
-#ticket {
-    padding: 10px;
-    height: 336.9px;
-    max-height: 336.9px;
-    /* overflow: hidden; */
-    background-color: rgb(248, 243, 238);
-    background-size: cover;
-    background-position: center;
-}
-#ticket-overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: rgba(26, 26, 26, 0.5);
-    z-index: 0;
+.ar {
+    font-family: "Noto Arabic Normal";
+    direction: rtl;
 }
 
-#content {
-    position: relative;
-    z-index: 1;
-    vertical-align: top;
-}
-
-#ticket-info {
-    width: 75%;
-    vertical-align: top;
-}
-#brand-logo td {
-    border-bottom: 1px solid rgb(184, 184, 184);
-}
-#ipc-logo img {
-    height: 90px;
-}
-#organizer-logo img {
-    max-height: 90px;
-    max-width: 170px;
-}
-
-#event-title-wrapper {
-    margin-bottom: 10px;
-}
-#event-title-wrapper h1 {
-    min-height: 90px;
-    font-family: "Poppins Bold";
-}
-#event-sub-title-wrapper h3 {
-    min-height: 50px;
-}
-#event-date {
-    font-family: "Poppins Bold";
-}
-
-#qr-area {
-    width: 25%; 
-    border-left: 2px dashed white;
-    vertical-align: top;
-}
-#ticket-name {
-    padding-top: 20px;
-    padding-bottom: 10px;
-    text-transform: uppercase;
-    font-family: "Poppins Normal";
-    font-weight: 400;
-}
-#ticket-price {
-    margin-bottom: 10px;
-    font-family: "Poppins Black";
+.content-table td, .content-table th {
+    padding: 5px 5px;
 }

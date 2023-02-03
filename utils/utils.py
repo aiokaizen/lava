@@ -387,3 +387,28 @@ def init_firebase():
     except Exception as e:
         logging.error(e)
         return Result(False, str(e))
+
+
+def hex_to_rgb(hex_value:str):
+    assert(hex_value.startswith("#"), "Invalid color format, please enter a hex color value")
+    hex_value = hex_value[1:]
+    return tuple(int(hex_value[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def adjust_color(color, amount=0.5):
+    """
+    color:  str: rgb or hex color value
+    amount: int: less than 0 => darker color, graiter than 0 => lighter color
+    """
+
+    rgb_color = color
+    if color.startswith("#"):
+        rgb_color = hex_to_rgb(color)
+
+    r, g, b = rgb_color
+    min_val = 0 if amount < 0 else 200
+    max_val = 55 if amount < 0 else 255
+    r = int(map_interval(r, 0, 255, min_val, max_val))
+    g = int(map_interval(g, 0, 255, min_val, max_val))
+    b = int(map_interval(b, 0, 255, min_val, max_val))
+    return f"rgb({r}, {g}, {b})"
