@@ -40,6 +40,11 @@ class Command(BaseCommand):
             type=str,
             help="The username suffix, defaults to user. eg: user1, user2, ..."
         )
+        parser.add_argument(
+            '--no-logs',
+            action='store_true',
+            help='If this argument is set, the function will not print anything to the console.',
+        )
 
     def handle(self, *args, **options):
         # Create some demo content here
@@ -48,6 +53,7 @@ class Command(BaseCommand):
         number_of_users = options["num_users"]
         skip_avatars = options["skip_avatars"]
         username_suffix = options["suffix"]
+        no_logs = options["no_logs"]
 
         logging.info(
             "Start importing demo content with the following parameters:\n"
@@ -129,6 +135,7 @@ class Command(BaseCommand):
                     )
                     user.update(update_fields=['photo'])
             
-            print(f'User {user.username} has been created.')
+            if not no_logs:
+                print(f'User {user.username} has been created.')
         
         shutil.rmtree(download_path, )

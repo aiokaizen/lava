@@ -12,7 +12,17 @@ class Command(BaseCommand):
         project that includes lava app.
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--no-logs',
+            action='store_true',
+            help='If this argument is set, the function will not print anything to the console.',
+        )
+
     def handle(self, *args, **options):
+
+        no_logs = options["no_logs"]
+
         # Create the group 'ADMINS' if it does not exist
         try:
             group = Group.objects.get(name="ADMINS")
