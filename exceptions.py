@@ -5,7 +5,6 @@ from rest_framework.exceptions import NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
 from rest_framework import status
 
-from lava.utils import Result
 from lava.messages import FORBIDDEN_MESSAGE, NOT_AUTHENTICATED_MESSAGE
 from lava.error_codes import PERMISSION_DENIED_ERROR_CODE, NOT_AUTHENTICATED_ERROR_CODE
 
@@ -19,6 +18,8 @@ class LavaBaseException(Exception):
 
 
 def lava_drf_exception_handler(exc, context):
+    from lava.utils import Result
+    
     if isinstance(exc, NotAuthenticated):
         return Response(
             Result(False, NOT_AUTHENTICATED_MESSAGE, error_code=NOT_AUTHENTICATED_ERROR_CODE).to_dict(),
