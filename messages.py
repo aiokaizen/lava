@@ -20,3 +20,5 @@ HTTP_403_MESSAGE = {"detail": FORBIDDEN_MESSAGE}
 NOT_AUTHENTICATED_MESSAGE =  _('Authentication credentials were not provided.')
 
 INVALID_FORMAT_MESSAGE = _("Invalid format.")
+
+NOT_FOUND_MESSAGE = _('Not found.')
