@@ -22,6 +22,11 @@ This application is the base for all our django projects. It contains the core f
     'django.middleware.common.CommonMiddleware',
 ```
 to your `MIDDLEWARE`s list.
+* Add the following to your DRF settings:
+```REST_FRAMEWORK = {
+    # other settings
+    "EXCEPTION_HANDLER": "lava.exceptions.lava_drf_exception_handler"
+}```
 * Add the following settings to your settings file:
 ```
 CORS_ALLOWED_ORIGINS = [
