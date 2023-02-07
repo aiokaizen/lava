@@ -269,6 +269,9 @@ class Group(BaseModelMixin, BaseGroupModel):
 
         return Result(True, _("The group has been deleted successfully."))
     
+    def restore(self, user=None):
+        return Result(False, "")
+    
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
         filter_params = Q()
