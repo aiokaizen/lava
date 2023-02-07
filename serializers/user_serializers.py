@@ -140,7 +140,6 @@ class UserCreateSerializer(BaseModelSerializer):
 
 class UserUpdateSerializer(BaseModelSerializer):
 
-    user_permissions = PermissionSerializer(many=True)
     m2m_field_names = ['groups', 'user_permissions']
 
     class Meta :
@@ -177,6 +176,51 @@ class UserUpdateSerializer(BaseModelSerializer):
         validated_data = super().validate(value)
         email = validated_data.get("email")
         groups = validated_data.get("groups")
+
+        if email:
+            try:
+                validated_data["email"] = validate_email(email, groups)
+            except ValidationError as e:
+                raise serializers.ValidationError({"email": e.message})
+
+        return validated_data
+
+    def create(self, validated_data):
+        raise serializers.ValidationError(
+            _("You can not create a user using this serializer.")
+        )
+
+
+class UserProfileUpdateSerializer(BaseModelSerializer):
+
+    class Meta :
+        model = User
+        fields = [
+            "username",
+            "photo",
+            "first_name",
+            "last_name",
+            "birth_day",
+            "gender",
+            "job",
+            "email",
+            "phone_number",
+            "country",
+            "city",
+            "street_address",
+            "cover_picture",
+        ]
+        extra_kwargs = {
+            "birth_day": {
+                "format": "%m/%d/%Y",
+                "input_formats": settings.DATE_INPUT_FORMATS,
+            }
+        }
+
+    def validate(self, value):
+        validated_data = super().validate(value)
+        email = validated_data.get("email")
+        groups = self.instance.groups.all()
 
         if email:
             try:

@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from djoser import utils
 
 from lava.serializers.user_serializers import (
-    UserGetSerializer, UserUpdateSerializer, UserDeleteSerializer
+    UserGetSerializer, UserProfileUpdateSerializer, UserDeleteSerializer
 )
 from lava.services import class_permissions as lava_permissions
 
@@ -31,7 +31,7 @@ class UserMeAPIView(APIView):
     def put(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         user = request.user
-        serializer = UserUpdateSerializer(
+        serializer = UserProfileUpdateSerializer(
             instance=user, data=request.data, user=user, partial=partial
         )
         serializer.is_valid(raise_exception=True)
