@@ -131,6 +131,10 @@ class BaseModelViewSet(ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
+
+        if not request.data:
+            return Response(serializer.data)
+
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
