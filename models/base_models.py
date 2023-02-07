@@ -16,9 +16,15 @@ from lava.utils import Result
 
 class BaseModelMixin:
 
-    def create(self, user=None, m2m_fields=None):
+    def create(self, user=None, m2m_fields=None, clean=False):
         if self.id:
             return Result(False, _("This object is already created."))
+
+        # if clean:
+        #     try:
+        #         self.clean_fields()
+        #     except ValidationError as e:
+        #         return Result(False, _("Erreurs de validation."), errors=e.error_dict)
         
         self.created_by = user
 

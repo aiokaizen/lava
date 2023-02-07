@@ -1,9 +1,15 @@
-from django.core.validators import EmailValidator, URLValidator
+from django.core.validators import EmailValidator, URLValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 from lava import settings as lava_settings
+
+
+def validate_empty_field(value):
+    print("validating object, value:", value)
+    validator = RegexValidator('.+', _("This field is required"), "required")
+    return validator(value)
 
 
 def validate_email(email, groups, email_group_unique_together=None):
