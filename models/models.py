@@ -233,6 +233,7 @@ class Group(BaseModelMixin, BaseGroupModel):
     #     'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
     #     related_name="sub_groups", null=True, blank=True
     # )
+    trash = TrashBaseModelManager()
     
     def create(self, user=None, m2m_fields=None):
         if user and not can_add_group(user):
