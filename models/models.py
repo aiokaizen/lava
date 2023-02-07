@@ -203,7 +203,7 @@ class Permission(BasePermissionModel, BaseModelMixin):
         return Result(True, _("The permission has been deleted successfully."))
 
 
-class Group(BaseGroupModel, BaseModelMixin):
+class Group(BaseModelMixin, BaseGroupModel):
 
     class Meta:
         verbose_name = _('Group')
