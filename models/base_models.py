@@ -45,7 +45,7 @@ class BaseModelMixin:
             return Result(False, _("This object is not yet created."))
 
         # Get changed message before saving the object
-        message = message or self.get_changed_message()
+        message = message or self.get_changed_message(m2m_fields)
 
         self.save(update_fields=update_fields)
 
@@ -101,10 +101,18 @@ class BaseModelMixin:
             return result
         return Result(True, _("The object has been restored successfully."))
 
-    def get_changed_message(self):
+    def get_changed_message(self, m2m_fields=None):
+
+        if not m2m_fields:
+            m2m_fields = []
+
         changed_message = {"fields": {}}
         klass = self.__class__
         old_self = klass.objects.get(pk=self.pk)
+        m2m_fields_dict = {}
+        for m2mfield in m2m_fields:
+            m2m_fields_dict[m2mfield[0]] = m2mfield[1]
+
         for field in klass._meta.get_fields(include_parents=True):
         
             field_name = field.name
@@ -115,8 +123,8 @@ class BaseModelMixin:
                 old_value = f"{old_value.id}|{old_value}" if old_value else None
                 new_value = f"{new_value.id}|{new_value}" if new_value else None
 
-            if type(field) == ManyToManyField:
-                old_value = list(old_value.all().values_list("pk", flat=True))
+            if type(field) == ManyToManyField and field_name in m2m_fields_dict:
+                old_value = [item.pk for item in m2m_fields_dict[field_name]]
                 new_value = list(new_value.all().values_list("pk", flat=True))
 
             if old_value != new_value:
