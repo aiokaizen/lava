@@ -9,7 +9,7 @@ from lava.serializers.user_serializers import UserExerptSerializer
 class LogEntrySerializer(ReadOnlyModelSerializer):
 
     user = UserExerptSerializer()
-    action_flag = serializers.CharField(source='get_action_flag_display')
+    action_flag_display = serializers.CharField(source='get_action_flag_display')
     content_type = serializers.CharField(source='content_type.model')
 
     class Meta:
@@ -21,6 +21,7 @@ class LogEntrySerializer(ReadOnlyModelSerializer):
             "content_type",
             "object_id",
             "object_repr",
+            "action_flag_display",
             "action_flag",
             "change_message",
         ]
