@@ -44,6 +44,9 @@ class BaseModelMixin:
         if not self.id:
             return Result(False, _("This object is not yet created."))
 
+        # Get changed message before saving the object
+        message = message or self.get_changed_message()
+
         self.save(update_fields=update_fields)
 
         if m2m_fields:
@@ -52,7 +55,6 @@ class BaseModelMixin:
                 field.set(value)
 
         if user:
-            message = message or self.get_changed_message()
             self.log_action(user, CHANGE, message)
 
         return Result(True, _("Object updated successfully."))
