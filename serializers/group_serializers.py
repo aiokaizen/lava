@@ -29,7 +29,7 @@ class GroupGetSerializer(ReadOnlyModelSerializer):
 
 class GroupCreateUpdateSerializer(BaseModelSerializer):
 
-    permissions = PermissionSerializer(many=True, required=False)
+    m2m_field_names = ["permissions"]
 
     class Meta:
         model = Group

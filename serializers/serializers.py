@@ -86,6 +86,9 @@ class PermissionSerializer(BaseModelSerializer):
             "name",
             "codename"
         ]
+        read_only_fields = [
+            "id", "codename"
+        ]
     
     def get_codename(self, obj):
         return f"{obj.content_type.app_label}.{obj.content_type.model}.{obj.codename}"

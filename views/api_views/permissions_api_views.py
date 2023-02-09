@@ -14,6 +14,8 @@ class PermissionAPIViewSet(BaseModelViewSet):
     serializer_class = PermissionSerializer
     queryset = Permission.objects.none()
 
+    denied_actions = ["create", "destroy", "restore"]
+
     def get_permissions(self):
         if self.action == 'create':
             self.permission_classes = [lava_permissions.CanAddPermission]

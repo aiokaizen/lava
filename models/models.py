@@ -177,27 +177,28 @@ class Permission(BasePermissionModel, BaseModelMixin):
             ('export_permissions', "Can export permissions"),
         )
 
-    def create(self, user=None):
+    def create(self, user=None, *args, **kwargs):
         
-        result = self.create(user=user)
+        return Result(False, _("You can not create a new permission."))
+
+        result = super().create(user=user, *args, **kwargs)
         if result.is_error:
             return result
         return Result(True, _("The permission has been created successfully."))
 
-    def update(self, user=None, update_fields=None):
+    def update(self, user=None, update_fields=None, *args, **kwargs):
+
+        if update_fields is None or len(update_fields) > 0:
+            update_fields = ["name"]
         
-        # TODO: Check if the deleted permission is defined in default_permissions
-        # or permissions attributes of any registered model.
-        
-        result = self.update(user=user, update_fields=update_fields)
+        result = super().update(user=user, update_fields=update_fields, *args, **kwargs)
         if result.is_error:
             return result
         return Result(True, _("The permission has been updated successfully."))
     
-    def delete(self, user=None):
+    def delete(self, user=None, *args, **kwargs):
         
-        # TODO: Check if the deleted permission is defined in default_permissions
-        # or permissions attributes of any registered model.
+        return Result(False, _("You can not delete a permission."))
         
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:

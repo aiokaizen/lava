@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
+from lava.messages import ACTION_NOT_ALLOWED
+from lava.utils import Result
 from lava.pagination import LavaPageNumberPagination
 
 
@@ -16,6 +18,8 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
 
     list_serializer_class = None
     retrieve_serializer_class = None
+
+    denied_actions = []
 
     def get_queryset(self):
         ActiveModel = self.queryset.model
@@ -40,14 +44,32 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
+        if "list" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+            
         self.user = request.user
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
+        if "retrieve" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+            
         self.user = request.user
         return super().retrieve(request, *args, **kwargs)
     
     def options(self, request, *args, **kwargs):
+        if "metadata" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+            
         self.user = request.user
         return super().options(request, *args, **kwargs)
    
@@ -61,6 +83,8 @@ class BaseModelViewSet(ModelViewSet):
     create_serializer_class = None
     update_serializer_class = None
     delete_serializer_class = None
+
+    denied_actions = []
 
     def get_queryset(self):
         ActiveModel = self.queryset.model
@@ -108,14 +132,32 @@ class BaseModelViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
+        if "list" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
+        if "retrieve" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         return super().retrieve(request, *args, **kwargs)
     
     def create(self, request, *args, **kwargs):
+        if "create" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -126,6 +168,12 @@ class BaseModelViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
+        if "update" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -147,6 +195,12 @@ class BaseModelViewSet(ModelViewSet):
         return Response(serializer.data)
     
     def destroy(self, request, *args, **kwargs):
+        if "destroy" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         object = self.get_object()
         result = object.delete(user=self.user)
@@ -155,11 +209,23 @@ class BaseModelViewSet(ModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     def options(self, request, *args, **kwargs):
+        if "metadata" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         return super().options(request, *args, **kwargs)
     
     @action(detail=True, methods=["POST"])
     def restore(self, request, pk):
+        if "restore" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )
+
         self.user = request.user
         ActiveModel = self.queryset.model
         product = get_object_or_404(ActiveModel.trash.all(), pk=pk)
