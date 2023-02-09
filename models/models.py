@@ -29,6 +29,7 @@ from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE
 from lava.models.base_models import BaseModel, BaseModelMixin
 from lava.services.permissions import (
     can_add_group, can_change_group, can_delete_group, can_list_group,
+    can_list_permission, can_list_user,
 )
 from lava.utils import (
     get_user_cover_filename,
@@ -159,7 +160,7 @@ class LogEntry(BaseLogEntryModel):
         return queryset | base_queryset
 
 
-class Permission(BasePermissionModel, BaseModelMixin):
+class Permission(BaseModelMixin, BasePermissionModel):
 
     class Meta:
         verbose_name = _('permission')
@@ -204,6 +205,24 @@ class Permission(BasePermissionModel, BaseModelMixin):
         if result.is_error:
             return result
         return Result(True, _("The permission has been deleted successfully."))
+
+    @classmethod
+    def get_filter_params(cls, user=None, kwargs=None):
+        filter_params = Q()
+
+        if "name" in kwargs:
+            filter_params |= Q(name__icontains=kwargs["name"])
+
+        return filter_params
+    
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = Permission.get_filter_params(user, kwargs)
+        queryset = Permission.objects.filter(filter_params)
+        if user and not can_list_permission(user):
+            return queryset.none()
+
+        return queryset
 
 
 class Group(BaseModelMixin, BaseGroupModel):
@@ -279,6 +298,10 @@ class Group(BaseModelMixin, BaseGroupModel):
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
         filter_params = Q()
+
+        if "name" in kwargs:
+            filter_params |= Q(name__icontains=kwargs["name"])
+
         return filter_params
     
     @classmethod
@@ -734,6 +757,10 @@ class User(AbstractUser, BaseModel):
 
         base_queryset = super().filter(user=user, kwargs=kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
+
+        if user and not can_list_user(user):
+            return base_queryset.none()
+
         if user and user not in admin_users:
             return base_queryset.exclude(pk__in=admin_users)
 
@@ -741,6 +768,7 @@ class User(AbstractUser, BaseModel):
 
 
 class Notification(models.Model):
+
     class Meta:
         verbose_name = _("Notification")
         verbose_name_plural = _("Notifications")
@@ -872,3 +900,19 @@ class Notification(models.Model):
             return Result(False, str(e))
 
         return Result(True)
+
+    @classmethod
+    def get_filter_params(cls, user=None, kwargs=None):
+
+        filter_params = Q()
+
+        if kwargs is None:
+            kwargs = {}
+
+        return filter_params
+
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        # filter_params = Notification.get_filter_params(user, kwargs)
+        # return Notification.objects.filter(filter_params)
+        return Notification.objects.all()
