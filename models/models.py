@@ -3,6 +3,7 @@ import logging
 import threading
 import itertools
 from datetime import datetime, timedelta
+from time import sleep
 
 from django.apps import apps
 from django.db import models
@@ -1035,32 +1036,22 @@ class Backup(BaseModel):
     
     def run_backup(self, user=None):
         try:
-            # Perform backup
             filename = get_backup_file_filename(self, "_")
-            filepath = os.path.join(settings.MEDIA_ROOT, filename)
-            tmp_file_path = os.path.join(settings.TMP_ROOT, filename)
-            tmp_backup_dir = os.path.dirname(tmp_file_path)
-            if not os.path.exists(tmp_backup_dir):
-                os.makedirs(tmp_backup_dir)
+            abs_filepath = os.path.join(settings.MEDIA_ROOT, filename)
+            backup_dir = os.path.dirname(abs_filepath)
+            if not os.path.exists(backup_dir):
+                os.makedirs(backup_dir)
 
-            zipdir(settings.MEDIA_ROOT, tmp_file_path, exclude_backup_files=True)
-            print("zipping has finished!")
+            # This sleep was put here for testing purposes only.
+            # Remove it once Backup interface is complete.
+            sleep(10)
 
-            try:
-                tmp_file = open(tmp_file_path, "rb")
-                self.backup_file.save(
-                    filename,
-                    File(tmp_file),
-                    save=False
-                )
-                self.status = "completed"
-                self.save(update_fields=["status", "backup_file"])
-            except Exception as e:
-                logging.error(e)
-            finally:
-                tmp_file.close()
-                os.remove(tmp_file_path)
-            
+            zipdir(settings.MEDIA_ROOT, abs_filepath, exclude_backup_files=True)
+
+            self.backup_file = filename
+            self.status = "completed"
+            self.save(update_fields=["status", "backup_file"])
+
             if user:
                 notif = Notification(
                     title=_("Backup complete"),
