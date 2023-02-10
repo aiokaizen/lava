@@ -51,6 +51,7 @@ if activate_api_urls:
     api_router.register(r"api/users", views.UserAPIViewSet)
     api_router.register(r"api/permissions", views.PermissionAPIViewSet)
     api_router.register(r"api/activity_journal", views.LogEntryAPIViewSet)
+    api_router.register(r"api/backup", views.BackupAPIViewSet)
 
     api_urlpatterns = [
         path("api/users/me/", views.UserMeAPIView.as_view(), name="api-user-me"),

@@ -3,6 +3,7 @@ import random
 import logging
 from datetime import datetime
 import unicodedata
+import zipfile
 
 from PIL import Image as PILImage
 
@@ -204,6 +205,20 @@ def get_group_photo_filename(instance, filename):
     return "{}/photo.{}".format(folder, ext)
 
 
+def get_backup_file_filename(instance, filename):
+    return "backup/{}".format(instance.get_filename())
+
+
+def get_log_filepath():
+    now = datetime.now()
+    current_hour = now.strftime("%Y%m%d_%H")
+    filename = f"{current_hour}.log"
+    filepath = os.path.join(settings.LOG_ROOT, filename)
+    if not os.path.exists(settings.LOG_ROOT):
+        os.makedirs(settings.LOG_ROOT)
+    return filepath
+
+
 def get_or_create(klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs):
     try:
         instance = klass.objects.get(*args, **kwargs)
@@ -277,16 +292,6 @@ def send_mass_html_email(
 
 
 # Other things
-def get_log_filepath():
-    now = datetime.now()
-    current_hour = now.strftime("%Y%m%d_%H")
-    filename = f"{current_hour}.log"
-    filepath = os.path.join(settings.LOG_ROOT, filename)
-    if not os.path.exists(settings.LOG_ROOT):
-        os.makedirs(settings.LOG_ROOT)
-    return filepath
-
-
 def add_margin_to_image(pil_img, top, right, bottom, left, color):
     width, height = pil_img.size
     new_width = width + right + left
@@ -323,7 +328,6 @@ def get_image(image_path, target_width=None, target_height=None, margin=None, co
         image = PILImage.open(tmp_image_filename)
     
     return image
-
 
 
 def generate_password(length=8, include_special_characters=True):
@@ -412,3 +416,34 @@ def adjust_color(color, amount=0.5):
     g = int(map_interval(g, 0, 255, min_val, max_val))
     b = int(map_interval(b, 0, 255, min_val, max_val))
     return f"rgb({r}, {g}, {b})"
+
+
+def zipdir(target_dir, output, exclude_backup_files=False):
+    """
+        Zip all files in a directory located at target_dir.
+        Outputs the zip into output our the parent directory.
+    """
+
+    with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, _dirs, files in os.walk(target_dir):
+            for file in files:
+                if "backup" not in file or not exclude_backup_files:
+                    zipf.write(
+                        os.path.join(root, file), 
+                        os.path.relpath(
+                            os.path.join(root, file), 
+                            os.path.join(target_dir, '..')
+                        )
+                    )
+
+
+# def zipf(filename, output):
+#     """ Zip the file with the path filename into the output zip. """
+#     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
+#         zipf.write(
+#             filename,
+#             os.path.relpath(
+#                 os.path.join(os.basedir(filename), filename), 
+#                 os.path.join(os.basedir(filename), '..')
+#             )
+#         )

@@ -10,7 +10,7 @@ from admin_interface.models import Theme
 
 from lava.forms.main_forms import LavaUserChangeForm
 from lava.models import (
-    Notification, Preferences, User, Group
+    Notification, Preferences, User, Group, Backup
 )
 
 
@@ -249,6 +249,11 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Backup)
+class BackupAdmin(admin.ModelAdmin):
     pass
 
 

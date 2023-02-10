@@ -51,6 +51,18 @@ EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
     False,
 )
 
+
+BACKUP_TYPE_CHOICES = (
+    ("full_backup", _("Full backup")),
+    ("db_backup", _("Database backup")),
+)
+
+BACKUP_STATUS_CHOICES = (
+    ("running", _("Running")),
+    ("completed", _("Completed")),
+    ("failed", _("Failed")),
+)
+
 BREADCRUMBS_DEPTH_LEVEL = getattr(settings, "BREADCRUMBS_DEPTH_LEVEL", 3)
 
 LOGO_FILE_PATH = getattr(
@@ -64,3 +76,11 @@ FIREBASE_ACTIVATED = False
 _init_firebase_result = init_firebase()
 if _init_firebase_result.success:
     FIREBASE_ACTIVATED = True
+
+LOG_ROOT = getattr(settings, "LOG_ROOT ", os.path.join(settings.BASE_DIR, 'log'))
+REMOTE_BACKUP_CONF = getattr(settings, "REMOTE_BACKUP_CONF", {
+    "server_name": "backup_server",  # IP address or domain name
+    "login_user": "ekadmin",
+    "backup_folder": "/var/backup/lava"
+})
+TMP_ROOT = getattr(settings, "TMP_ROOT", os.path.join(settings.BASE_DIR, "tmp"))

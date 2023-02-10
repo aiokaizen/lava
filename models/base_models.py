@@ -65,7 +65,9 @@ class BaseModelMixin:
 
         if soft_delete:
             self.deleted_at = timezone.now()
-            self.update(user=user, update_fields=['deleted_at'], message="Deletion")
+            res = self.update(user=user, update_fields=['deleted_at'], message="Deletion")
+            if res.is_error:
+                return res
             return Result(True, success_message)
 
         if user:

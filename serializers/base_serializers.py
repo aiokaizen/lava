@@ -26,7 +26,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
 
         self.result = instance.create(user=self.user, m2m_fields=m2m_fields)
-        if self.result.is_error:
+        if self.result.is_error and self.result.errors:
             raise serializers.ValidationError(self.result.errors or self.result.message, self.result.error_code)
         return instance
     

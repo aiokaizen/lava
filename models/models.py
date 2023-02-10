@@ -1,10 +1,13 @@
+import os
 import logging
+import threading
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.apps import apps
 from django.db import models
 from django.db.models import Q
+from django.core.files import File
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
@@ -25,18 +28,20 @@ from django.utils import timezone
 from lava import settings as lava_settings
 from lava import validators as lava_validators
 from lava.error_codes import UNIMPLEMENTED, UNKNOWN
-from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE
+from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE, ACTION_NOT_ALLOWED
 from lava.models.base_models import BaseModel, BaseModelMixin
 from lava.services.permissions import (
     can_add_group, can_change_group, can_delete_group, can_list_group,
     can_list_permission, can_list_user,
 )
 from lava.utils import (
+    Result,
     get_user_cover_filename,
     get_user_photo_filename,
-    Result,
     generate_password,
     strtobool,
+    get_backup_file_filename,
+    zipdir
 )
 from lava.managers import (
     DefaultBaseModelManager, LavaUserManager
@@ -916,3 +921,182 @@ class Notification(models.Model):
         # filter_params = Notification.get_filter_params(user, kwargs)
         # return Notification.objects.filter(filter_params)
         return Notification.objects.all()
+
+
+class Backup(BaseModel):
+
+    backup_lock_tag_path = os.path.join(
+        settings.BASE_DIR,
+        "back_up_in_progress"
+    )
+
+    class Meta:
+        verbose_name = _("Backup")
+        verbose_name_plural = _("Backups")
+        ordering = ("-created_at", )
+        default_permissions = ()
+        permissions = (
+            ('add_backup', _("Can add backup")),
+            ('delete_backup', _("Can delete backup")),
+            ('soft_delete_backup', _("Can soft backup")),
+            ('list_backup', _("Can view backup")),
+        )
+
+    type = models.CharField(
+        _("Backup type"), max_length=16, default="full_backup",
+        choices=lava_settings.BACKUP_TYPE_CHOICES
+    )
+    status = models.CharField(
+        _("Status"), max_length=16, default="running",
+        choices=lava_settings.BACKUP_STATUS_CHOICES
+    )
+    backup_file = models.FileField(
+        _("Backup file"), null=True, blank=True,
+        upload_to=get_backup_file_filename
+    )
+
+    def __str__(self):
+        return (
+            f"{self.created_at.strftime('%c')} "
+            f"{self.get_type_display()}"
+        )
+    
+    def get_filename(self):
+        return (
+            f"{self.created_at.strftime('%Y%m%d.%H%M%S')}_"
+            f"{self.type}.zip"
+        )
+    
+    def create(self, user=None, *args, **kwargs):
+        return self.start_backup(user=user, *args, **kwargs)
+    
+    def update(self, *args, **kwargs):
+        if 'message' not in kwargs:
+            return Result(False, ACTION_NOT_ALLOWED)
+        return super().update(*args, **kwargs)
+    
+    def delete(self, user=None, soft_delete=True):
+        backup_file = self.backup_file
+
+        result = super().delete(user=user, soft_delete=soft_delete)
+        if result.is_error:
+            return result
+
+        if backup_file:
+            backup_file.delete()
+    
+        return Result(True, _("Backup has been deleted successfully."))
+    
+    def can_start_backup(self):
+
+        if Backup.is_locked():
+            return Result(False, _("A backup is already running, please wait "
+                "until it's finished before starting a new one."), tag="warning")
+        
+        # min_period_between_backups = timedelta(minutes=1)
+        # daily_limit = 2
+        # now = timezone.now()
+
+        # all_backups = (
+        #     Backup.trash.filter(status="completed") |
+        #     Backup.objects.filter(status="completed")
+        # )
+
+        # today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
+        # latest_backup = all_backups.first()
+
+        # if not latest_backup:
+        #     return Result(True)
+
+        # if today_backups.count() >= daily_limit:
+        #     return Result(False, _("You can not create more than %s backups per day." % daily_limit))
+        
+        # latest_backup_time = latest_backup.created_at
+        # if now < latest_backup_time + min_period_between_backups:
+        #     return Result(False, _("You can only create one backup per hour"))
+
+        return Result(True)
+    
+    def start_backup(self, user=None, *args, **kwargs):
+        result = self.can_start_backup()
+        if not result.success:
+            return result
+        
+        result = super().create(user, *args, **kwargs)
+        if result.is_error:
+            return result
+        
+        Backup.lock()
+        
+        backup = self
+        threading.Thread(target=backup.run_backup, args=(user, )).start()
+
+        return Result(True, _("Backup has been started, you will get notified once it is finished."))
+    
+    def run_backup(self, user=None):
+        try:
+            # Perform backup
+            filename = get_backup_file_filename(self, "_")
+            filepath = os.path.join(settings.MEDIA_ROOT, filename)
+            tmp_file_path = os.path.join(settings.TMP_ROOT, filename)
+            tmp_backup_dir = os.path.dirname(tmp_file_path)
+            if not os.path.exists(tmp_backup_dir):
+                os.makedirs(tmp_backup_dir)
+
+            zipdir(settings.MEDIA_ROOT, tmp_file_path, exclude_backup_files=True)
+            print("zipping has finished!")
+
+            try:
+                tmp_file = open(tmp_file_path, "rb")
+                self.backup_file.save(
+                    filename,
+                    File(tmp_file),
+                    save=False
+                )
+                self.status = "completed"
+                self.save(update_fields=["status", "backup_file"])
+            except Exception as e:
+                logging.error(e)
+            finally:
+                tmp_file.close()
+                os.remove(tmp_file_path)
+            
+            if user:
+                notif = Notification(
+                    title=_("Backup complete"),
+                    content=_("A %s that was started on %s is finished successfully." % (
+                        self.get_type_display(), self.created_at.strftime("%c")
+                    )),
+                )
+                notif.create(target_users=[user])
+
+        except Exception as e:
+            if user:
+                notif = Notification(
+                    title=_("Backup failed"),
+                    content=_("A %s that was started on %s has failed.\nError: %s" % (
+                        self.get_type_display(), self.created_at.strftime("%c"), e
+                    )),
+                )
+                notif.create(target_users=[user])
+            
+            # Change status to failed
+            self.status = "failed"
+            self.save(update_fields=["status"])
+
+        finally:
+            Backup.unlock()
+        
+    @classmethod
+    def is_locked(cls):
+        return os.path.exists(cls.backup_lock_tag_path)
+    
+    @classmethod
+    def lock(cls):
+        open(cls.backup_lock_tag_path, "w").close()
+
+    @classmethod
+    def unlock(cls):
+        if cls.is_locked():
+            os.remove(cls.backup_lock_tag_path)
+    
