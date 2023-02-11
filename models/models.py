@@ -4,6 +4,7 @@ import threading
 import itertools
 from datetime import datetime, timedelta
 from time import sleep
+import zipfile
 
 from django.apps import apps
 from django.db import models
@@ -42,7 +43,8 @@ from lava.utils import (
     generate_password,
     strtobool,
     get_backup_file_filename,
-    zipdir
+    zipdir, zipf, dump_pgdb,
+    generate_requirements
 )
 from lava.managers import (
     DefaultBaseModelManager, LavaUserManager
@@ -964,7 +966,7 @@ class Backup(BaseModel):
     
     def get_filename(self):
         return (
-            f"{self.created_at.strftime('%Y%m%d.%H%M%S')}_"
+            f"{self.created_at.strftime('%Y%m%d%H%M%S')}_"
             f"{self.type}.zip"
         )
     
@@ -1046,7 +1048,17 @@ class Backup(BaseModel):
             # Remove it once Backup interface is complete.
             sleep(10)
 
-            zipdir(settings.MEDIA_ROOT, abs_filepath, exclude_backup_files=True)
+            if self.type == "db_backup":
+                zipdir(settings.MEDIA_ROOT, abs_filepath, skip_dirs=['backup'])
+            elif self.type == "full_backup":
+                generate_requirements()
+                zipdir(settings.BASE_DIR, abs_filepath, skip_dirs=[
+                    "venv", "tmp", "log", ".idea", "backup"
+                ])
+
+            ziph = zipfile.ZipFile(abs_filepath, 'a', zipfile.ZIP_DEFLATED)
+            db_filename = dump_pgdb()
+            zipf(db_filename, ziph=ziph)
 
             self.backup_file = filename
             self.status = "completed"

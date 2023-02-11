@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 import unicodedata
 import zipfile
+import subprocess
 
 from PIL import Image as PILImage
 
@@ -418,32 +419,114 @@ def adjust_color(color, amount=0.5):
     return f"rgb({r}, {g}, {b})"
 
 
-def zipdir(target_dir, output, exclude_backup_files=False):
+def path_is_parent(parent_path, child_path):
+    parent_path = os.path.abspath(parent_path)
+    child_path = os.path.abspath(child_path)
+    return os.path.commonpath([parent_path]) == os.path.commonpath([parent_path, child_path])
+
+
+def path_includes_dir(parent_path, dir_name):
+    return (
+        f"{os.sep}{dir_name}{os.sep}" in parent_path or
+        parent_path.startswith(f"{dir_name}{os.sep}") or
+        parent_path.endswith(f"{os.sep}{dir_name}")
+    )
+
+
+def zipdir(target_dir, output=None, mode='w', skip_dirs=None):
     """
         Zip all files in a directory located at target_dir.
         Outputs the zip into output our the parent directory.
     """
 
-    with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    if not skip_dirs:
+        skip_dirs = []
+
+    if not output:
+        filename = f"{os.path.basename(target_dir)}.zip"
+        output = os.path.join(os.path.dirname(target_dir), filename)
+
+    with zipfile.ZipFile(output, mode, zipfile.ZIP_DEFLATED) as zipf:
         for root, _dirs, files in os.walk(target_dir):
+            skip_root = False
+            for skip_dir in skip_dirs:
+                if path_includes_dir(root, skip_dir):
+                    skip_root = True
+                    break
+            
+            if skip_root:
+                continue
+
             for file in files:
-                if "backup" not in file or not exclude_backup_files:
-                    zipf.write(
+                zipf.write(
+                    os.path.join(root, file), 
+                    os.path.relpath(
                         os.path.join(root, file), 
-                        os.path.relpath(
-                            os.path.join(root, file), 
-                            os.path.join(target_dir, '..')
-                        )
+                        os.path.join(target_dir, '..')
                     )
+                )
+
+    return output
 
 
-# def zipf(filename, output):
-#     """ Zip the file with the path filename into the output zip. """
-#     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
-#         zipf.write(
-#             filename,
-#             os.path.relpath(
-#                 os.path.join(os.basedir(filename), filename), 
-#                 os.path.join(os.basedir(filename), '..')
-#             )
-#         )
+def zipf(filename, output=None, ziph=None):
+    """ Zip the file with the path filename into the output zip. """
+
+    if not output:
+        file_name, ext = os.path.splitext(filename)
+        output = os.path.join(
+            os.path.dirname(filename),
+            f"{file_name}.zip"
+        )
+
+    output_parent_dir = os.path.dirname(output)
+
+    try:
+        zipf = ziph if ziph else zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
+        zipf.write(
+            filename,
+            os.path.relpath(
+                filename, 
+                os.path.join(output_parent_dir)
+            )
+        )
+    finally:
+        if not ziph:
+            zipf.close()
+
+
+def dump_pgdb(output_filename=None, db="default"):
+
+    db_name = settings.DATABASES[db]["NAME"]
+    username = settings.DATABASES[db]["USER"]
+    password = settings.DATABASES[db]["PASSWORD"]
+    host = settings.DATABASES[db]["HOST"]
+    port = settings.DATABASES[db]["PORT"]
+    port = f' -p {port}' if port else ''
+
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    filename = output_filename or f"{db_name}_backup_{now}.sql"
+
+    with open(filename, 'w') as output:
+        subprocess.Popen(
+            [f"PGPASSWORD='{password}' pg_dump -h {host}{port} -U {username} {db_name}"],
+            stdout=output,
+            shell=True
+        )
+    return filename
+
+
+def generate_requirements(out=None):
+
+    base_dir = settings.BASE_DIR
+    filename = out or os.path.join(base_dir, "all_requirements.txt")
+
+    with open(filename, 'w') as output:
+        process = subprocess.Popen(
+            [f"pip freeze"],
+            stdout=output,
+            shell=True
+        )
+        process.wait()
+
+    return filename
