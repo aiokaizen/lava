@@ -1051,14 +1051,17 @@ class Backup(BaseModel):
             if self.type == "db_backup":
                 zipdir(settings.MEDIA_ROOT, abs_filepath, skip_dirs=['backup'])
             elif self.type == "full_backup":
-                generate_requirements()
+                reqs_filename = generate_requirements()
                 zipdir(settings.BASE_DIR, abs_filepath, skip_dirs=[
                     "venv", "tmp", "log", ".idea", "backup"
                 ])
+                os.remove(reqs_filename)
 
             ziph = zipfile.ZipFile(abs_filepath, 'a', zipfile.ZIP_DEFLATED)
             db_filename = dump_pgdb()
             zipf(db_filename, ziph=ziph)
+
+            os.remove(db_filename)
 
             self.backup_file = filename
             self.status = "completed"
