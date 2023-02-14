@@ -167,8 +167,10 @@ class Result(imdict):
         if not self.success:
             res_dict["errors"] = self.errors or []
             res_dict["error_code"] = self.error_code
+        if self.instance:
+            res_dict["object_id"] = self.instance.id
         return res_dict
-
+    
 
 def mask_number(n):
     """This function disguises an ID before using it in a public context."""

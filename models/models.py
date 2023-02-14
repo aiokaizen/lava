@@ -193,7 +193,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         result = super().create(user=user, *args, **kwargs)
         if result.is_error:
             return result
-        return Result(True, _("The permission has been created successfully."))
+        return Result(True, _("The permission has been created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, *args, **kwargs):
 
@@ -273,7 +273,7 @@ class Group(BaseModelMixin, BaseGroupModel):
         if result.is_error:
             return result
             
-        return Result(True, _("Group created successfully."))
+        return Result(True, _("Group created successfully."), instance=self)
     
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if user and not can_change_group(user):
@@ -490,6 +490,7 @@ class User(AbstractUser, BaseModel):
         return Result(
             success=True,
             message=_("User has been created successfully."),
+            instance=self
         )
 
     def link_payments_app(self):
@@ -850,7 +851,7 @@ class Notification(models.Model):
         if send_notification:
             self.send_firebase_notification()
 
-        return Result(True, _("The notification has been created successfully."))
+        return Result(True, _("The notification has been created successfully."), instance=self)
 
     def mark_as_read(self, user):
         """Call this function when a user have seen the notification."""

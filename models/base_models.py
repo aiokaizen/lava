@@ -38,7 +38,7 @@ class BaseModelMixin:
         if user:
             self.log_action(user, ADDITION)
             
-        return Result(True, _("Object created successfully."))
+        return Result(True, _("Object created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.id:
