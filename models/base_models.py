@@ -273,7 +273,7 @@ class BaseModel(BaseModelMixin, models.Model):
             ('delete_object', _("Can delete %s" % (_class_name, ))),
             ('soft_delete_object', _("Can soft delete %s" % (_class_name, ))),
             ('view_object', _("Can view %s" % (_class_name, ))),
-            ('list_object', _("Can view %s" % (_class_name, ))),
+            ('list_object', _("Can list %s" % (_class_name, ))),
             ('restore_object', _("Can restore %s" % (_class_name, ))),
         )
 
