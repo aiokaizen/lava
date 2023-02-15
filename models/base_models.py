@@ -268,13 +268,13 @@ class BaseModel(BaseModelMixin, models.Model):
         # _class_name = label_lower.split('.')[1]
         _class_name = "object"
         permissions = (
-            ('add_object', f"Can add {_class_name}"),
-            ('change_object', f"Can update {_class_name}"),
-            ('delete_object', f"Can delete {_class_name}"),
-            ('soft_delete_object', f"Can soft delete {_class_name}"),
-            ('view_object', f"Can view {_class_name}"),
-            ('list_object', f"Can view {_class_name}"),
-            ('restore_object', f"Can restore {_class_name}"),
+            ('add_object', _("Can add %s" % (_class_name, ))),
+            ('change_object', _("Can update %s" % (_class_name, ))),
+            ('delete_object', _("Can delete %s" % (_class_name, ))),
+            ('soft_delete_object', _("Can soft delete %s" % (_class_name, ))),
+            ('view_object', _("Can view %s" % (_class_name, ))),
+            ('list_object', _("Can view %s" % (_class_name, ))),
+            ('restore_object', _("Can restore %s" % (_class_name, ))),
         )
 
     created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)

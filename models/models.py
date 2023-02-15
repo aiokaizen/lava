@@ -108,8 +108,8 @@ class LogEntry(BaseLogEntryModel):
         ordering = ['-action_time']
         default_permissions = ()
         permissions = (
-            ('list_logentry', f"Can view activity journal"),
-            ('export_logentry', f"Can export activity journal"),
+            ('list_logentry', _("Can view activity journal")),
+            ('export_logentry', _("Can export activity journal")),
         )
 
     @classmethod
@@ -177,13 +177,13 @@ class Permission(BaseModelMixin, BasePermissionModel):
         proxy = True
         default_permissions = ()
         permissions = (
-            ('add_permission', "Can add permissions"),
-            ('view_permission', "Can view permission details"),
-            ('change_permission', "Can update permissions"),
-            ('delete_permission', "Can delete permissions"),
-            ('list_permission', "Can view permissions list"),
-            ('set_permission', "Can set permissions"),
-            ('export_permissions', "Can export permissions"),
+            ('add_permission', _("Can add permissions")),
+            ('view_permission', _("Can view permission details")),
+            ('change_permission', _("Can update permissions")),
+            ('delete_permission', _("Can delete permissions")),
+            ('list_permission', _("Can view permissions list")),
+            ('set_permission', _("Can set permissions")),
+            ('export_permissions', _("Can export permissions")),
         )
 
     def create(self, user=None, *args, **kwargs):
@@ -242,14 +242,14 @@ class Group(BaseModelMixin, BaseGroupModel):
         proxy = True
         default_permissions = ()
         permissions = (
-            ('add_group', "Can add group"),
-            ('change_group', "Can update group"),
-            ('delete_group', "Can delete group"),
-            ('soft_delete_group', "Can soft delete group"),
-            ('view_group', "Can view group"),
-            ('list_group', "Can view group list"),
-            ('view_trash_group', "Can view deleted groups"),
-            ('restore_group', "Can restore group"),
+            ('add_group', _("Can add group")),
+            ('change_group', _("Can update group")),
+            ('delete_group', _("Can delete group")),
+            ('soft_delete_group', _("Can soft delete group")),
+            ('view_group', _("Can view group")),
+            ('list_group', _("Can view group list")),
+            ('view_trash_group', _("Can view deleted groups")),
+            ('restore_group', _("Can restore group")),
         )
 
     # description = models.TextField(_('Description'), default='', blank=True)

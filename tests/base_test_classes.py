@@ -63,7 +63,6 @@ class BaseModelTest(TestCase, BaseTestMixin):
     users = None
 
     def setUp(self):
-        print("\nStart setup...")
         super().setUp()
         SetUpLava().handle(no_logs=True)
         LavaInstallDemo().handle(num_users=2, suffix="testuser", skip_avatars=True, no_logs=True)
@@ -77,4 +76,6 @@ class BaseModelTest(TestCase, BaseTestMixin):
         for user in self.users.keys():
             Token.objects.create(user=self.users[user])
 
-        print("Setup complete.")
+    def tearDown(self):
+        # Clean up run after every test method.
+        pass
