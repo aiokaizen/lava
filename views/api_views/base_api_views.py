@@ -164,7 +164,10 @@ class BaseModelViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         if hasattr(serializer, 'result'):
-            return Response(serializer.result.to_dict(), headers=headers)
+            result = serializer.result
+            if result.is_error:
+                return Response(result.to_dict(), headers=headers, status=status.HTTP_400_BAD_REQUEST)
+            return Response(result.to_dict(), headers=headers)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     def update(self, request, *args, **kwargs):
