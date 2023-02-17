@@ -63,6 +63,10 @@ BACKUP_STATUS_CHOICES = (
     ("failed", _("Failed")),
 )
 
+BACKUP_LOCK_TAG_PATH = os.path.join(
+    settings.BASE_DIR, ".back_up_in_progress"
+)
+
 BREADCRUMBS_DEPTH_LEVEL = getattr(settings, "BREADCRUMBS_DEPTH_LEVEL", 3)
 
 LOGO_FILE_PATH = getattr(

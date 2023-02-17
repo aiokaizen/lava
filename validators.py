@@ -7,7 +7,6 @@ from lava import settings as lava_settings
 
 
 def validate_empty_field(value):
-    print("validating object, value:", value)
     validator = RegexValidator('.+', _("This field is required"), "required")
     return validator(value)
 

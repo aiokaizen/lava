@@ -128,6 +128,7 @@ class Result(imdict):
         error_code: str = "",
     ):
         self.success = success
+        self.is_success = success
         self.message = message
         self.instance = instance
         self.tag = tag
@@ -138,23 +139,46 @@ class Result(imdict):
         self.errors = errors
         self.error_code = error_code
         dict.__init__(self, success=success, message=message, errors=errors)
+        # logging.warning(
+        #     "This method is deprecated. Please use a class methods instead:\n"
+        #     "\tsuccess: Result.success('My success message')\n"
+        #     "\twarning: Result.warning('My warning message')\n"
+        #     "\terror  : Result.error('My error message')\n"
+        # )
+
+    @classmethod
+    def success(self, message="", instance=None):
+        return Result(True, message, instance=instance)
+
+    @classmethod
+    def warning(self, message="", instance=None):
+        return Result(True, message, instance=instance, tag="warning")
+
+    @classmethod
+    def error(self, message="", instance=None, errors=None, error_code=""):
+        return Result(
+            True, message, instance=instance, errors=errors, error_code=error_code
+        )
 
     @classmethod
     def from_dict(cls, result_dict):
-        if "success" not in result_dict or "message" not in result_dict:
-            raise TypeError()
+        if "result" not in result_dict or "message" not in result_dict:
+            raise TypeError("result_dict must contain 'result' and 'message' members")
+        
+        tag = result_dict["result"]
+        is_success = True if tag == "success" else False
 
         return cls(
-            result_dict["success"],
-            result_dict["message"],
-            result_dict.get("instance", None),
-            result_dict.get("errors", None),
-            result_dict.get("tag", None),
-            result_dict.get("error_code", None),
+            success=is_success,
+            message=result_dict["message"],
+            instance=result_dict.get("instance", None),
+            errors=result_dict.get("errors", None),
+            error_code=result_dict.get("error_code", None),
+            tag=tag,
         )
 
     def to_dict(self):
-        type = "success" if self.success else "error"
+        type = "success" if self.is_success else "error"
         if self.is_warning:
             type = "warning"
 
@@ -164,7 +188,7 @@ class Result(imdict):
             "message": self.message
         }
 
-        if not self.success:
+        if not self.is_success:
             res_dict["errors"] = self.errors or []
             res_dict["error_code"] = self.error_code
         if self.instance:
@@ -397,7 +421,7 @@ def init_firebase():
 
 
 def hex_to_rgb(hex_value:str):
-    assert(hex_value.startswith("#"), "Invalid color format, please enter a hex color value")
+    assert hex_value.startswith("#"), "Invalid color format, please enter a hex color value"
     hex_value = hex_value[1:]
     return tuple(int(hex_value[i:i + 2], 16) for i in (0, 2, 4))
 

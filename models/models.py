@@ -929,11 +929,6 @@ class Notification(models.Model):
 
 class Backup(BaseModel):
 
-    backup_lock_tag_path = os.path.join(
-        settings.BASE_DIR,
-        "back_up_in_progress"
-    )
-
     class Meta:
         verbose_name = _("Backup")
         verbose_name_plural = _("Backups")
@@ -1096,14 +1091,14 @@ class Backup(BaseModel):
         
     @classmethod
     def is_locked(cls):
-        return os.path.exists(cls.backup_lock_tag_path)
+        return os.path.exists(lava_settings.BACKUP_LOCK_TAG_PATH)
     
     @classmethod
     def lock(cls):
-        open(cls.backup_lock_tag_path, "w").close()
+        open(lava_settings.BACKUP_LOCK_TAG_PATH, "w").close()
 
     @classmethod
     def unlock(cls):
-        if cls.is_locked():
-            os.remove(cls.backup_lock_tag_path)
+        if Backup.is_locked():
+            os.remove(lava_settings.BACKUP_LOCK_TAG_PATH)
     
