@@ -32,13 +32,17 @@ class BaseAPITest(APITestCase, URLPatternsTestCase, BaseTestMixin):
 
     users = None
 
-    def authenticate_user(self, username):
+    def authenticate_user(self, username=""):
+        if not username:
+            self.client.credentials()
+            return None
+        
         user = self.users[username]
         token = Token.objects.get(user=user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token}')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        return user
 
     def setUp(self):
-        print("\nStart setup...")
         super().setUp()
         SetUpLava().handle(no_logs=True)
         LavaInstallDemo().handle(num_users=3, suffix="testuser", skip_avatars=True, no_logs=True)
@@ -50,12 +54,15 @@ class BaseAPITest(APITestCase, URLPatternsTestCase, BaseTestMixin):
             testuser_2=User.objects.get(username="testuser_2"),
             testuser_3=User.objects.get(username="testuser_3"),
         )
+        for username, user in self.users.items():
+            if username.startswith("testuser"):
+                user.groups.clear()
+                user.user_permissions.clear()
 
-        for user in self.users.keys():
-            Token.objects.create(user=self.users[user])
+        for user in self.users.values():
+            Token.objects.create(user=user)
 
         self.authenticate_user(username="ekadmin")
-        print("Setup complete.")
 
 
 class BaseModelTest(TestCase, BaseTestMixin):
