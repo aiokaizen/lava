@@ -9,3 +9,5 @@ openpyxl==3.0.10
 django-admin-interface==0.24.2
 psycopg2-binary==2.9.5
 djangorestframework-simplejwt==4.8.0
+translate==3.6.1
+polib==1.1.1

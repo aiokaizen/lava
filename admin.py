@@ -203,7 +203,10 @@ class BaseModelAdmin(admin.ModelAdmin):
                     request,
                     _(
                         "The following error rose while trying "
-                        "to delete '%s': \n\t%s" % (obj, result.message)
+                        "to delete '%(obj)s': \n\t%(msg)s" % {
+                            'obj': obj,
+                            'msg': result.message
+                        }
                     ),
                     lvl
                 )
@@ -220,7 +223,10 @@ class BaseModelAdmin(admin.ModelAdmin):
                     request,
                     _(
                         "The following error rose while trying "
-                        "to restore '%s': \n\t%s" % (obj, result.message)
+                        "to restore '%(obj)s': \n\t%(msg)s" % {
+                            'obj': obj,
+                            'msg': result.message
+                        }
                     ),
                     lvl
                 )
@@ -237,7 +243,10 @@ class BaseModelAdmin(admin.ModelAdmin):
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
-                    _("The following error rose while deleting '%s': \n\t%s" % (obj, result.message)),
+                    _("The following error rose while deleting '%(obj)s': \n\t%(msg)s" % {
+                        'obj': obj,
+                        'msg': result.message
+                    }),
                     lvl
                 )
 

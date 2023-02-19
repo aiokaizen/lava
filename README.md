@@ -61,6 +61,13 @@ AUTH_USER_MODEL = "lava.User"
 
 AUTHENTICATION_BACKENDS = ['lava.backends.EmailOrUsernameAuthenticationBackend']
 
+FILE_PATTERNS = {
+    '*.html': 'django',
+    '*.txt': 'django',
+    '*.js': 'javascript',
+    '*.py': 'gettext',
+}
+
 ```
 ### 2. Dependencies ###
 ```shell
