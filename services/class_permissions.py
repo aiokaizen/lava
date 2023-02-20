@@ -292,3 +292,48 @@ class CanExportLogEntry(IsAuthenticated):
         is_authenticated = super().has_permission(request, view)
         user = request.user
         return is_authenticated and can_export_logentry(user)
+
+
+# Backup PERMISSIONS
+class CanAddBackup(IsAuthenticated):
+    """
+    Checks if a user has the permission to create a backup.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_add_backup(user)
+
+
+class CanDeleteBackup(IsAuthenticated):
+    """
+    Checks if a user has the permission to delete a backup.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_delete_backup(user)
+
+
+class CanSoftDeleteBackup(IsAuthenticated):
+    """
+    Checks if a user has the permission to soft delete a backup.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_soft_delete_backup(user)
+
+
+class CanListBackup(IsAuthenticated):
+    """
+    Checks if a user has the permission to view a list of backups.
+    """
+
+    def has_permission(self, request, view):
+        is_authenticated = super().has_permission(request, view)
+        user = request.user
+        return is_authenticated and can_list_backup(user)

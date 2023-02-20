@@ -33,7 +33,7 @@ from lava.error_codes import UNIMPLEMENTED, UNKNOWN
 from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE, ACTION_NOT_ALLOWED
 from lava.models.base_models import BaseModel, BaseModelMixin
 from lava.services.permissions import (
-    can_add_group, can_change_group, can_delete_group, can_list_group,
+    can_add_group, can_change_group, can_delete_group, can_list_backup, can_list_group,
     can_list_permission, can_list_user,
 )
 from lava.utils import (
@@ -941,6 +941,7 @@ class Backup(BaseModel):
             ('list_backup', _("Can view backup")),
         )
 
+    name = models.CharField(_("Backup name"), max_length=256, blank=True)
     type = models.CharField(
         _("Backup type"), max_length=16, default="full_backup",
         choices=lava_settings.BACKUP_TYPE_CHOICES
@@ -955,10 +956,7 @@ class Backup(BaseModel):
     )
 
     def __str__(self):
-        return (
-            f"{self.created_at.strftime('%c')} "
-            f"{self.get_type_display()}"
-        )
+        return self.name
     
     def get_filename(self):
         return (
@@ -971,6 +969,7 @@ class Backup(BaseModel):
     
     def update(self, *args, **kwargs):
         if 'message' not in kwargs:
+            """ Allow modification for inner actions only (eg: soft_delete()). """
             return Result(False, ACTION_NOT_ALLOWED)
         return super().update(*args, **kwargs)
     
@@ -1021,6 +1020,10 @@ class Backup(BaseModel):
         if not result.success:
             return result
         
+        self.name = (
+            f"{self.created_at.strftime('%c')} "
+            f"{self.get_type_display()}"
+        )
         result = super().create(user, *args, **kwargs)
         if result.is_error:
             return result
@@ -1101,4 +1104,28 @@ class Backup(BaseModel):
     def unlock(cls):
         if Backup.is_locked():
             os.remove(lava_settings.BACKUP_LOCK_TAG_PATH)
-    
+
+    @classmethod
+    def get_filter_params(cls, user=None, kwargs=None):
+
+        filter_params = Q()
+
+        if kwargs is None:
+            kwargs = {}
+
+        if "query" in kwargs or 'name' in kwargs:
+            name = kwargs.get("query") or kwargs.get("name")
+            filter_params &= Q(name__icontains=name)
+
+        return filter_params
+
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = Backup.get_filter_params(user, kwargs)
+
+        base_queryset = super().filter(user=user, kwargs=kwargs)
+
+        if user and not can_list_backup(user):
+            return base_queryset.none()
+
+        return base_queryset.filter(filter_params)

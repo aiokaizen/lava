@@ -140,3 +140,24 @@ def can_list_logentry(user):
 def can_export_logentry(user):
     has_perm = user.has_perm('lava.export_logentry')
     return has_perm
+
+
+# Backup permissions
+def can_add_backup(user):
+    has_perm = user.has_perm('lava.add_backup')
+    return has_perm
+
+
+def can_delete_backup(user):
+    has_perm = user.has_perm('lava.delete_backup')
+    return has_perm
+
+
+def can_soft_delete_backup(user):
+    has_perm = user.has_perm('lava.soft_delete_backup')
+    return has_perm
+
+
+def can_list_backup(user):
+    has_perm = user.has_perm('lava.list_backup')
+    return has_perm

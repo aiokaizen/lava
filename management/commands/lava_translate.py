@@ -24,7 +24,7 @@ class Command(BaseCommand):
             '-l', '--locales',
             required=True,
             type=str,
-            help="The local languages to translate to separated by commas(eg: en,fr_FR,ar,en_GB,...)."
+            help="The local languages to translate to separated by commas(eg: en,fr_FR,ar,...)."
         )
         parser.add_argument(
             '-n', '--app-name',
@@ -53,8 +53,7 @@ class Command(BaseCommand):
         generate_translations = options["generate_translations"]
         source_language =  options["source_language"]
 
-        # logging.info(
-        print(
+        logging.info(
             "Start generating translations with the following parameters:\n"
             f"\t-locales={locales}\n"
             f"\t-app_name={app_name}\n"

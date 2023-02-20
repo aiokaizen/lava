@@ -8,8 +8,6 @@ from lava.serializers.base_serializers import BaseModelSerializer
 
 class BackupSerializer(BaseModelSerializer):
 
-    name = serializers.SerializerMethodField(label=_("Name"))
-
     class Meta:
         model = Backup
         fields = [
@@ -21,9 +19,7 @@ class BackupSerializer(BaseModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "name",
             "status",
             "backup_file"
         ]
-    
-    def get_name(self, instance):
-        return str(instance)
