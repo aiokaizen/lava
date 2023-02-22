@@ -16,13 +16,13 @@ class BackupAPIViewSet(BaseModelViewSet):
     serializer_class = BackupSerializer
     queryset = Backup.objects.none()
 
-    denied_actions = ["update", "restore", "retrieve", "metadata"]
+    denied_actions = ["update", "restore", "retrieve"]
 
     def get_permissions(self):
         if self.action == 'create':
-            self.permission_classes = [lava_permissions.CanAddGroup]
+            self.permission_classes = [lava_permissions.CanAddBackup]
         if self.action == 'delete':
-            self.permission_classes = [lava_permissions.CanSoftDeleteGroup]
+            self.permission_classes = [lava_permissions.CanSoftDeleteBackup]
         if self.action == 'list':
-            self.permission_classes = [lava_permissions.CanListGroup]
+            self.permission_classes = [lava_permissions.CanListBackup]
         return super().get_permissions()
