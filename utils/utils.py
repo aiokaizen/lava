@@ -152,12 +152,12 @@ class Result(imdict):
 
     @classmethod
     def warning(self, message="", instance=None):
-        return Result(True, message, instance=instance, tag="warning")
+        return Result(False, message, instance=instance, tag="warning")
 
     @classmethod
     def error(self, message="", instance=None, errors=None, error_code=""):
         return Result(
-            True, message, instance=instance, errors=errors, error_code=error_code
+            False, message, instance=instance, errors=errors, error_code=error_code
         )
 
     @classmethod
