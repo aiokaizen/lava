@@ -13,6 +13,7 @@ from django.core.files import File
 
 from lava.models import User, Group
 from lava.utils import get_user_photo_filename
+from lava import settings as lava_settings
 
 
 class Command(BaseCommand):
@@ -85,7 +86,7 @@ class Command(BaseCommand):
         
         today_str = datetime.now().strftime("%Y%m%d")
         download_path = os.path.join(
-            settings.TMP_ROOT, f'tmp_user_avatars_{today_str}'
+            lava_settings.TMP_ROOT, f'tmp_user_avatars_{today_str}'
         )
         if not os.path.exists(download_path):
             os.makedirs(download_path)

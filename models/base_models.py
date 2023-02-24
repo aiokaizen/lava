@@ -235,6 +235,8 @@ class BaseModelMixin:
     def get_ordering_params(cls, kwargs):
 
         ordering = []
+        if kwargs is None:
+            kwargs = {}
 
         if "order_by" in kwargs:
             order_params = kwargs.getlist('order_by')

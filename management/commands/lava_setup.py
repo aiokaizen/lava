@@ -3,7 +3,7 @@ import logging
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Permission
 
-from lava.models import User, Group
+from lava.models import User, Group, NotificationGroup
 
 
 class Command(BaseCommand):
@@ -37,6 +37,9 @@ class Command(BaseCommand):
 
         # Add all available permissions to group ADMINS
         group.permissions.add(*Permission.objects.all().values_list('id', flat=True))
+
+        # Create notifications groups
+        NotificationGroup.create_notification_groups()
 
         # Create the superadmin and the `ADMINS` group if they don't exist
         try:

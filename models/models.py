@@ -47,7 +47,7 @@ from lava.utils import (
     generate_requirements
 )
 from lava.managers import (
-    DefaultBaseModelManager, LavaUserManager
+    GroupManager, NotificationGroupManager, LavaUserManager
 )
 
 try:
@@ -263,21 +263,44 @@ class Group(BaseModelMixin, BaseGroupModel):
     #     'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
     #     related_name="sub_groups", null=True, blank=True
     # )
+    objects = GroupManager()
     trash = models.Manager()
     
-    def create(self, user=None, m2m_fields=None):
+    def create(self, user=None, m2m_fields=None, notification_group=False):
         if user and not can_add_group(user):
-            return Result(False, FORBIDDEN_MESSAGE)
+            return Result.error(FORBIDDEN_MESSAGE)
+
+        if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
+            msg = _(
+                "You can not create a group with this name. Please remove the "
+                "prefix '%(prefix)s' from the beginning of the field." % {
+                    "prefix": lava_settings.NOTIFICATION_GROUP_PREFIX
+                }
+            )
+            return Result.error(
+                msg, errors={"name": [msg]}, error_code='invalid'
+            )
         
         result = super().create(user=user, m2m_fields=m2m_fields)
         if result.is_error:
             return result
             
-        return Result(True, _("Group created successfully."), instance=self)
+        return Result.success(_("Group created successfully."), instance=self)
     
-    def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
+    def update(self, user=None, update_fields=None, m2m_fields=None, message="", notification_group=False):
         if user and not can_change_group(user):
-            return Result(False, FORBIDDEN_MESSAGE)
+            return Result.error(FORBIDDEN_MESSAGE)
+        
+        if not notification_group and 'name' in update_fields and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
+            msg = _(
+                "You can not update a group with this name. Please remove the "
+                "prefix '%(prefix)s' from the beginning of the field." % {
+                    "prefix": lava_settings.NOTIFICATION_GROUP_PREFIX
+                }
+            )
+            return Result.error(
+                msg, errors={"name": [msg]}, error_code='invalid'
+            )
         
         result = super().update(
             user=user,
@@ -288,17 +311,20 @@ class Group(BaseModelMixin, BaseGroupModel):
         if result.is_error:
             return result
 
-        return Result(True, _("Group updated successfully."))
+        return Result.success(_("Group updated successfully."))
     
-    def delete(self, user=None):
+    def delete(self, user=None, notification_group=False):
         if user and not can_delete_group(user):
-            return Result(False, FORBIDDEN_MESSAGE)
+            return Result.error(FORBIDDEN_MESSAGE)
 
+        if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
+            return Result.error(_("You can not delete a this group."))
+        
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
 
-        return Result(True, _("The group has been deleted successfully."))
+        return Result.success(_("The group has been deleted successfully."))
     
     def restore(self, user=None):
         return Result(False, "")
@@ -306,11 +332,45 @@ class Group(BaseModelMixin, BaseGroupModel):
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
         filter_params = Q()
+        if kwargs is None:
+            kwargs = {}
 
         if "name" in kwargs:
             filter_params |= Q(name__icontains=kwargs["name"])
 
         return filter_params
+    
+    @classmethod
+    def filter(cls, user=None, kwargs=None):
+        filter_params = cls.get_filter_params(user, kwargs)
+        queryset = super().filter(user=user, kwargs=kwargs)
+        queryset = queryset.filter(filter_params)
+        if user and not can_list_group(user):
+            return queryset.none()
+
+        return queryset
+
+
+class NotificationGroup(Group):
+
+    class Meta:
+        proxy = True
+    
+    objects = NotificationGroupManager()
+
+    @classmethod
+    def create_notification_groups(cls):
+        for notification_id, group_data in lava_settings.NOTIFICATION_GROUPS_NAMES.items():
+            group, _created = NotificationGroup.objects.get_or_create(name=group_data.get("name"))
+        return Result.success(_("All notification groups have been created successfully."))
+
+    @classmethod
+    def get_notification_group(cls, group_name):
+
+        try:
+            return NotificationGroup.objects.get(name=group_name)
+        except Group.DoesNotExist:
+            return None
     
     @classmethod
     def filter(cls, user=None, kwargs=None):

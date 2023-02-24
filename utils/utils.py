@@ -19,12 +19,6 @@ from templated_mail.mail import BaseEmailMessage
 
 from lava.exceptions import LavaBaseException
 
-try:
-    import firebase_admin
-    from firebase_admin import credentials
-except ImportError:
-    firebase_admin = None
-
 from lava import settings as lava_settings
 
 
@@ -97,7 +91,7 @@ def contains_arabic_chars(val:str):
 
 
 def get_tmp_root(dirname=None):
-    tmp_root = settings.TMP_ROOT
+    tmp_root = lava_settings.TMP_ROOT
     tmp_root = os.path.join(tmp_root, dirname) if dirname else tmp_root
     if not os.path.exists(tmp_root):
         os.makedirs(tmp_root)
@@ -105,7 +99,7 @@ def get_tmp_root(dirname=None):
 
 
 def get_log_root(dirname=None):
-    log_root = settings.LOG_ROOT
+    log_root = lava_settings.LOG_ROOT
     log_root = os.path.join(log_root, dirname) if dirname else log_root
     if not os.path.exists(log_root):
         os.makedirs(log_root)
@@ -234,16 +228,6 @@ def get_group_photo_filename(instance, filename):
 
 def get_backup_file_filename(instance, filename):
     return "backup/{}".format(instance.get_filename())
-
-
-def get_log_filepath():
-    now = datetime.now()
-    current_hour = now.strftime("%Y%m%d_%H")
-    filename = f"{current_hour}.log"
-    filepath = os.path.join(settings.LOG_ROOT, filename)
-    if not os.path.exists(settings.LOG_ROOT):
-        os.makedirs(settings.LOG_ROOT)
-    return filepath
 
 
 def get_or_create(klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs):
@@ -399,25 +383,6 @@ def _is_username_valid(username):
         return False
     except User.DoesNotExist:
         return True
-
-
-def init_firebase():
-    creds_file_path = lava_settings.FIREBASE_CREDENTIALS_FILE_PATH
-    if firebase_admin is None:
-        return Result(False, _("Firebase is not installed"))
-        
-    if not os.path.exists(creds_file_path):
-        logging.error("Firebase credentials file does not exist.")
-        return Result(False, _("Firebase credentials file does not exist."))
-
-    try:
-        creds = credentials.Certificate(creds_file_path)
-        # cred = credentials.RefreshToken(creds_file_path)
-        default_app = firebase_admin.initialize_app(creds)
-        return Result(True)
-    except Exception as e:
-        logging.error(e)
-        return Result(False, str(e))
 
 
 def hex_to_rgb(hex_value:str):
