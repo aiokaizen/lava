@@ -24,16 +24,8 @@ class Command(BaseCommand):
         no_logs = options["no_logs"]
 
         # Create the group 'ADMINS' if it does not exist
-        try:
-            group = Group.objects.get(name="ADMINS")
-        except Group.DoesNotExist:
-            group = Group(name='ADMINS')
-            group.create()
-    
-        # Create static permissions
-        # export_permissions_permission = Permission.objects.create(
-
-        # )
+        group, _created = Group.objects.get_or_create(name="ADMINS")
+        Group.objects.get_or_create(name="STANDARD")  # Default group for signed up users
 
         # Add all available permissions to group ADMINS
         group.permissions.add(*Permission.objects.all().values_list('id', flat=True))
@@ -41,7 +33,7 @@ class Command(BaseCommand):
         # Create notifications groups
         NotificationGroup.create_notification_groups()
 
-        # Create the superadmin and the `ADMINS` group if they don't exist
+        # Create the superuser and the ekadmin users if they don't exist
         try:
             eksuperuser = User.objects.get(username="eksuperuser")
             logging.warning("superuser eksuperuser already exists!")
