@@ -350,8 +350,9 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
         extra_attributes = validated_data.pop("extra_attributes", None)
         instance = User(**validated_data)
+        user = getattr(self, 'user', None)
         result = instance.create(
-            user=self.user, photo=photo, cover=cover, groups=groups, password=password, extra_attributes=extra_attributes
+            user=user, photo=photo, cover=cover, groups=groups, password=password, extra_attributes=extra_attributes
         )
         if not result.success:
             raise serializers.ValidationError(result.to_dict())
