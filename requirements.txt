@@ -11,3 +11,4 @@ psycopg2-binary==2.9.5
 djangorestframework-simplejwt==4.8.0
 translate==3.6.1
 polib==1.1.1
+qrcode==7.4.2

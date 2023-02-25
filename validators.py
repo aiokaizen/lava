@@ -1,6 +1,11 @@
-from django.core.validators import EmailValidator, URLValidator, RegexValidator
+import qrcode
+
+from django.core.validators import (
+    EmailValidator, URLValidator, RegexValidator, BaseValidator
+)
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.utils.deconstruct import deconstructible
+from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from django.conf import settings
 
 from lava import settings as lava_settings
@@ -47,6 +52,30 @@ class SchemelessURLValidator(URLValidator):
                 )
             value = "https://www.ekblocks.com" + value
         super().__call__(value)
+
+
+@deconstructible
+class ExactLengthValidator(BaseValidator):
+    message = ngettext_lazy(
+        'Ensure this value has exactly %(limit_value)d character (it has %(show_value)d).',
+        'Ensure this value has exactly %(limit_value)d characters (it has %(show_value)d).',
+        'limit_value')
+    code = 'exact_length'
+
+    def compare(self, a, b):
+        return a != b
+
+    def clean(self, x):
+        return len(x)
+
+
+def qr_code_validator(value):
+    try:
+        qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_L)
+        qr.add_data(value)
+        qr.make(fit=True)
+    except:
+        raise ValidationError(_('Invalid QR code'))
 
 
 def validate_notifications_settings(value):
