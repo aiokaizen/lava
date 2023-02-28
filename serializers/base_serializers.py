@@ -6,6 +6,9 @@ from rest_framework.fields import empty
 
 
 class BaseModelSerializer(serializers.ModelSerializer):
+
+    m2m_field_names = []
+    file_field_names = []
     
     def __init__(self, instance=None, data=empty, user=None, **kwargs):
         self.user = user
@@ -16,16 +19,23 @@ class BaseModelSerializer(serializers.ModelSerializer):
         m2m_field_names = getattr(self, 'm2m_field_names', [])
         m2m_fields = [] if m2m_field_names else None
 
+        file_field_names = getattr(self, 'file_field_names', [])
+        file_fields = [] if file_field_names else None
+
         ModelClass = self.Meta.model
         instance = ModelClass()
 
         for attr, value in validated_data.items():
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
+            elif attr in file_field_names:
+                file_fields.append((attr, value))
             else:
                 setattr(instance, attr, value)
 
-        self.result = instance.create(user=self.user, m2m_fields=m2m_fields)
+        self.result = instance.create(
+            user=self.user, m2m_fields=m2m_fields, file_fields=file_fields
+        )
         if self.result.is_error and self.result.errors:
             raise serializers.ValidationError(self.result.errors or self.result.message, self.result.error_code)
         return instance

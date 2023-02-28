@@ -16,7 +16,7 @@ from lava.utils import Result
 
 class BaseModelMixin:
 
-    def create(self, user=None, m2m_fields=None, clean=False):
+    def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.id:
             return Result(False, _("This object is already created."))
 
@@ -34,6 +34,14 @@ class BaseModelMixin:
             for attr, value in m2m_fields:
                 field = getattr(self, attr)
                 field.set(value)
+        
+        if file_fields:
+            update_fields = []
+            for attr, value in file_fields:
+                setattr(self, attr, value)
+                update_fields.append(attr)
+            self.save(update_fields=update_fields)
+
 
         if user:
             self.log_action(user, ADDITION)
