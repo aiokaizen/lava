@@ -12,9 +12,17 @@ from django.utils import timezone
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.utils import Result
+from lava.constants import DELETE_POLICY
 
 
 class BaseModelMixin:
+
+    create_success_message = _("Object created successfully.")
+    update_success_message = _("Object updated successfully.")
+    delete_success_message = _("The object was deleted successfully.")
+    duplicate_success_message = _("Object duplicated successfully.")
+    restore_success_message = _("The object has been restored successfully.")
+    default_delete_policy = DELETE_POLICY.SOFT_DELETE
 
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.id:
@@ -46,7 +54,7 @@ class BaseModelMixin:
         if user:
             self.log_action(user, ADDITION)
             
-        return Result(True, _("Object created successfully."), instance=self)
+        return Result(True, self.create_success_message, instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.id:
@@ -65,24 +73,27 @@ class BaseModelMixin:
         if user:
             self.log_action(user, CHANGE, message)
 
-        return Result(True, _("Object updated successfully."))
+        return Result.success(self.update_success_message)
 
-    def delete(self, user=None, soft_delete=True):
+    def delete(self, user=None, soft_delete=None):
 
-        success_message = _("The object was deleted successfully.")
+        if soft_delete is None:
+            soft_delete = False
+            if self.default_delete_policy == DELETE_POLICY.SOFT_DELETE:
+                soft_delete = True
 
         if soft_delete:
             self.deleted_at = timezone.now()
             res = self.update(user=user, update_fields=['deleted_at'], message="Deletion")
             if res.is_error:
                 return res
-            return Result(True, success_message)
+            return Result.success(self.delete_success_message)
 
         if user:
             self.log_action(user, DELETION)
 
         super().delete()
-        return Result(True, success_message)
+        return Result.success(self.delete_success_message)
     
     def delete_alias(self, user=None, soft_delete=True):
         """
@@ -99,7 +110,7 @@ class BaseModelMixin:
         result = new.create(user=user)
         if result.is_error:
             return result
-        return Result(True, _("Object duplicated successfully."), instance=new)
+        return Result.success(self.duplicate_success_message, instance=new)
     
     def restore(self, user=None):
         if not self.deleted_at:
@@ -109,7 +120,7 @@ class BaseModelMixin:
         result = self.update(user=user, update_fields=['deleted_at'], message="Restoration")
         if result.is_error:
             return result
-        return Result(True, _("The object has been restored successfully."))
+        return Result.success(self.restore_success_message)
 
     def get_changed_message(self, m2m_fields=None):
 
