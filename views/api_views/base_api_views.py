@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
@@ -86,6 +88,12 @@ class BaseModelViewSet(ModelViewSet):
 
     denied_actions = []
 
+    def get_override_field_values(self):
+        """
+        This function is used to override field values gotten from the API
+        """
+        return {}
+    
     def get_queryset(self):
         ActiveModel = self.queryset.model
         return ActiveModel.filter(user=self.user, kwargs=self.request.GET)
@@ -159,7 +167,14 @@ class BaseModelViewSet(ModelViewSet):
             )
 
         self.user = request.user
-        serializer = self.get_serializer(data=request.data)
+        override_field_values = self.get_override_field_values()
+        data = request.data
+        if override_field_values:
+            data = deepcopy(data)
+            for key, value in override_field_values.items():
+                data[key] = value
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -180,7 +195,15 @@ class BaseModelViewSet(ModelViewSet):
         self.user = request.user
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        override_field_values = self.get_override_field_values()
+        data = request.data
+        if override_field_values:
+            data = deepcopy(data)
+            for key, value in override_field_values.items():
+                data[key] = value
+
+        serializer = self.get_serializer(data=data, partial=partial)
+
         serializer.is_valid(raise_exception=True)
 
         if not request.data:
@@ -231,8 +254,8 @@ class BaseModelViewSet(ModelViewSet):
 
         self.user = request.user
         ActiveModel = self.queryset.model
-        product = get_object_or_404(ActiveModel.trash.all(), pk=pk)
-        result = product.restore(user=self.user)
+        object = get_object_or_404(ActiveModel.trash.all(), pk=pk)
+        result = object.restore(user=self.user)
         if result.is_error:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)

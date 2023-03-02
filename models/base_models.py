@@ -115,11 +115,12 @@ class BaseModelMixin:
     def restore(self, user=None):
         if not self.deleted_at:
             return Result(False, _("Object is not deleted!"))
-            
+
         self.deleted_at = None
         result = self.update(user=user, update_fields=['deleted_at'], message="Restoration")
         if result.is_error:
             return result
+
         return Result.success(self.restore_success_message)
 
     def get_changed_message(self, m2m_fields=None):
@@ -170,6 +171,10 @@ class BaseModelMixin:
             action_flag=action_flag,
             change_message=change_message
         )
+
+    @classmethod
+    def get_all_items(cls):
+        return cls.objects.all() | cls.trash.all()
 
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
@@ -269,10 +274,13 @@ class BaseModelMixin:
         return ordering
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = BaseModelMixin.get_filter_params(user, kwargs)
         ordering = cls.get_ordering_params(kwargs)
-        queryset = cls.objects.filter(filter_params)
+        if not trash:
+            queryset = cls.objects.filter(filter_params)
+        else:
+            queryset = cls.trash.filter(filter_params)
         if ordering:
             queryset = queryset.order_by(*ordering)
         return queryset

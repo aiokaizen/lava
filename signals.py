@@ -59,8 +59,13 @@ def pre_save_file_cleanup(sender, **kwargs):
 
         if field and isinstance(field, FileField):
             fieldname = field.name
-            manager = sender._default_manager
-            old_inst = manager.get(id=instance.id)
+
+            if hasattr(sender, 'get_all_items'):
+                old_inst = sender.get_all_items().get(id=instance.id)
+            else:
+                manager = sender._default_manager
+                old_inst = manager.get(id=instance.id)
+
             old_field = getattr(old_inst, fieldname)
             new_field = getattr(instance, fieldname)
 
