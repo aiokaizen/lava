@@ -202,7 +202,7 @@ class BaseModelViewSet(ModelViewSet):
             for key, value in override_field_values.items():
                 data[key] = value
 
-        serializer = self.get_serializer(data=data, partial=partial)
+        serializer = self.get_serializer(instance=instance, data=data, partial=partial)
 
         serializer.is_valid(raise_exception=True)
 
@@ -254,8 +254,8 @@ class BaseModelViewSet(ModelViewSet):
 
         self.user = request.user
         ActiveModel = self.queryset.model
-        object = get_object_or_404(ActiveModel.trash.all(), pk=pk)
-        result = object.restore(user=self.user)
+        obj = get_object_or_404(ActiveModel.trash.all(), pk=pk)
+        result = obj.restore(user=self.user)
         if result.is_error:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)
