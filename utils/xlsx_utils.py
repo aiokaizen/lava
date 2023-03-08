@@ -11,7 +11,7 @@ from openpyxl.drawing.image import Image
 
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
 from django.utils.text import slugify
 
 from lava.styles import XLSXStyles
@@ -49,7 +49,7 @@ def get_cell_str(col, row):
     return f"{get_column_letter(col)}{row}"
 
 
-def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None):
+def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None, serializer_class=None):
     """
     file_name | string: The path to open or a File like object
     start_row | int: the number of row where the header of the file is located.
@@ -57,36 +57,45 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
     The extract_columns param will be slugified as well as the columns from the excel file,
     so caps, spaces, and special characters are ignored, making it easier to match.
     target_sheet | string: Name of the target sheet
+    serializer_class | DRFSerializerClass: The serializer_class that is used to handle the target model data
 
     example:
     >>> start_row = 1
     >>> column_names = [
     >>>     "name", "age", "address"
     >>> ]
-    >>> data = handle_excel_file("file.xlsx", start_row, column_names)
+    >>> serializer_class = MyModelImportExportSerializer
+    >>> data = handle_excel_file(
+    >>>     filename="file.xlsx",
+    >>>     start_row=start_row,
+    >>>     extract_columns=column_names,
+    >>>     serializer_class=serializer_class
+    >>> )
     """
 
     if type(start_row) != int or start_row <= 0:
         raise Exception("'start_row' attribute is invalid!")
+    
+    if extract_columns is None:
+        extract_columns = []
+
     start_row -= 1
+    field_mapping = {}
+    empty_serializer = serializer_class()
 
     try:
 
-        # Slugify extract_columns
-        if not extract_columns:
-            extract_columns = []
-            slugified_extract_columns = []
-        else:
-            slugified_extract_columns = [slugify(name) for name in extract_columns]
-
         wb = openpyxl.load_workbook(file_name)
-        worksheet = wb[target_sheet]
+        if target_sheet:
+            worksheet = wb[target_sheet]
+        else:
+            worksheet = wb.active
 
         # Extract columns names from the excel file
         column_names = []
         columns_indexes = []
 
-        fill_extract_columns = False if slugified_extract_columns else True
+        fill_extract_columns = False if extract_columns else True
 
         for index, row in enumerate(worksheet.iter_rows()):
             if index != start_row:
@@ -94,21 +103,20 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
             
             exit_on_null = False
             for col_index, cell in enumerate(row):
-                value = cell.value
-                if value:
-                    slugified_value = slugify(str(value))
+                value = str(cell.value)
+                if cell.value:  # To avoid getting the string 'None'
                     if fill_extract_columns:
-                        extract_columns.append(str(value))
-                        slugified_extract_columns.append(slugified_value)
-                    column_names.append(slugified_value)
+                        extract_columns.append(value)
+                    column_names.append(value)
                     columns_indexes.append(col_index)
                     exit_on_null = True
                 elif exit_on_null:
+                    # Exits once at least a column has been read, and a null value is encountered.
                     break 
         
         extract_columns_indexes = []
         # Check if all extract_columns exist in the excel file.
-        for column_name in slugified_extract_columns:
+        for column_name in extract_columns:
             if column_name not in column_names:
                 raise ValidationError(
                     _(
@@ -118,8 +126,18 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
                 )
         
         for index, column_name in enumerate(column_names):
-            if column_name in slugified_extract_columns:
+            if column_name in extract_columns:
                 extract_columns_indexes.append(index)
+        
+        # extract_columns
+        read_only_fields = serializer_class.Meta.read_only_fields
+        read_only_columns = []
+        for field in empty_serializer.get_fields():
+            field_label = empty_serializer.fields[field].label
+            if str(field_label) in column_names:
+                field_mapping[field_label] = field
+            if field in read_only_fields:
+                read_only_columns.append(field_label)
         
         excel_data = list()
         # iterating over the rows and
@@ -131,8 +149,8 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
             is_row_empty = True
             row_data = odict()
             for col_index, cell in enumerate(row):
-                if col_index in extract_columns_indexes:
-                    row_data[column_names[col_index]] = cell.value
+                if col_index in extract_columns_indexes and column_names[col_index] not in read_only_columns:
+                    row_data[field_mapping[column_names[col_index]]] = cell.value
                     if cell.value:
                         is_row_empty = False
             
@@ -141,7 +159,6 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
 
         # return odict object with the following format:
         return odict(
-            column_names=slugified_extract_columns,
             column_names_display=extract_columns,
             data=excel_data
         )
@@ -186,6 +203,8 @@ def export_xlsx(
     col_titles = data.col_titles
     data_cols_count = len(col_titles)
 
+    language_code = get_language().upper()
+
     try:
         # Workbook initialization
         wb = Workbook()
@@ -221,6 +240,9 @@ def export_xlsx(
             f'{get_cell_str(start_file_header_col, start_file_header_row)}:'
             f'{get_cell_str(start_file_header_col, start_file_header_row + 1)}'
         )
+        cell = ws.cell(row=start_file_header_row, column=start_file_header_col)
+        cell.font = styles.fonts.white
+        cell.value = language_code
 
         # Title cell
         if header_title:
@@ -269,7 +291,6 @@ def export_xlsx(
 
                 col_width = get_col_width(row_title, cell.font.sz)
                 if col_width > start_column.width:
-                    print('Column width: old:', start_column.width, ' | new:', col_width)
                     start_column.width = col_width
 
         start_data_col_index = start_col_index
@@ -298,3 +319,54 @@ def export_xlsx(
         return Result(False, _("The tmp file could not be created!"))
 
     return Result(True, _("File exported successfully"), instance=tmp_file_path)
+
+
+def export_serializer_xlsx(
+    queryset, serializer_class, header_title='', description='',
+    sheet_title="Data", freeze_header=True, remove_cells_borders=False,
+    title_section_length=7
+):
+    """
+    This function creates a tmp .xlsx file based on the data provided and
+    returns a result that has the tmp file path in it's instance attribute.
+
+    :queryset:QuerySet:Data to be exported to excel file.
+    :serializer_class:Serializer:Serializer model that is used to handle data.
+    :header_title:str:The title that is displayed above the table.
+    :description:str:Discription of the document, note, or a usage tip.
+    :sheet_title:str:The title of the generated spread sheet.
+    :freeze_header:bool:If set to True (default), the header aread will be fixed on scroll.
+    :remove_cells_borders:bool:If set to True, the cell borders will disapear,
+    resulting in a white spread sheet.
+    :title_section_length:int:The number of columns that will be occuppied by the title and
+    the description
+    """
+
+    empty_serializer = serializer_class()
+    field_names = [field_name for field_name in empty_serializer.get_fields()]
+    columns = [str(empty_serializer[field_name].label) for field_name in field_names]
+    serializer = serializer_class(instance=queryset, many=True)
+
+    data_content = []
+    for client in serializer.data:
+        content = []
+        for field_name in field_names:
+            content.append(client.get(field_name, '---'))
+        data_content.append(content)
+    
+    data = ExportDataType(
+        col_titles=columns,
+        data=data_content
+    )
+    
+    result = export_xlsx(
+        data,
+        header_title=header_title,
+        description=description,
+        sheet_title=sheet_title,
+        freeze_header=freeze_header,
+        remove_cells_borders=remove_cells_borders,
+        title_section_length=title_section_length
+    )
+
+    return result

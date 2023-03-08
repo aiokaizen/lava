@@ -16,13 +16,15 @@ class XLSXStyles:
     def __init__(self):
 
         # Fonts
+        white_font = Font(sz=14, bold=False, color="ffffff")
         default_font = Font(sz=14, bold=False, color="11123a")
         header_font = Font(sz=14, bold=True, color="11123a")
         title_font = Font(sz=28, bold=True, color="11123a")
         self.fonts = odict(
             default=default_font,
             header=header_font,
-            title=title_font
+            title=title_font,
+            white=white_font,
         )
 
         # Borders

@@ -2,11 +2,11 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from lava.models.models import LogEntry
-from lava.serializers.base_serializers import ReadOnlyModelSerializer
+from lava.serializers.base_serializers import ReadOnlyBaseModelSerializer
 from lava.serializers.user_serializers import UserExerptSerializer
 
 
-class LogEntrySerializer(ReadOnlyModelSerializer):
+class LogEntrySerializer(ReadOnlyBaseModelSerializer):
 
     user = UserExerptSerializer()
     action_flag_display = serializers.CharField(source='get_action_flag_display')

@@ -59,7 +59,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ReadOnlyModelSerializer(BaseModelSerializer):
+class ReadOnlyBaseModelSerializer(BaseModelSerializer):
 
     _READ_ONLY_ERROR_MESSAGE = _("You can not create or update objects using a read-only serializer.")
 

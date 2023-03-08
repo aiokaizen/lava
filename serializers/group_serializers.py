@@ -1,11 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 
 from lava.models import Group
-from lava.serializers.base_serializers import BaseModelSerializer, ReadOnlyModelSerializer
+from lava.serializers.base_serializers import BaseModelSerializer, ReadOnlyBaseModelSerializer
 from lava.serializers.serializers import PermissionSerializer
 
 
-class GroupListSerializer(ReadOnlyModelSerializer):
+class GroupListSerializer(ReadOnlyBaseModelSerializer):
     class Meta:
         model = Group
         fields = [
@@ -14,7 +14,7 @@ class GroupListSerializer(ReadOnlyModelSerializer):
         ]
 
 
-class GroupGetSerializer(ReadOnlyModelSerializer):
+class GroupGetSerializer(ReadOnlyBaseModelSerializer):
 
     permissions = PermissionSerializer(many=True)
 

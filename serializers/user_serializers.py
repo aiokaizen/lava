@@ -9,13 +9,13 @@ from lava.models import User, Group
 from lava import settings as lava_settings
 from lava.serializers.serializers import PermissionSerializer
 from lava.serializers.base_serializers import (
-    BaseModelSerializer, ReadOnlyModelSerializer
+    BaseModelSerializer, ReadOnlyBaseModelSerializer
 )
 from lava.serializers.group_serializers import GroupListSerializer
 from lava.validators import validate_email
 
 
-class UserExerptSerializer(ReadOnlyModelSerializer):
+class UserExerptSerializer(ReadOnlyBaseModelSerializer):
     class Meta:
         model = User
         fields = ["id", "photo", "username", "first_name", "last_name"]
@@ -26,7 +26,7 @@ class UserExerptSerializer(ReadOnlyModelSerializer):
         )
 
 
-class UserListSerializer(ReadOnlyModelSerializer):
+class UserListSerializer(ReadOnlyBaseModelSerializer):
 
     class Meta:
         model = User
@@ -44,7 +44,7 @@ class UserListSerializer(ReadOnlyModelSerializer):
         ]
 
 
-class UserGetSerializer(ReadOnlyModelSerializer):
+class UserGetSerializer(ReadOnlyBaseModelSerializer):
 
     groups = GroupListSerializer(many=True)
     user_permissions = PermissionSerializer(many=True)
@@ -236,7 +236,7 @@ class UserProfileUpdateSerializer(BaseModelSerializer):
         )
 
 
-class UserDeleteSerializer(ReadOnlyModelSerializer):
+class UserDeleteSerializer(ReadOnlyBaseModelSerializer):
 
     current_password = serializers.CharField(label="Password", required=True)
     
