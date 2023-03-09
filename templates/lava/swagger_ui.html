@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+    <title>LAVA - API Documentation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href={% static 'lava/assets/images/logo/favicon.png' %}>
+    <link rel="stylesheet" href="{% static 'lava/assets/css/swagger-ui.css' %}">
+    <style>
+      html { box-sizing: border-box; overflow-y: scroll; }
+      *, *:after, *:before { box-sizing: inherit; }
+      body { background: #fafafa; margin: 0; }
+      .swagger-ui .opblock .opblock-summary .view-line-link {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .swagger-ui .opblock .opblock-summary:hover .view-line-link {
+        width: 22px;
+        padding-right: 1px;
+      }
+    </style>
+    {% endblock head %}
+  </head>
+  <body>
+    {% block body %}
+    <!-- Content -->
+    <div id="swagger-ui"></div>
+
+    <!-- Scripts -->
+    <script src="{% static 'lava/assets/js/swagger-ui-bundle.js' %}"></script>
+    <script src="{% static 'lava/assets/js/swagger-ui-standalone-preset.js' %}"></script>>
+    {% include 'lava/swagger_ui_script.html' %}
+    {% endblock %}
+  </body>
+</html>

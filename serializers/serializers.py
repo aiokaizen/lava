@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+from drf_spectacular.utils import extend_schema_field
+
 from lava.models import Preferences, User
 from lava.models.models import Permission
 from lava.serializers.base_serializers import BaseModelSerializer
@@ -90,5 +92,6 @@ class PermissionSerializer(BaseModelSerializer):
             "id", "codename"
         ]
     
+    @extend_schema_field(str)
     def get_codename(self, obj):
         return f"{obj.content_type.app_label}.{obj.content_type.model}.{obj.codename}"

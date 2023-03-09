@@ -12,3 +12,7 @@ djangorestframework-simplejwt==4.8.0
 translate==3.6.1
 polib==1.1.1
 qrcode==7.4.2
+swagger-ui-py==22.7.13
+PyYAML==6.0
+uritemplate==4.1.1
+drf-spectacular==0.26.0

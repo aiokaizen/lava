@@ -102,6 +102,8 @@ class NotificationViewSet(ReadOnlyModelViewSet):
     queryset = Notification.objects.none()
 
     def get_queryset(self):
+        if not hasattr(self, 'user'):
+            return self.queryset
         return self.user.get_notifications()
 
     def get_permissions(self):

@@ -15,6 +15,7 @@ from lava.services import class_permissions as lava_permissions
 class UserMeAPIView(APIView):
 
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserGetSerializer
 
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH']:

@@ -4,6 +4,8 @@ from django.urls import path
 
 from rest_framework import routers
 
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
 from lava import views
 
 
@@ -54,6 +56,13 @@ if activate_api_urls:
     api_router.register(r"api/backup", views.BackupAPIViewSet)
 
     api_urlpatterns = [
+        # Swagger Documentation URLs
+        path('api/schema', SpectacularAPIView.as_view(), name='schema'),
+        path('api/docs', SpectacularSwaggerView.as_view(
+            url_name="lava:schema",
+            template_name="lava/swagger_ui.html"
+        ), name='swagger-ui'),
+
         path("api/users/me/", views.UserMeAPIView.as_view(), name="api-user-me"),
         path("api/settings/", views.SettingsList.as_view(), name="api-settings"),
         path("api/maintenance/", views.maintenance, name="api-maintenance"),
