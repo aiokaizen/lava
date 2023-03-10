@@ -91,6 +91,11 @@ EMAIL_GROUP_UNIQUE_TOGETHER = getattr(
     False,
 )
 
+RESULT_TYPE_CHOICES = (
+    ("success", _("Success")),
+    ("warning", _("Warning")),
+    ("error", _("Error")),
+)
 
 BACKUP_TYPE_CHOICES = (
     ("full_backup", _("Full backup")),

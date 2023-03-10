@@ -8,9 +8,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
+from drf_spectacular.utils import extend_schema
+
 from lava.messages import ACTION_NOT_ALLOWED
-from lava.utils import Result
 from lava.pagination import LavaPageNumberPagination
+from lava.serializers.serializers import ResultSerializer
+from lava.utils import Result
 
 
 class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
@@ -159,6 +162,7 @@ class BaseModelViewSet(ModelViewSet):
         self.user = request.user
         return super().retrieve(request, *args, **kwargs)
     
+    @extend_schema(responses=ResultSerializer)
     def create(self, request, *args, **kwargs):
         if "create" in self.denied_actions:
             return Response(
@@ -185,6 +189,7 @@ class BaseModelViewSet(ModelViewSet):
             return Response(result.to_dict(), headers=headers)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
+    @extend_schema(responses=ResultSerializer)
     def update(self, request, *args, **kwargs):
         if "update" in self.denied_actions:
             return Response(
@@ -220,6 +225,7 @@ class BaseModelViewSet(ModelViewSet):
             return Response(serializer.result.to_dict())
         return Response(serializer.data)
     
+    @extend_schema(responses=ResultSerializer)
     def destroy(self, request, *args, **kwargs):
         if "destroy" in self.denied_actions:
             return Response(
@@ -244,6 +250,7 @@ class BaseModelViewSet(ModelViewSet):
         self.user = request.user
         return super().options(request, *args, **kwargs)
     
+    @extend_schema(responses=ResultSerializer)
     @action(detail=True, methods=["POST"])
     def restore(self, request, pk):
         if "restore" in self.denied_actions:

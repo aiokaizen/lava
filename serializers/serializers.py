@@ -6,9 +6,32 @@ from rest_framework.fields import empty
 
 from drf_spectacular.utils import extend_schema_field
 
+from lava import settings as lava_settings
 from lava.models import Preferences, User
 from lava.models.models import Permission
 from lava.serializers.base_serializers import BaseModelSerializer
+
+
+class ResultSerializer(serializers.Serializer):
+
+    class_name = serializers.CharField(label=_("Class name"), required=True)
+    result = serializers.ChoiceField(
+        label=_("Result"), choices=lava_settings.RESULT_TYPE_CHOICES, required=True
+    )
+    message = serializers.CharField(label=_("Message"), required=True)
+    errors = serializers.DictField(label=_("Errors"), required=False)
+    error_code = serializers.CharField(label=_("Error code"), required=False)
+    object_id = serializers.IntegerField(label=_("Object ID"), required=False)
+
+    class Meta:
+        fields = [
+            "class_name",
+            "result",
+            "message",
+            "errors",
+            "error_code",
+            "object_id",
+        ]
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):

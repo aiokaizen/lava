@@ -4,7 +4,7 @@ from django.urls import path
 
 from rest_framework import routers
 
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 from lava import views
 
@@ -62,6 +62,9 @@ if activate_api_urls:
             url_name="lava:schema",
             template_name="lava/swagger_ui.html"
         ), name='swagger-ui'),
+        path('api/docs/redoc', SpectacularRedocView.as_view(
+            url_name="lava:schema",
+        ), name='redoc-ui'),
 
         path("api/users/me/", views.UserMeAPIView.as_view(), name="api-user-me"),
         path("api/settings/", views.SettingsList.as_view(), name="api-settings"),
