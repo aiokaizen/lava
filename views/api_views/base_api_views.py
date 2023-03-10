@@ -25,7 +25,7 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         ActiveModel = self.queryset.model
-        return ActiveModel.filter(user=self.user, kwargs=self.request.GET)
+        return ActiveModel.filter(user=getattr(self, 'user', None), kwargs=self.request.GET)
     
     def get_serializer(self, *args, **kwargs):
         self.serializer_class = self.list_serializer_class or self.serializer_class
@@ -38,7 +38,7 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
 
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        serializer = serializer_class(*args, user=self.user, **kwargs)
+        serializer = serializer_class(*args, user=getattr(self, 'user', None), **kwargs)
         return serializer
 
     def get_permissions(self):
@@ -96,7 +96,7 @@ class BaseModelViewSet(ModelViewSet):
     
     def get_queryset(self):
         ActiveModel = self.queryset.model
-        return ActiveModel.filter(user=getattr(self, 'user'), kwargs=self.request.GET)
+        return ActiveModel.filter(user=getattr(self, 'user', None), kwargs=self.request.GET)
     
     def get_serializer_class(self):
         self.serializer_class = self.list_serializer_class or self.serializer_class
@@ -115,7 +115,7 @@ class BaseModelViewSet(ModelViewSet):
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        serializer = serializer_class(*args, user=getattr(self, 'user'), **kwargs)
+        serializer = serializer_class(*args, user=getattr(self, 'user', None), **kwargs)
         return serializer
 
     def get_metadata_serializer_class(self):
