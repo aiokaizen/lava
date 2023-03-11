@@ -119,7 +119,7 @@ class LogEntry(BaseLogEntryModel):
         filter_params = Q()
         if kwargs is None:
             kwargs = {}
-        
+
         if "user" in kwargs:
             filters |= Q(user=kwargs.get("user"))
 
@@ -187,7 +187,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         )
 
     def create(self, user=None, *args, **kwargs):
-        
+
         return Result(False, _("You can not create a new permission."))
 
         result = super().create(user=user, *args, **kwargs)
@@ -199,16 +199,16 @@ class Permission(BaseModelMixin, BasePermissionModel):
 
         if update_fields is None or len(update_fields) > 0:
             update_fields = ["name"]
-        
+
         result = super().update(user=user, update_fields=update_fields, *args, **kwargs)
         if result.is_error:
             return result
         return Result(True, _("The permission has been updated successfully."))
-    
+
     def delete(self, user=None, *args, **kwargs):
-        
+
         return Result(False, _("You can not delete a permission."))
-        
+
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
@@ -222,7 +222,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
             filter_params |= Q(name__icontains=kwargs["name"])
 
         return filter_params
-    
+
     @classmethod
     def filter(cls, user=None, kwargs=None):
         filter_params = Permission.get_filter_params(user, kwargs)
@@ -265,7 +265,7 @@ class Group(BaseModelMixin, BaseGroupModel):
     # )
     objects = GroupManager()
     trash = models.Manager()
-    
+
     def create(self, user=None, m2m_fields=None, notification_group=False):
         if user and not can_add_group(user):
             return Result.error(FORBIDDEN_MESSAGE)
@@ -280,17 +280,17 @@ class Group(BaseModelMixin, BaseGroupModel):
             return Result.error(
                 msg, errors={"name": [msg]}, error_code='invalid'
             )
-        
+
         result = super().create(user=user, m2m_fields=m2m_fields)
         if result.is_error:
             return result
-            
+
         return Result.success(_("Group created successfully."), instance=self)
-    
+
     def update(self, user=None, update_fields=None, m2m_fields=None, message="", notification_group=False):
         if user and not can_change_group(user):
             return Result.error(FORBIDDEN_MESSAGE)
-        
+
         if not notification_group and 'name' in update_fields and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
             msg = _(
                 "You can not update a group with this name. Please remove the "
@@ -301,7 +301,7 @@ class Group(BaseModelMixin, BaseGroupModel):
             return Result.error(
                 msg, errors={"name": [msg]}, error_code='invalid'
             )
-        
+
         result = super().update(
             user=user,
             update_fields=update_fields,
@@ -312,23 +312,23 @@ class Group(BaseModelMixin, BaseGroupModel):
             return result
 
         return Result.success(_("Group updated successfully."))
-    
+
     def delete(self, user=None, notification_group=False):
         if user and not can_delete_group(user):
             return Result.error(FORBIDDEN_MESSAGE)
 
         if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
             return Result.error(_("You can not delete a this group."))
-        
+
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
 
         return Result.success(_("The group has been deleted successfully."))
-    
+
     def restore(self, user=None):
         return Result(False, "")
-    
+
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
         filter_params = Q()
@@ -339,7 +339,7 @@ class Group(BaseModelMixin, BaseGroupModel):
             filter_params |= Q(name__icontains=kwargs["name"])
 
         return filter_params
-    
+
     @classmethod
     def filter(cls, user=None, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
@@ -355,7 +355,7 @@ class NotificationGroup(Group):
 
     class Meta:
         proxy = True
-    
+
     objects = NotificationGroupManager()
 
     @classmethod
@@ -371,7 +371,7 @@ class NotificationGroup(Group):
             return NotificationGroup.objects.get(name=group_name)
         except Group.DoesNotExist:
             return None
-    
+
     @classmethod
     def filter(cls, user=None, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
@@ -521,7 +521,7 @@ class User(AbstractUser, BaseModel):
             update_fields.append("cover_picture")
         if groups is not None:
             self.groups.set(groups)
-        
+
         result = self.update(user=None, update_fields=update_fields)
 
         if link_payments_app:
@@ -546,7 +546,7 @@ class User(AbstractUser, BaseModel):
 
         if user:
             self.log_action(user, ADDITION)
-            
+
         return Result(
             success=True,
             message=_("User has been created successfully."),
@@ -709,7 +709,7 @@ class User(AbstractUser, BaseModel):
             self.log_action(user, DELETION)
 
         return Result(success=True, message=success_message)
-    
+
     def set_password(self, raw_password, user=None):
         self.password = make_password(raw_password)
         self._password = raw_password
@@ -724,7 +724,7 @@ class User(AbstractUser, BaseModel):
         if result.is_error:
             return result
         return Result(True, _("Password has been changed successfully."))
-    
+
     def restore(self, user=None):
 
         result = super().restore(user=user)
@@ -787,7 +787,7 @@ class User(AbstractUser, BaseModel):
             return Result(
                 success=False, message=_("Invalid password."), errors=e.messages
             )
-    
+
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
 
@@ -907,7 +907,7 @@ class Notification(models.Model):
 
         if target_groups:
             self.target_groups.set(target_groups)
-        
+
         if send_notification:
             self.send_firebase_notification()
 
@@ -1017,22 +1017,22 @@ class Backup(BaseModel):
 
     def __str__(self):
         return self.name
-    
+
     def get_filename(self):
         return (
             f"{self.created_at.strftime('%Y%m%d%H%M%S')}_"
             f"{self.type}.zip"
         )
-    
+
     def create(self, user=None, *args, **kwargs):
         return self.start_backup(user=user, *args, **kwargs)
-    
+
     def update(self, *args, **kwargs):
         if 'message' not in kwargs:
             """ Allow modification for inner actions only (eg: soft_delete()). """
             return Result(False, ACTION_NOT_ALLOWED)
         return super().update(*args, **kwargs)
-    
+
     def delete(self, user=None, soft_delete=True):
         backup_file = self.backup_file
 
@@ -1042,15 +1042,15 @@ class Backup(BaseModel):
 
         if backup_file:
             backup_file.delete()
-    
+
         return Result(True, _("Backup has been deleted successfully."))
-    
+
     def can_start_backup(self):
 
         if Backup.is_locked():
             return Result(False, _("A backup is already running, please wait "
                 "until it's finished before starting a new one."), tag="warning")
-        
+
         # min_period_between_backups = timedelta(minutes=1)
         # daily_limit = 2
         # now = timezone.now()
@@ -1068,18 +1068,18 @@ class Backup(BaseModel):
 
         # if today_backups.count() >= daily_limit:
         #     return Result(False, _("You can not create more than %s backups per day." % daily_limit))
-        
+
         # latest_backup_time = latest_backup.created_at
         # if now < latest_backup_time + min_period_between_backups:
         #     return Result(False, _("You can only create one backup per hour"))
 
         return Result(True)
-    
+
     def start_backup(self, user=None, *args, **kwargs):
         result = self.can_start_backup()
         if not result.success:
             return result
-        
+
         self.name = (
             f"{self.created_at.strftime('%c')} "
             f"{self.get_type_display()}"
@@ -1087,14 +1087,14 @@ class Backup(BaseModel):
         result = super().create(user, *args, **kwargs)
         if result.is_error:
             return result
-        
+
         Backup.lock()
-        
+
         backup = self
         threading.Thread(target=backup.run_backup, args=(user, )).start()
 
         return Result(True, _("Backup has been started, you will get notified once it is finished."))
-    
+
     def run_backup(self, user=None):
         try:
             filename = get_backup_file_filename(self, "_")
@@ -1144,18 +1144,18 @@ class Backup(BaseModel):
                     )),
                 )
                 notif.create(target_users=[user])
-            
+
             # Change status to failed
             self.status = "failed"
             self.save(update_fields=["status"])
 
         finally:
             Backup.unlock()
-        
+
     @classmethod
     def is_locked(cls):
         return os.path.exists(lava_settings.BACKUP_LOCK_TAG_PATH)
-    
+
     @classmethod
     def lock(cls):
         open(lava_settings.BACKUP_LOCK_TAG_PATH, "w").close()
