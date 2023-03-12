@@ -156,8 +156,12 @@ class Result(imdict):
 
     @classmethod
     def from_dict(cls, result_dict):
-        if "result" not in result_dict or "message" not in result_dict:
-            raise TypeError("result_dict must contain 'result' and 'message' members")
+        if (
+            "result" not in result_dict or
+            "message" not in result_dict or
+            result_dict.get("class_name", "") != "lava.utils.Result"
+        ):
+            raise TypeError("Invalid result dict format.")
         
         tag = result_dict["result"]
         is_success = True if tag == "success" else False
@@ -177,7 +181,7 @@ class Result(imdict):
             type = "warning"
 
         res_dict = {
-            "class": 'lava.utils.Result',
+            "class_name": 'lava.utils.Result',
             "result": type,
             "message": self.message
         }
