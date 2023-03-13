@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 is_staff=True,
                 is_superuser=True,
             )
-            eksuperuser.create(groups=[group], password="admin_super_pass", force_is_active=True, link_payments_app=False)
+            eksuperuser.create(groups=[group], password="admin_super_1234", force_is_active=True, link_payments_app=False)
             logging.info("eksuperuser was created successfully!")
 
         try:
@@ -60,5 +60,5 @@ class Command(BaseCommand):
                 last_name="Administrator",
                 is_staff=True,
             )
-            ekadmin.create(groups=[group], password="admin_pass", force_is_active=True, link_payments_app=False)
+            ekadmin.create(groups=[group], password="admin_1234", force_is_active=True, link_payments_app=False)
             logging.info("ekadmin was created successfully!")
