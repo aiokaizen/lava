@@ -1,10 +1,16 @@
 import json
 from datetime import datetime
+import io
+import os
 
-from django.db import models
-from django.db.models import Q, ForeignObjectRel, ForeignKey, ManyToManyField
 from django.contrib.admin.models import (
     DELETION, CHANGE, ADDITION
+)
+from django.core.files import File
+from django.core.files.base import ContentFile
+from django.db import models
+from django.db.models import (
+    Q, ForeignKey, ManyToManyField, OneToOneField, FileField
 )
 from django.contrib.admin.options import get_content_type_for_model
 from django.utils.translation import gettext_lazy as _
@@ -25,7 +31,7 @@ class BaseModelMixin:
     default_delete_policy = DELETE_POLICY.SOFT_DELETE
 
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
-        if self.id:
+        if self.pk:
             return Result(False, _("This object is already created."))
 
         # if clean:
@@ -33,7 +39,7 @@ class BaseModelMixin:
         #         self.clean_fields()
         #     except ValidationError as e:
         #         return Result(False, _("Erreurs de validation."), errors=e.error_dict)
-        
+
         self.created_by = user
 
         self.save()
@@ -42,7 +48,7 @@ class BaseModelMixin:
             for attr, value in m2m_fields:
                 field = getattr(self, attr)
                 field.set(value)
-        
+
         if file_fields:
             update_fields = []
             for attr, value in file_fields:
@@ -53,11 +59,11 @@ class BaseModelMixin:
 
         if user:
             self.log_action(user, ADDITION)
-            
+
         return Result(True, self.create_success_message, instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
-        if not self.id:
+        if not self.pk:
             return Result(False, _("This object is not yet created."))
 
         # Get changed message before saving the object
@@ -94,7 +100,7 @@ class BaseModelMixin:
 
         super().delete()
         return Result.success(self.delete_success_message)
-    
+
     def delete_alias(self, user=None, soft_delete=True):
         """
         This method is used in case of multi-inheritance, using super().delete()
@@ -102,16 +108,52 @@ class BaseModelMixin:
         """
         return self.delete(user=user, soft_delete=soft_delete)
 
-    def duplicate(self, user=None):
+    def duplicate(self, user=None, override_values=dict):
         klass = self.__class__
-        new = klass.objects.get(pk=self.pk)
-        new.pk = None
-        new._state.adding = True
-        result = new.create(user=user)
+        new = klass()
+
+        ignore_fields = [
+            'id',
+            'created_at',
+            'created_by',
+            'last_updated_at',
+            'deleted_at',
+            *override_values.keys()
+        ]
+        file_fields = []
+        m2m_fields = []
+        opened_files = []
+
+        for field in self._meta.fields:
+            if field.name not in ignore_fields and not isinstance(field, OneToOneField):
+                if isinstance(field, FileField):
+                    filefield = getattr(self, field.name)
+                    if filefield:
+                        f = filefield.file.open(mode='rb')
+                        opened_files.append(f)
+                        stream = io.BytesIO(f.read())
+                        io_file = File(ContentFile(stream.getvalue()))
+                        io_file.name = f"file{os.path.splitext(filefield.name)[1]}"
+                        file_fields.append((field.name, io_file))
+                else:
+                    setattr(new, field.name, getattr(self, field.name))
+
+        for field in self._meta.many_to_many:
+            m2m_fields.append((field.name, getattr(self, field.name).all()))
+
+        for key, value in override_values.items():
+            setattr(new, key, value)
+
+        result = new.create(user=user, file_fields=file_fields, m2m_fields=m2m_fields)
+
+        for f in opened_files:
+            f.close()
+
         if result.is_error:
             return result
+
         return Result.success(self.duplicate_success_message, instance=new)
-    
+
     def restore(self, user=None):
         if not self.deleted_at:
             return Result(False, _("Object is not deleted!"))
@@ -136,7 +178,7 @@ class BaseModelMixin:
             m2m_fields_dict[m2mfield[0]] = m2mfield[1]
 
         for field in klass._meta.get_fields(include_parents=True):
-        
+
             field_name = field.name
             old_value = getattr(old_self, field_name, None)
             new_value = getattr(self, field_name, None)
@@ -160,7 +202,7 @@ class BaseModelMixin:
 
         if not user:
             return
-        
+
         from lava.models.models import LogEntry
 
         LogEntry.objects.log_action(
@@ -254,7 +296,7 @@ class BaseModelMixin:
                 pass
 
         return filter_params
-    
+
     @classmethod
     def get_ordering_params(cls, kwargs):
 

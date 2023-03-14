@@ -342,9 +342,9 @@ class Group(BaseModelMixin, BaseGroupModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
-        queryset = super().filter(user=user, kwargs=kwargs)
+        queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
         if user and not can_list_group(user):
             return queryset.none()
@@ -374,9 +374,9 @@ class NotificationGroup(Group):
             return None
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = cls.get_filter_params(user, kwargs)
-        queryset = super().filter(user=user, kwargs=kwargs)
+        queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
         if user and not can_list_group(user):
             return queryset.none()
@@ -823,10 +823,10 @@ class User(AbstractUser, BaseModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = User.get_filter_params(user, kwargs)
 
-        base_queryset = super().filter(user=user, kwargs=kwargs)
+        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
 
         if user and not can_list_user(user):
@@ -1182,10 +1182,10 @@ class Backup(BaseModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = Backup.get_filter_params(user, kwargs)
 
-        base_queryset = super().filter(user=user, kwargs=kwargs)
+        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
 
         if user and not can_list_backup(user):
             return base_queryset.none()
