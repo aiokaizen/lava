@@ -5,8 +5,9 @@ from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 
-from lava.models import User, Group
 from lava import settings as lava_settings
+from lava.models import User, Group
+from lava.serializer_fields import ThumbnailImageField
 from lava.serializers.serializers import PermissionSerializer
 from lava.serializers.base_serializers import (
     BaseModelSerializer, ReadOnlyBaseModelSerializer
@@ -28,7 +29,7 @@ class UserExerptSerializer(ReadOnlyBaseModelSerializer):
 
 class UserListSerializer(ReadOnlyBaseModelSerializer):
 
-    photo = serializers.SerializerMethodField()
+    photo = ThumbnailImageField(alias='thumbnail')
 
     class Meta:
         model = User
@@ -45,19 +46,14 @@ class UserListSerializer(ReadOnlyBaseModelSerializer):
             "is_superuser",
         ]
 
-    def get_photo(self, instance):
-        if instance.photo:
-            return instance.photo["thumbnail"].url
-        return ''
-
 
 class UserGetSerializer(ReadOnlyBaseModelSerializer):
 
     groups = GroupListSerializer(many=True)
     user_permissions = PermissionSerializer(many=True)
     permissions = PermissionSerializer(many=True, source="get_all_permissions")
-    cover_picture = serializers.SerializerMethodField()
-    photo = serializers.SerializerMethodField()
+    photo = ThumbnailImageField(alias='avatar')
+    cover_picture = ThumbnailImageField(alias='cover')
 
     class Meta:
         model = User
@@ -90,16 +86,6 @@ class UserGetSerializer(ReadOnlyBaseModelSerializer):
             "last_login": {"format": "%m/%d/%Y %H:%M:%S"},
             "date_joined": {"format": "%m/%d/%Y %H:%M:%S"},
         }
-
-    def get_photo(self, instance):
-        if instance.photo:
-            return instance.photo["avatar"].url
-        return ''
-
-    def get_cover_picture(self, instance):
-        if instance.cover_picture:
-            return instance.cover_picture["cover"].url
-        return ''
 
 
 class UserCreateSerializer(BaseModelSerializer):
