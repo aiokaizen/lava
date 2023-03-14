@@ -22,10 +22,11 @@ from django.contrib.admin.models import (
     LogEntry as BaseLogEntryModel,
     ADDITION, CHANGE, DELETION
 )
-from django.contrib.admin.options import get_content_type_for_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+
+from easy_thumbnails.fields import ThumbnailerImageField
 
 from lava import settings as lava_settings
 from lava import validators as lava_validators
@@ -253,7 +254,7 @@ class Group(BaseModelMixin, BaseGroupModel):
         )
 
     # description = models.TextField(_('Description'), default='', blank=True)
-    # image = models.ImageField(
+    # image = ThumbnailerImageField(
     #     _("Image"),
     #     upload_to=get_group_photo_filename,
     #     null=True,
@@ -423,7 +424,7 @@ class User(AbstractUser, BaseModel):
         related_query_name="user",
     )
 
-    photo = models.ImageField(
+    photo = ThumbnailerImageField(
         _("Photo"), upload_to=get_user_photo_filename, blank=True, null=True
     )
     birth_day = models.DateField(_("Birth day"), blank=True, null=True)
@@ -442,8 +443,9 @@ class User(AbstractUser, BaseModel):
     )
     fax = models.CharField(_("Fax"), max_length=32, default="", blank=True)
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
-    cover_picture = models.ImageField(
-        _("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True
+    cover_picture = ThumbnailerImageField(
+        _("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True,
+        help_text=_("Preferred image dimentions: (1200 x 250)")
     )
     preferences = models.OneToOneField(
         Preferences, on_delete=models.PROTECT, blank=True

@@ -51,6 +51,7 @@ INSTALLED_APPS_SUFFIX = [
     "corsheaders",
     "djoser",
     "drf_spectacular",
+    'easy_thumbnails',
 
     'lava',
 ]
@@ -168,6 +169,23 @@ DJOSER = {
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+
+
+# Thumbnails settings
+BASE_THUMBNAIL_ALIASES = {
+    **getattr(settings, 'THUMBNAIL_ALIASES', {})
+}
+THUMBNAIL_ALIASES = {
+    '': {
+        'thumbnail': {'size': (50, 50), 'crop': 'smart'},
+        'avatar': {'size': (150, 150), 'crop': 'smart'},
+        **BASE_THUMBNAIL_ALIASES.pop('', {})
+    },
+    'lava.User.cover_picture': {
+        'cover': {'size': (1200, 250), 'crop': 'smart'},
+    },
+    **BASE_THUMBNAIL_ALIASES
+}
 
 
 # SPECTACULAR Docs Settings
