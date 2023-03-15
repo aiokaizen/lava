@@ -188,8 +188,8 @@ class BaseModelMixin:
                 new_value = f"{new_value.id}|{new_value}" if new_value else None
 
             if type(field) == ManyToManyField and field_name in m2m_fields_dict:
-                old_value = [item.pk for item in m2m_fields_dict[field_name]]
-                new_value = list(new_value.all().values_list("pk", flat=True))
+                old_value = list(new_value.all().values_list("pk", flat=True))
+                new_value = [item.pk for item in m2m_fields_dict[field_name]]
 
             if old_value != new_value:
                 changed_message["fields"][field_name] = {
