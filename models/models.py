@@ -225,7 +225,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
+    def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = Permission.get_filter_params(user, kwargs)
         queryset = Permission.objects.filter(filter_params)
         if user and not can_list_permission(user):
