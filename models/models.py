@@ -33,10 +33,6 @@ from lava import validators as lava_validators
 from lava.error_codes import UNIMPLEMENTED, UNKNOWN
 from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE, ACTION_NOT_ALLOWED
 from lava.models.base_models import BaseModel, BaseModelMixin
-from lava.services.permissions import (
-    can_add_group, can_change_group, can_delete_group, can_list_backup, can_list_group,
-    can_list_permission, can_list_user,
-)
 from lava.utils import (
     Result,
     get_user_cover_filename,
@@ -228,8 +224,6 @@ class Permission(BaseModelMixin, BasePermissionModel):
     def filter(cls, user=None, trash=False, kwargs=None):
         filter_params = Permission.get_filter_params(user, kwargs)
         queryset = Permission.objects.filter(filter_params)
-        if user and not can_list_permission(user):
-            return queryset.none()
 
         return queryset
 
@@ -268,8 +262,6 @@ class Group(BaseModelMixin, BaseGroupModel):
     trash = models.Manager()
 
     def create(self, user=None, m2m_fields=None, notification_group=False):
-        if user and not can_add_group(user):
-            return Result.error(FORBIDDEN_MESSAGE)
 
         if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
             msg = _(
@@ -289,8 +281,6 @@ class Group(BaseModelMixin, BaseGroupModel):
         return Result.success(_("Group created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message="", notification_group=False):
-        if user and not can_change_group(user):
-            return Result.error(FORBIDDEN_MESSAGE)
 
         if not notification_group and 'name' in update_fields and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
             msg = _(
@@ -315,8 +305,6 @@ class Group(BaseModelMixin, BaseGroupModel):
         return Result.success(_("Group updated successfully."))
 
     def delete(self, user=None, notification_group=False):
-        if user and not can_delete_group(user):
-            return Result.error(FORBIDDEN_MESSAGE)
 
         if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
             return Result.error(_("You can not delete a this group."))
@@ -346,8 +334,6 @@ class Group(BaseModelMixin, BaseGroupModel):
         filter_params = cls.get_filter_params(user, kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
-        if user and not can_list_group(user):
-            return queryset.none()
 
         return queryset
 
@@ -378,8 +364,6 @@ class NotificationGroup(Group):
         filter_params = cls.get_filter_params(user, kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
-        if user and not can_list_group(user):
-            return queryset.none()
 
         return queryset
 
@@ -829,9 +813,6 @@ class User(AbstractUser, BaseModel):
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
 
-        if user and not can_list_user(user):
-            return base_queryset.none()
-
         if user and user not in admin_users:
             return base_queryset.exclude(pk__in=admin_users)
 
@@ -1153,6 +1134,9 @@ class Backup(BaseModel):
 
         finally:
             Backup.unlock()
+
+    def restore_backup(self, user=None):
+        return Result.error("You can not restore a backup, this functionality is not implemented yet.")
 
     @classmethod
     def is_locked(cls):

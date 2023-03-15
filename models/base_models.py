@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.utils import Result
-from lava.constants import DELETE_POLICY
+from lava.enums import DeletePolicy
 
 
 class BaseModelMixin:
@@ -28,7 +28,7 @@ class BaseModelMixin:
     delete_success_message = _("The object was deleted successfully.")
     duplicate_success_message = _("Object duplicated successfully.")
     restore_success_message = _("The object has been restored successfully.")
-    default_delete_policy = DELETE_POLICY.SOFT_DELETE
+    default_delete_policy = DeletePolicy.SOFT_DELETE
 
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.pk:
@@ -85,7 +85,7 @@ class BaseModelMixin:
 
         if soft_delete is None:
             soft_delete = False
-            if self.default_delete_policy == DELETE_POLICY.SOFT_DELETE:
+            if self.default_delete_policy == DeletePolicy.SOFT_DELETE:
                 soft_delete = True
 
         if soft_delete:

@@ -15,16 +15,3 @@ class PermissionAPIViewSet(BaseModelViewSet):
     queryset = Permission.objects.none()
 
     denied_actions = ["create", "destroy", "restore"]
-
-    def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = [lava_permissions.CanAddPermission]
-        if self.action == 'update':
-            self.permission_classes = [lava_permissions.CanChangePermission]
-        if self.action == 'destroy':
-            self.permission_classes = [lava_permissions.CanDeletePermission]
-        if self.action == 'retrieve':
-            self.permission_classes = [lava_permissions.CanViewPermission]
-        if self.action == 'list':
-            self.permission_classes = [lava_permissions.CanListPermission]
-        return super().get_permissions()

@@ -1,11 +1,4 @@
-import enum
-
 from django.utils.translation import gettext_lazy as _
-
-
-class DELETE_POLICY(enum.Enum):
-    HARD_DELETE = 0
-    SOFT_DELETE = 1
 
 
 # These messages are used by Djoser

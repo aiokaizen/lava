@@ -22,20 +22,3 @@ class GroupAPIViewSet(BaseModelViewSet):
         elif self.action in ['create', 'update', 'partial_update']:
             self.serializer_class = GroupCreateUpdateSerializer
         return super().get_serializer(*args, **kwargs)
-
-    def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = [lava_permissions.CanAddGroup]
-        if self.action == 'update':
-            self.permission_classes = [lava_permissions.CanChangeGroup]
-        if self.action == 'delete':
-            self.permission_classes = [lava_permissions.CanSoftDeleteGroup]
-        if self.action == 'retrieve':
-            self.permission_classes = [lava_permissions.CanViewGroup]
-        if self.action == 'list':
-            self.permission_classes = [lava_permissions.CanListGroup]
-        if self.action == 'restore':
-            self.permission_classes = [lava_permissions.CanRestoreGroup]
-        if self.action == "metadata":
-            self.permission_classes = [permissions.AllowAny]
-        return super().get_permissions()

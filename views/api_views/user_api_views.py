@@ -29,24 +29,11 @@ class UserAPIViewSet(BaseModelViewSet):
     queryset = User.objects.none()
 
     def get_permissions(self):
-        if self.action == 'create':
-            self.permission_classes = [lava_permissions.CanAddUser]
-        elif self.action == 'update':
-            self.permission_classes = [lava_permissions.CanChangeUser]
-        elif self.action == 'destroy':
-            self.permission_classes = [lava_permissions.CanSoftDeleteUser]
-        elif self.action == 'retrieve':
-            self.permission_classes = [lava_permissions.CanViewUser]
-        elif self.action == 'list':
-            self.permission_classes = [lava_permissions.CanListUser]
-        elif self.action == 'restore':
-            self.permission_classes = [lava_permissions.CanRestoreUser]
-
         if self.action == 'me' or getattr(self, 'is_me', False):
             self.permission_classes = [permissions.IsAuthenticated]
 
         return super().get_permissions()
-    
+
     def destroy(self, request, *args, **kwargs):
         self.user = request.user
         serializer = self.get_serializer(data=request.data)
@@ -56,7 +43,7 @@ class UserAPIViewSet(BaseModelViewSet):
         result = user.delete(user=self.user, soft_delete=True)
         if result.is_error:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
-        
+
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["POST"])

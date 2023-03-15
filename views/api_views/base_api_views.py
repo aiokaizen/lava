@@ -1,6 +1,6 @@
 from copy import deepcopy
+import importlib
 
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import permissions, status
@@ -10,73 +10,13 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 
 from drf_spectacular.utils import extend_schema
 
+from lava.enums import PermissionActionName
 from lava.messages import ACTION_NOT_ALLOWED
 from lava.pagination import LavaPageNumberPagination
 from lava.serializers.serializers import ResultSerializer
+from lava.services.permissions import get_model_base_permission_class
+from lava.services.class_permissions import ActionNotAllowed
 from lava.utils import Result
-
-
-class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
-
-    pagination_class = LavaPageNumberPagination
-    permission_classes = [permissions.IsAuthenticated]
-
-    list_serializer_class = None
-    retrieve_serializer_class = None
-
-    denied_actions = []
-
-    def get_queryset(self):
-        ActiveModel = self.queryset.model
-        return ActiveModel.filter(user=getattr(self, 'user', None), kwargs=self.request.GET)
-
-    def get_serializer(self, *args, **kwargs):
-        self.serializer_class = self.list_serializer_class or self.serializer_class
-        if self.action == 'retrieve' and self.retrieve_serializer_class:
-            self.serializer_class = self.retrieve_serializer_class
-        elif self.action == 'metadata' and self.detail:
-            serializer_class = self.get_serializer_class
-        elif self.action == 'metadata':
-            serializer_class = self.list_serializer_class
-
-        serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-        serializer = serializer_class(*args, user=getattr(self, 'user', None), **kwargs)
-        return serializer
-
-    def get_permissions(self):
-        permission_classes = [permissions.IsAuthenticated]
-        return [permission() for permission in permission_classes]
-
-    def list(self, request, *args, **kwargs):
-        if "list" in self.denied_actions:
-            return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
-            )
-
-        self.user = request.user
-        return super().list(request, *args, **kwargs)
-
-    def retrieve(self, request, *args, **kwargs):
-        if "retrieve" in self.denied_actions:
-            return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
-            )
-
-        self.user = request.user
-        return super().retrieve(request, *args, **kwargs)
-
-    def options(self, request, *args, **kwargs):
-        if "metadata" in self.denied_actions:
-            return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
-            )
-
-        self.user = request.user
-        return super().options(request, *args, **kwargs)
 
 
 class BaseModelViewSet(ModelViewSet):
@@ -142,7 +82,48 @@ class BaseModelViewSet(ModelViewSet):
         return serializer_class or self.serializer_class
 
     def get_permissions(self):
-        permission_classes = self.permission_classes
+        permission_classes = self.permission_classes or []
+        ActiveModel = self.queryset.model
+
+        if self.action == 'create':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.Add)
+            ])
+        elif self.action in ['update', 'partial_update']:
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.Change)
+            ])
+        elif self.action == 'destroy':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.SoftDelete)
+            ])
+        elif self.action == 'retrieve':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.View)
+            ])
+        elif self.action == 'list':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.List)
+            ])
+        elif self.action in ['view_trash', 'view_trash_item']:
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.ViewTrash)
+            ])
+        elif self.action == 'hard_delete':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.Delete)
+            ])
+        elif self.action == 'restore':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.Restore)
+            ])
+        elif self.action == 'duplicate':
+            permission_classes.extend([
+                get_model_base_permission_class(ActiveModel, PermissionActionName.Duplicate)
+            ])
+        # elif self.action == "metadata":
+        #     self.permission_classes = [permissions.AllowAny]
+
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
@@ -333,3 +314,29 @@ class BaseModelViewSet(ModelViewSet):
         if result.is_error:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)
+
+
+
+class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
+
+    pagination_class = LavaPageNumberPagination
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        permission_classes = super().permission_classes()
+
+        if self.action == 'create':
+            permission_classes = [ActionNotAllowed]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [ActionNotAllowed]
+        elif self.action == 'destroy':
+            permission_classes = [ActionNotAllowed]
+        elif self.action in ['view_trash', 'view_trash_item']:
+            permission_classes = [ActionNotAllowed]
+        elif self.action == 'hard_delete':
+            permission_classes = [ActionNotAllowed]
+        elif self.action == 'restore':
+            permission_classes = [ActionNotAllowed]
+        elif self.action == 'duplicate':
+            permission_classes = [ActionNotAllowed]
+        return [permission() for permission in permission_classes]
