@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: settings.py:53
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 16:44+0100\n"
+"POT-Creation-Date: 2023-03-16 16:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +22,7 @@ msgstr ""
 msgid "Personal info"
 msgstr "Info personnelle"
 
-#: admin.py:43 models/models.py:76 models/models.py:77
+#: admin.py:43 models/models.py:73 models/models.py:74
 msgid "Preferences"
 msgstr "Préférences"
 
@@ -47,7 +48,8 @@ msgid ""
 "The following error rose while trying to delete '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"L'erreur suivante s'est produite lors de la tentative de suppression de '%(obj)s' : \n"
+"L'erreur suivante s'est produite lors de la tentative de suppression de "
+"'%(obj)s' : \n"
 "        %(msg)s"
 
 #: admin.py:214 admin.py:253
@@ -64,7 +66,8 @@ msgid ""
 "The following error rose while trying to restore '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"L'erreur suivante s'est produite lors de la tentative de restauration de '%(obj)s' : \n"
+"L'erreur suivante s'est produite lors de la tentative de restauration de "
+"'%(obj)s' : \n"
 "        %(msg)s"
 
 #: admin.py:235
@@ -120,7 +123,7 @@ msgstr "Mise à Jour Profil"
 msgid "Update profile"
 msgstr "Mettre à jour le profil"
 
-#: breadcrumbs.py:61 models/models.py:240 serializers/user_serializers.py:262
+#: breadcrumbs.py:61 models/models.py:229 serializers/user_serializers.py:267
 msgid "Groups"
 msgstr "Groupes"
 
@@ -181,7 +184,7 @@ msgstr "Les champs mot de passe sont différent."
 msgid "The two {0} fields didn't match."
 msgstr "Les deux {0} champs ne correspondaient pas."
 
-#: constants.py:13 models/models.py:728
+#: constants.py:13 models/models.py:750
 msgid "Invalid password."
 msgstr "Mot de passe invalide."
 
@@ -237,310 +240,272 @@ msgstr "Format invalide. "
 msgid "Not found."
 msgstr "Non trouvé."
 
-#: models/base_models.py:21
-msgid "This object is already created."
-msgstr "Cet objet est déjà créé."
-
-#: models/base_models.py:41
+#: models/base_models.py:26
 msgid "Object created successfully."
 msgstr "Objet créé avec succès."
 
-#: models/base_models.py:45
-msgid "This object is not yet created."
-msgstr "Cet objet n'est pas encore créé."
-
-#: models/base_models.py:60
+#: models/base_models.py:27
 msgid "Object updated successfully."
 msgstr "Objet mis à jour avec succès."
 
-#: models/base_models.py:64
+#: models/base_models.py:28
 msgid "The object was deleted successfully."
 msgstr "L'objet a été supprimé avec succès."
 
-#: models/base_models.py:94
+#: models/base_models.py:29
 msgid "Object duplicated successfully."
 msgstr "Objet dupliqué avec succès."
 
-#: models/base_models.py:98
-msgid "Object is not deleted!"
-msgstr "L'objet n'est pas supprimé."
-
-#: models/base_models.py:104
+#: models/base_models.py:30
 msgid "The object has been restored successfully."
 msgstr "Pièce restaurée."
 
-#: models/base_models.py:271
-#, python-format
-msgid "Can add %s"
-msgstr "Peut ajouter %s"
+#: models/base_models.py:35
+msgid "This object is already created."
+msgstr "Cet objet est déjà créé."
 
-#: models/base_models.py:272
-#, python-format
-msgid "Can update %s"
-msgstr "Mises à jour %s"
+#: models/base_models.py:67
+msgid "This object is not yet created."
+msgstr "Cet objet n'est pas encore créé."
 
-#: models/base_models.py:273
-#, python-format
-msgid "Can delete %s"
-msgstr "Supprimer %s"
+#: models/base_models.py:159
+msgid "Object is not deleted!"
+msgstr "L'objet n'est pas supprimé."
 
-#: models/base_models.py:274
-#, python-format
-msgid "Can soft delete %s"
-msgstr "Peut supprimer doucement %s"
-
-#: models/base_models.py:275
-#, python-format
-msgid "Can view %s"
-msgstr "Peut voir %s"
-
-#: models/base_models.py:276
+#: models/base_models.py:231
 #, python-format
 msgid "Can list %s"
 msgstr "Peut lister %s"
 
-#: models/base_models.py:277
+#: models/base_models.py:232
+#, python-format
+msgid "Can add %s"
+msgstr "Peut ajouter %s"
+
+#: models/base_models.py:233
+#, python-format
+msgid "Can view %s"
+msgstr "Peut voir %s"
+
+#: models/base_models.py:234
+#, python-format
+msgid "Can update %s"
+msgstr "Peut modifier %s"
+
+#: models/base_models.py:235
+#, fuzzy, python-format
+msgid "Can duplicate %s"
+msgstr "Peut dupliquer %s"
+
+#: models/base_models.py:236
+#, python-format
+msgid "Can soft delete %s"
+msgstr "Peut supprimer %s"
+
+#: models/base_models.py:237
+#, fuzzy, python-format
+msgid "Can view deleted %s"
+msgstr "Peut voir les %s supprimé(e)s"
+
+#: models/base_models.py:238
 #, python-format
 msgid "Can restore %s"
-msgstr "Restaurer %s"
+msgstr "Peut restaurer %s"
 
-#: models/base_models.py:280
+#: models/base_models.py:239
+#, python-format
+msgid "Can delete %s"
+msgstr "Peut supprimer definitivement %s"
+
+#: models/base_models.py:240
+#, fuzzy, python-format
+msgid "Can import %s list"
+msgstr "Peut importer la liste des %s"
+
+#: models/base_models.py:241
+#, fuzzy, python-format
+msgid "Can export %s list"
+msgstr "Peut exporter la liste des %s"
+
+#: models/base_models.py:365
 msgid "Created at"
 msgstr "Créé à"
 
-#: models/base_models.py:282
+#: models/base_models.py:367
 msgid "Last update"
 msgstr "Last update"
 
-#: models/base_models.py:283 models/models.py:401
+#: models/base_models.py:368 models/models.py:423
 msgid "Deleted at"
 msgstr "Supprimé à"
 
-#: models/models.py:62
+#: models/models.py:59
 msgid "List"
 msgstr "Liste"
 
-#: models/models.py:63
+#: models/models.py:60
 msgid "Cards"
 msgstr "Cartes"
 
-#: models/models.py:66
+#: models/models.py:63
 msgid "Default"
 msgstr "Default"
 
-#: models/models.py:69
+#: models/models.py:66 project_settings.py:205
 msgid "English"
 msgstr "Anglais"
 
-#: models/models.py:70
+#: models/models.py:67
 msgid "Français"
 msgstr "Français"
 
-#: models/models.py:71
+#: models/models.py:68
 msgid "Español"
 msgstr "Español"
 
-#: models/models.py:72
+#: models/models.py:69
 msgid "العربية"
 msgstr "العربية"
 
-#: models/models.py:79
+#: models/models.py:76
 msgid "Font style"
 msgstr "Style police"
 
-#: models/models.py:80
+#: models/models.py:77
 msgid "Dark theme on?"
 msgstr "Thème sombre activé ?"
 
-#: models/models.py:82
+#: models/models.py:79
 msgid "List layout"
 msgstr "Liste des mises en page"
 
-#: models/models.py:85
+#: models/models.py:82
 msgid "Menu layout"
 msgstr "Disposition du menu"
 
-#: models/models.py:88
+#: models/models.py:85
 msgid "Language"
 msgstr "Langue"
 
-#: models/models.py:91
+#: models/models.py:88
 msgid "Notifications settings"
 msgstr "Préférences des notifications"
 
-#: models/models.py:106
+#: models/models.py:103
 msgid "Log entry"
 msgstr "Entrée au journal"
 
-#: models/models.py:107
+#: models/models.py:104
 msgid "Log entries"
 msgstr "Entrées de journal"
 
-#: models/models.py:111
+#: models/models.py:108
 msgid "Can view activity journal"
 msgstr "Peut afficher le journal d'activité"
 
-#: models/models.py:112
+#: models/models.py:109
 msgid "Can export activity journal"
 msgstr "Peut exporter le journal d'activité"
 
-#: models/models.py:174
+#: models/models.py:171
 msgid "permission"
 msgstr "permission"
 
-#: models/models.py:175
+#: models/models.py:172
 msgid "permissions"
 msgstr "autorisations"
 
-#: models/models.py:180
-msgid "Can add permissions"
-msgstr "Ajouter des autorisations"
-
-#: models/models.py:181
-msgid "Can view permission details"
-msgstr "Peut afficher les détails d'autorisation"
+#: models/models.py:177
+msgid "Can set permissions"
+msgstr "Peut affecter les autorisations"
 
 #: models/models.py:182
-msgid "Can update permissions"
-msgstr "Mettre à jour les autorisations"
-
-#: models/models.py:183
-msgid "Can delete permissions"
-msgstr "Peut supprimer des autorisations"
-
-#: models/models.py:184
-msgid "Can view permissions list"
-msgstr "Peut afficher la liste des autorisations"
-
-#: models/models.py:185
-msgid "Can set permissions"
-msgstr "Définir les permissions"
-
-#: models/models.py:186
-msgid "Can export permissions"
-msgstr "Droits d'exportation"
-
-#: models/models.py:191
 msgid "You can not create a new permission."
 msgstr "Vous ne pouvez pas créer une nouvelle autorisation."
 
-#: models/models.py:196
+#: models/models.py:187
 msgid "The permission has been created successfully."
 msgstr "L'autorisation a été créée."
 
-#: models/models.py:206
+#: models/models.py:197
 msgid "The permission has been updated successfully."
 msgstr "L'autorisation a été mise à jour avec succès."
 
-#: models/models.py:210
+#: models/models.py:201
 msgid "You can not delete a permission."
 msgstr "Vous ne pouvez pas supprimer une autorisation."
 
-#: models/models.py:215
+#: models/models.py:206
 msgid "The permission has been deleted successfully."
 msgstr "L'autorisation a été supprimée avec succès."
 
-#: models/models.py:239
+#: models/models.py:228
 msgid "Group"
 msgstr "Groupe"
 
-#: models/models.py:245
-msgid "Can add group"
-msgstr "Ajouter groupe"
-
-#: models/models.py:246
-msgid "Can update group"
-msgstr "Mettre à jour le groupe"
-
-#: models/models.py:247
-msgid "Can delete group"
-msgstr "Supprimer le groupe"
-
-#: models/models.py:248
-msgid "Can soft delete group"
-msgstr "Peut supprimer le groupe en douceur"
-
-#: models/models.py:249
-msgid "Can view group"
-msgstr "Voir groupe "
-
-#: models/models.py:250
-msgid "Can view group list"
-msgstr "Peut afficher la liste des groupes"
-
-#: models/models.py:251
-msgid "Can view deleted groups"
-msgstr "Voir les groupe supprimées"
-
 #: models/models.py:252
-msgid "Can restore group"
-msgstr "Peut restaurer le groupe"
+#, python-format
+msgid ""
+"You can not create a group with this name. Please remove the prefix "
+"'%(prefix)s' from the beginning of the field."
+msgstr ""
 
-#: models/models.py:276
+#: models/models.py:265
 msgid "Group created successfully."
 msgstr "Groupe créé avec succès."
 
-#: models/models.py:291
+#: models/models.py:271
+#, python-format
+msgid ""
+"You can not update a group with this name. Please remove the prefix "
+"'%(prefix)s' from the beginning of the field."
+msgstr ""
+
+#: models/models.py:289
 msgid "Group updated successfully."
 msgstr "Groupe mis à jour avec succès."
 
-#: models/models.py:301
+#: models/models.py:294
+#, fuzzy
+#| msgid "You can not delete a permission."
+msgid "You can not delete a this group."
+msgstr "Vous ne pouvez pas supprimer une autorisation."
+
+#: models/models.py:300
 msgid "The group has been deleted successfully."
 msgstr "Le groupe a été supprimé avec succès."
 
-#: models/models.py:332
-msgid "Can add user"
-msgstr "Peut ajouter un utilisateur"
-
-#: models/models.py:333
-msgid "Can change user"
-msgstr "Changer d'utilisateur"
-
-#: models/models.py:334
-msgid "Can delete user"
-msgstr "Supprimer l'utilisateur"
-
-#: models/models.py:335
-msgid "Can soft delete user"
-msgstr "Peut supprimer l'utilisateur en douceur"
-
 #: models/models.py:336
-msgid "Can view user"
-msgstr "Peut voir l'utilisateur"
+#, fuzzy
+#| msgid "The notification has been created successfully."
+msgid "All notification groups have been created successfully."
+msgstr "La notification a été créée avec succès."
 
-#: models/models.py:337
-msgid "Can view users list"
-msgstr "Peut afficher la liste des utilisateurs"
-
-#: models/models.py:338
-msgid "Can restore user"
-msgstr "Peut restaurer l'utilisateur"
-
-#: models/models.py:340
+#: models/models.py:361
 msgid "Can change user profile"
 msgstr "Changer le profil d'utilisateur…"
 
-#: models/models.py:341
+#: models/models.py:362
 msgid "Can delete user profile"
 msgstr "Supprimer le profil de l’utilisateur"
 
-#: models/models.py:342
+#: models/models.py:363
 msgid "Can soft delete user profile"
 msgstr "Peut supprimer le profil de l'utilisateur"
 
-#: models/models.py:347
+#: models/models.py:368
 msgid "user permissions"
 msgstr "Les permissions de l’utilisateur"
 
-#: models/models.py:349
+#: models/models.py:370
 msgid "Specific permissions for this user."
 msgstr "Autorisations spécifiques pour cet utilisateur."
 
-#: models/models.py:356
+#: models/models.py:377
 msgid "groups"
 msgstr "groupes"
 
-#: models/models.py:359
+#: models/models.py:380
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
@@ -548,91 +513,95 @@ msgstr ""
 "Les groupes auxquels cet utilisateur appartient. Un utilisateur obtiendra "
 "toutes les autorisations accordées à chacun de ses groupes."
 
-#: models/models.py:367
+#: models/models.py:388
 msgid "Photo"
 msgstr "Photo"
 
-#: models/models.py:369
+#: models/models.py:390
 msgid "Birth day"
 msgstr "Date de naissance"
 
-#: models/models.py:371
+#: models/models.py:392
 msgid "Gender"
 msgstr "Sexe"
 
-#: models/models.py:377
+#: models/models.py:398
 msgid "Country"
 msgstr "Pays"
 
-#: models/models.py:378
+#: models/models.py:399
 msgid "City"
 msgstr "Ville"
 
-#: models/models.py:379
+#: models/models.py:400
 msgid "Street address"
 msgstr "N° et nom de rue"
 
-#: models/models.py:381
+#: models/models.py:402
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-#: models/models.py:383
+#: models/models.py:404
 msgid "Fax"
 msgstr "Fax"
 
-#: models/models.py:384
+#: models/models.py:405
 msgid "Job title"
 msgstr "Intitulé du poste"
 
-#: models/models.py:386
+#: models/models.py:407
 msgid "Cover picture"
 msgstr "Photo de couverture"
 
-#: models/models.py:392
+#: models/models.py:408
+msgid "Preferred image dimentions: (1200 x 250)"
+msgstr ""
+
+#: models/models.py:414
 msgid "Temporary password"
 msgstr "Mot de passe temporaire"
 
-#: models/models.py:395
+#: models/models.py:417
 msgid "Device IDs"
 msgstr "Identifiants de l'appareil"
 
-#: models/models.py:398
+#: models/models.py:420
 msgid "A list of devices the the user is connected from."
 msgstr "Liste des appareils à partir desquels l'utilisateur est connecté."
 
-#: models/models.py:429
+#: models/models.py:451
 msgid "User is already created."
 msgstr "L'utilisateur est déjà créé."
 
-#: models/models.py:492
+#: models/models.py:514
 msgid "User has been created successfully."
 msgstr "L’utilisateur a été créé avec succès"
 
-#: models/models.py:498 models/models.py:512 models/models.py:527
+#: models/models.py:520 models/models.py:534 models/models.py:549
 msgid "Payments application is not installed"
 msgstr "L'application de paiement n'est pas installée"
 
-#: models/models.py:508
+#: models/models.py:530
 msgid "Payments application was implemented successfully."
 msgstr "L'application de paiement a été mise en œuvre avec succès."
 
-#: models/models.py:514
+#: models/models.py:536
 msgid "Account already created"
 msgstr "Compte déjà créé"
 
-#: models/models.py:523
+#: models/models.py:545
 msgid "Associated account was created successfully."
 msgstr "Le compte associé a été créé avec succès."
 
-#: models/models.py:529
+#: models/models.py:551
 msgid "Customer already created"
 msgstr "Client déjà créé"
 
-#: models/models.py:539
+#: models/models.py:561
 msgid "Associated BrainTree customer was created successfully."
 msgstr "Le client BrainTree associé a été créé avec succès."
 
-#: models/models.py:543
+#: models/models.py:565
 msgid ""
 "Unable to connect to one of our servers, please try again later. We "
 "apologize for the inconvenience."
@@ -640,168 +609,158 @@ msgstr ""
 "Impossible de se connecter à l'un de nos serveurs, veuillez réessayer plus "
 "tard. Nous nous excusons pour la gêne occasionnée."
 
-#: models/models.py:555 models/models.py:601
+#: models/models.py:577 models/models.py:623
 msgid "This functionality is not valid for a user with many or no groups."
 msgstr ""
 "Cette fonctionnalité n'est pas valable pour un utilisateur avec beaucoup ou "
 "pas de groupes."
 
-#: models/models.py:573
+#: models/models.py:595
 msgid "Associated object was created successfully."
 msgstr "L'objet associé a été créé avec succès."
 
-#: models/models.py:590
+#: models/models.py:612
 msgid "User has been updated successfully."
 msgstr "L'utilisateur a été mis à jour avec succès."
 
-#: models/models.py:612
+#: models/models.py:634
 msgid "Invalid group type for this operation."
 msgstr "Type de groupe invalide pour cette opération."
 
-#: models/models.py:619
+#: models/models.py:641
 msgid "Associated object was updated successfully."
 msgstr "L'objet associé a été mis à jour avec succès."
 
-#: models/models.py:624
+#: models/models.py:646
 msgid "User is already deleted"
 msgstr "L'utilisateur est déjà supprimé"
 
-#: models/models.py:626
+#: models/models.py:648
 msgid "User has been deleted successfully"
 msgstr "L'utilisateur a été supprimé avec succès."
 
-#: models/models.py:666
+#: models/models.py:688
 msgid "Password has been changed successfully."
 msgstr "Le mot de passe a été mis à jour avec succès."
 
-#: models/models.py:674
+#: models/models.py:696
 msgid "The user has been restored successfully."
 msgstr "L'utilisateur a été restauré avec succès."
 
-#: models/models.py:710
+#: models/models.py:732
 msgid "The notification was sent successfully."
 msgstr "La notification a été envoyée avec succès."
 
-#: models/models.py:721
+#: models/models.py:743
 msgid "`password` must be a string."
 msgstr "`mot de passe` doit être une chaîne."
 
-#: models/models.py:725
+#: models/models.py:747
 msgid "User password is valid."
 msgstr "Le mot de passe utilisateur est valide."
 
-#: models/models.py:782
+#: models/models.py:801
 msgid "Notification"
 msgstr "Notification"
 
-#: models/models.py:783
+#: models/models.py:802
 msgid "Notifications"
 msgstr "Notifications"
 
-#: models/models.py:790
+#: models/models.py:809
 msgid "Date sent"
 msgstr "Date d'envoi"
 
-#: models/models.py:791
+#: models/models.py:810
 msgid "Title"
 msgstr "Titre"
 
-#: models/models.py:792
+#: models/models.py:811
 msgid "Content"
 msgstr "Contenu"
 
-#: models/models.py:794
+#: models/models.py:813
 msgid "Category"
 msgstr "Catégories"
 
-#: models/models.py:800
+#: models/models.py:819
 msgid "URL"
 msgstr "URL"
 
-#: models/models.py:801
+#: models/models.py:820
 msgid "Action URL"
 msgstr "URL d'action"
 
-#: models/models.py:813
+#: models/models.py:832
 msgid "Seen by"
 msgstr "Vu par"
 
-#: models/models.py:840
+#: models/models.py:859
 msgid "You must specify either target users or target groups."
 msgstr "Vous devez spécifier les utilisateurs cibles ou les groupes cibles."
 
-#: models/models.py:854
+#: models/models.py:873
 msgid "The notification has been created successfully."
 msgstr "La notification a été créée avec succès."
 
-#: models/models.py:933
+#: models/models.py:952
 msgid "Backup"
 msgstr "Backup"
 
-#: models/models.py:934
+#: models/models.py:953
 msgid "Backups"
 msgstr "Les Sauvegardes"
 
-#: models/models.py:938
-msgid "Can add backup"
-msgstr "Ajouter une sauvegarde"
+#: models/models.py:955
+#, fuzzy
+#| msgid "Backup failed"
+msgid "Backup name"
+msgstr "Détails sauvegarde"
 
-#: models/models.py:939
-msgid "Can delete backup"
-msgstr "Supprimer la sauvegarde"
-
-#: models/models.py:940
-msgid "Can soft backup"
-msgstr "Sauvegarde logicielle CAN"
-
-#: models/models.py:941
-msgid "Can view backup"
-msgstr "Afficher la sauvegarde"
-
-#: models/models.py:945
+#: models/models.py:957
 msgid "Backup type"
 msgstr "Type de sauvegarde :"
 
-#: models/models.py:949
+#: models/models.py:961
 msgid "Status"
 msgstr "Statut"
 
-#: models/models.py:953
+#: models/models.py:965
 msgid "Backup file"
 msgstr "Fichier de sauvegarde "
 
-#: models/models.py:987
+#: models/models.py:997
 msgid "Backup has been deleted successfully."
 msgstr "A été supprimé avec succès."
 
-#: models/models.py:992
+#: models/models.py:1002
 msgid ""
-"A backup is already running, please wait until it's finished before starting"
-" a new one."
+"A backup is already running, please wait until it's finished before starting "
+"a new one."
 msgstr ""
-"Une sauvegarde est déjà en cours d'exécution, veuillez attendre qu'elle soit"
-" terminée avant d'en démarrer une nouvelle."
+"Une sauvegarde est déjà en cours d'exécution, veuillez attendre qu'elle soit "
+"terminée avant d'en démarrer une nouvelle."
 
-#: models/models.py:1033
+#: models/models.py:1047
 msgid "Backup has been started, you will get notified once it is finished."
 msgstr ""
 "La sauvegarde a été démarrée, vous serez averti une fois qu'elle sera "
 "terminée."
 
-#: models/models.py:1068
+#: models/models.py:1082
 msgid "Backup complete"
 msgstr "Sauvegarde terminée"
 
-#: models/models.py:1069
+#: models/models.py:1083
 #, python-format
 msgid "A %s that was started on %s is finished successfully."
 msgstr "Un %s qui a été démarré sur %s est terminé avec succès."
 
-#: models/models.py:1078
+#: models/models.py:1092
 msgid "Backup failed"
 msgstr "Détails sauvegarde"
 
-#: models/models.py:1079
+#: models/models.py:1093
 #, python-format
 msgid ""
 "A %s that was started on %s has failed.\n"
@@ -810,125 +769,209 @@ msgstr ""
 "Un %s qui a été démarré sur %s a échoué.\n"
 "Erreur : %s"
 
-#: serializers/backup_serializers.py:11
-msgid "Name"
-msgstr "Nom"
+#: project_settings.py:206
+msgid "Arabic"
+msgstr ""
 
-#: serializers/base_serializers.py:54
+#: project_settings.py:207
+msgid "Frensh"
+msgstr ""
+
+#: serializers/base_serializers.py:64
 msgid "You can not create or update objects using a read-only serializer."
 msgstr ""
 "Vous ne pouvez pas créer ou mettre à jour des objets à l'aide d'un "
 "sérialiseur en lecture seule."
 
 #: serializers/notififaction_serializers.py:13
+#, fuzzy
+#| msgid "Notifications"
+msgid "Notifications ids"
+msgstr "Notifications"
+
+#: serializers/notififaction_serializers.py:34
 msgid "Seen"
 msgstr "Vu"
 
-#: serializers/notififaction_serializers.py:55
+#: serializers/notififaction_serializers.py:76
 msgid "You must specify either target groups or target users."
 msgstr "Vous devez spécifier des groupes cibles ou des utilisateurs cibles."
 
-#: serializers/serializers.py:29
+#: serializers/serializers.py:17
+#, fuzzy
+#| msgid "Code name"
+msgid "Class name"
+msgstr "Nom du code"
+
+#: serializers/serializers.py:19
+msgid "Result"
+msgstr ""
+
+#: serializers/serializers.py:21
+msgid "Message"
+msgstr ""
+
+#: serializers/serializers.py:22
+msgid "Errors"
+msgstr ""
+
+#: serializers/serializers.py:23
+msgid "Error code"
+msgstr ""
+
+#: serializers/serializers.py:24
+msgid "Object ID"
+msgstr ""
+
+#: serializers/serializers.py:54
 msgid "Current password"
 msgstr "Mot de passe actuel"
 
-#: serializers/serializers.py:32
+#: serializers/serializers.py:57
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: serializers/serializers.py:35
+#: serializers/serializers.py:60
 msgid "Confirm new password"
 msgstr "Confirmer le nouveau mot de passe"
 
-#: serializers/serializers.py:49
+#: serializers/serializers.py:74
 msgid "The current password does not match!"
 msgstr "Le mot de passe actuel ne correspond pas !"
 
-#: serializers/serializers.py:61 serializers/user_serializers.py:117
+#: serializers/serializers.py:86 serializers/user_serializers.py:122
 msgid "Password confirmation is not valid!"
 msgstr "La confirmation du mot de passe n'est pas valide !"
 
-#: serializers/serializers.py:79
+#: serializers/serializers.py:104
 msgid "Code name"
 msgstr "Nom du code"
 
-#: serializers/user_serializers.py:25
+#: serializers/user_serializers.py:26
 msgid "You can't create or update objects using a read-only serializer."
 msgstr ""
 "Vous ne pouvez pas créer ou mettre à jour des objets à l'aide d'un "
 "sérialiseur en lecture seule."
 
-#: serializers/user_serializers.py:89
+#: serializers/user_serializers.py:94
 msgid "Password confirmation"
 msgstr "Confirmation du mot de passe"
 
-#: serializers/user_serializers.py:137
+#: serializers/user_serializers.py:142
 msgid "You can not update a user using this serializer."
 msgstr ""
 "Vous ne pouvez pas mettre à jour un utilisateur à l'aide de ce sérialiseur."
 
-#: serializers/user_serializers.py:190 serializers/user_serializers.py:235
+#: serializers/user_serializers.py:195 serializers/user_serializers.py:240
 msgid "You can not create a user using this serializer."
 msgstr "Vous ne pouvez pas créer d'utilisateur à l'aide de ce sérialiseur."
 
-#: serializers/user_serializers.py:252
+#: serializers/user_serializers.py:257
 msgid "Incorrect password, please verify that 'All caps' is disabled."
 msgstr ""
 "Mot de passe incorrect, veuillez vérifier que « Tous les majuscules » est "
 "désactivé."
 
-#: serializers/user_serializers.py:264
+#: serializers/user_serializers.py:269
 msgid "Extra attributes"
 msgstr "Attributs supplémentaires"
 
-#: serializers/user_serializers.py:267
+#: serializers/user_serializers.py:272
 msgid "Attributes related to an object that is related to the current user."
 msgstr "Attributs liés à un objet lié à l'utilisateur actuel."
 
-#: serializers/user_serializers.py:337
+#: serializers/user_serializers.py:342
 msgid "groups names must be a list of names."
 msgstr "les noms de groupes doivent être une liste de noms."
 
-#: serializers/user_serializers.py:343
+#: serializers/user_serializers.py:348
 msgid "Invalid group choice."
 msgstr "Choix de groupe invalide."
 
 #: services/import_export.py:59 services/import_export.py:141
-#: utils/xlsx_utils.py:300
+#: utils/xlsx_utils.py:321
 msgid "File exported successfully"
 msgstr "Fichier exporté avec succès"
 
-#: settings.py:13
+#: settings.py:24
+msgid "Firebase is not installed"
+msgstr "Firebase n'est pas installé"
+
+#: settings.py:28
+msgid "Firebase credentials file does not exist."
+msgstr "Le fichier d'informations d'identification Firebase n'existe pas."
+
+#: settings.py:53
 msgid "Female"
 msgstr "Féminin"
 
-#: settings.py:13
+#: settings.py:53
 msgid "Male"
 msgstr "Homme"
 
-#: settings.py:15
+#: settings.py:55
 msgid "Alert"
 msgstr "Alerte"
 
-#: settings.py:56
+#: settings.py:95
+msgid "Success"
+msgstr ""
+
+#: settings.py:96
+msgid "Warning"
+msgstr ""
+
+#: settings.py:97
+msgid "Error"
+msgstr ""
+
+#: settings.py:101
 msgid "Full backup"
 msgstr "Sauvegarde totale"
 
-#: settings.py:57
+#: settings.py:102
 msgid "Database backup"
 msgstr "Sauvegarde de BdD"
 
-#: settings.py:61
+#: settings.py:106
 msgid "Running"
 msgstr "course à pied"
 
-#: settings.py:62
+#: settings.py:107
 msgid "Completed"
 msgstr "Complété"
 
-#: settings.py:63
+#: settings.py:108
 msgid "Failed"
 msgstr "Echoué"
+
+#: settings.py:135
+#, fuzzy
+#| msgid "The notification has been created successfully."
+msgid "This notification is sent when a new user is created."
+msgstr "La notification a été créée avec succès."
+
+#: settings.py:139
+#, fuzzy
+#| msgid "The notification was sent successfully."
+msgid "This notification is sent when a user is deleted."
+msgstr "La notification a été envoyée avec succès."
+
+#: settings.py:143
+msgid "This notification is sent when a new group is created."
+msgstr ""
+
+#: settings.py:147
+#, fuzzy
+#| msgid "The notification was sent successfully."
+msgid "This notification is sent when a group is deleted."
+msgstr "La notification a été envoyée avec succès."
+
+#: settings.py:151
+msgid ""
+"This notification is sent when a permission has been affected or revoked "
+"from a user or group."
+msgstr ""
 
 #: templates/lava/email/activation.html:4
 #, python-format
@@ -938,8 +981,8 @@ msgstr "Activation de compte sur %(site_name)s"
 #: templates/lava/email/activation.html:8
 #, python-format
 msgid ""
-"You're receiving this email because you need to finish activation process on"
-" %(site_name)s."
+"You're receiving this email because you need to finish activation process on "
+"%(site_name)s."
 msgstr ""
 "Vous recevez cet e-mail car vous devez terminer le processus d'activation "
 "sur %(site_name)s."
@@ -1040,8 +1083,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de"
-" passe pour votre compte d'utilisateur de %(site_name)s."
+"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de "
+"passe pour votre compte d'utilisateur de %(site_name)s."
 
 #: templates/lava/email/password_reset.html:10
 msgid "Please go to the following page and choose a new password:"
@@ -1075,59 +1118,68 @@ msgid ""
 "You're receiving this email because you requested a username reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de"
-" passe pour votre compte d'utilisateur de %(site_name)s."
+"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de "
+"passe pour votre compte d'utilisateur de %(site_name)s."
 
 #: templates/lava/email/username_reset.html:10
 #: templates/lava/email/username_reset.html:22
 msgid "Please go to the following page and choose a new username:"
 msgstr "Veuillez accéder à cette page pour choisir un nouveau mot de passe :"
 
-#: utils/utils.py:83
+#: utils/utils.py:78
 #, python-format
 msgid "invalid truth value %r"
 msgstr "valeur de vérité %r non valide"
 
-#: utils/utils.py:407
-msgid "Firebase is not installed"
-msgstr "Firebase n'est pas installé"
-
-#: utils/utils.py:411
-msgid "Firebase credentials file does not exist."
-msgstr "Le fichier d'informations d'identification Firebase n'existe pas."
-
-#: utils/xlsx_utils.py:115
+#: utils/xlsx_utils.py:123
 #, python-format
 msgid "The uploaded file does not contain a column named '%s'."
 msgstr "Le fichier téléchargé ne contient pas de colonne nommée '%s'."
 
-#: utils/xlsx_utils.py:298
+#: utils/xlsx_utils.py:319
 msgid "The tmp file could not be created!"
 msgstr "Impossible de créer le fichier."
 
-#: validators.py:10
+#: validators.py:15
 msgid "This field is required"
 msgstr "Cette donnée est requise"
 
-#: validators.py:29 validators.py:36
+#: validators.py:34 validators.py:41
 msgid "A user with that email already exists."
 msgstr "Un utilisateur est déjà associé à cette adresse e-mail"
 
-#: validators.py:46
+#: validators.py:51
 msgid "A local url must start with a forward slash `/`"
 msgstr "Une URL locale doit commencer par une barre oblique «/»"
 
-#: validators.py:63
+#: validators.py:60
+#, python-format
+msgid ""
+"Ensure this value has exactly %(limit_value)d character (it only has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has exactly %(limit_value)d characters (it only has "
+"%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: validators.py:78
+#, fuzzy
+#| msgid "Invalid group choice."
+msgid "Invalid QR code"
+msgstr "Choix de groupe invalide."
+
+#: validators.py:92
 msgid "The notifications settings must be a dictionary."
 msgstr "Les paramètres de notification doivent être un dictionnaire."
 
-#: validators.py:69
+#: validators.py:98
 #, python-format
 msgid "`%(key)s` is not a valid key for notifications settings."
 msgstr ""
 "`%(key)s`n' est pas une clé valide pour les paramètres de notifications."
 
-#: validators.py:75
+#: validators.py:104
 #, python-format
 msgid "The value of `%(key)s` is not a valid boolean value."
 msgstr "La valeur de `%(key)s`n' est pas une valeur booléenne valide."
@@ -1136,7 +1188,7 @@ msgstr "La valeur de `%(key)s`n' est pas une valeur booléenne valide."
 msgid "'device_id' field is mandatory."
 msgstr "Le champ 'device_id' est obligatoire."
 
-#: views/api_views/api_views.py:154
+#: views/api_views/api_views.py:170
 msgid ""
 "This site is under maintenance. Our team is working hard to resolve the "
 "issues as soon as possible. Please come back later."
@@ -1145,6 +1197,84 @@ msgstr ""
 "résoudre les problèmes le plus rapidement possible. Veuillez revenir plus "
 "tard."
 
-#: views/api_views/user_api_views.py:73
+#: views/api_views/user_api_views.py:60
 msgid "Password has been changed successfully!"
 msgstr "Mot de passe changé avec succès "
+
+#~ msgid "Can add permissions"
+#~ msgstr "Peut ajouter des autorisations"
+
+#~ msgid "Can view permission details"
+#~ msgstr "Peut afficher les détails d'une autorisation"
+
+#~ msgid "Can update permissions"
+#~ msgstr "Mettre à jour les autorisations"
+
+#~ msgid "Can delete permissions"
+#~ msgstr "Peut supprimer des autorisations"
+
+#~ msgid "Can view permissions list"
+#~ msgstr "Peut afficher la liste des autorisations"
+
+#~ msgid "Can export permissions"
+#~ msgstr "Peut exporter les autorisations"
+
+#~ msgid "Can add group"
+#~ msgstr "Peut ajouter groupe"
+
+#~ msgid "Can update group"
+#~ msgstr "Peut modifier groupe"
+
+#~ msgid "Can delete group"
+#~ msgstr "Peut supprimer definitivement un groupe"
+
+#~ msgid "Can soft delete group"
+#~ msgstr "Peut supprimer un groupe"
+
+#~ msgid "Can view group"
+#~ msgstr "Peut voir groupe "
+
+#~ msgid "Can view group list"
+#~ msgstr "Peut afficher la liste des groupes"
+
+#~ msgid "Can view deleted groups"
+#~ msgstr "Voir les groupe supprimées"
+
+#~ msgid "Can restore group"
+#~ msgstr "Peut restaurer le groupe"
+
+#~ msgid "Can add user"
+#~ msgstr "Peut ajouter un utilisateur"
+
+#~ msgid "Can change user"
+#~ msgstr "Changer d'utilisateur"
+
+#~ msgid "Can delete user"
+#~ msgstr "Supprimer l'utilisateur"
+
+#~ msgid "Can soft delete user"
+#~ msgstr "Peut supprimer l'utilisateur en douceur"
+
+#~ msgid "Can view user"
+#~ msgstr "Peut voir l'utilisateur"
+
+#~ msgid "Can view users list"
+#~ msgstr "Peut afficher la liste des utilisateurs"
+
+#~ msgid "Can restore user"
+#~ msgstr "Peut restaurer l'utilisateur"
+
+#~ msgid "Can add backup"
+#~ msgstr "Ajouter une sauvegarde"
+
+#~ msgid "Can delete backup"
+#~ msgstr "Supprimer la sauvegarde"
+
+#~ msgid "Can soft delete backup"
+#~ msgstr "Peut supprimer definitivement une sauvegarde"
+
+#~ msgid "Can view backup"
+#~ msgstr "Peut afficher la sauvegarde"
+
+#~ msgid "Name"
+#~ msgstr "Nom"

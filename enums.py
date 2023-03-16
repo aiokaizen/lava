@@ -7,14 +7,14 @@ class DeletePolicy(enum.Enum):
 
 
 class PermissionActionName(enum.Enum):
-    Add = "add"
-    Change = "change"
-    SoftDelete = "soft_delete"
-    View = "view"
     List = "list"
-    ViewTrash = "view_trash"
-    Delete = "delete"
-    Restore = "restore"
+    Add = "add"
+    View = "view"
+    Change = "change"
     Duplicate = "duplicate"
-    Export = "export"
+    SoftDelete = "soft_delete"
+    ViewTrash = "view_trash"
+    Restore = "restore"
+    Delete = "delete"
     Import = "import"
+    Export = "export"

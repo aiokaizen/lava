@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Backup',
                 'verbose_name_plural': 'Backups',
                 'ordering': ('-created_at',),
-                'permissions': (('add_backup', 'Can add backup'), ('delete_backup', 'Can delete backup'), ('soft_delete_backup', 'Can soft backup'), ('list_backup', 'Can view backup')),
+                'permissions': (('add_backup', 'Can add backup'), ('delete_backup', 'Can delete backup'), ('soft_delete_backup', 'Can soft delete backup'), ('list_backup', 'Can view backup')),
                 'default_permissions': (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),

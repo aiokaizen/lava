@@ -174,13 +174,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         proxy = True
         default_permissions = ()
         permissions = (
-            ('add_permission', _("Can add permissions")),
-            ('view_permission', _("Can view permission details")),
-            ('change_permission', _("Can update permissions")),
-            ('delete_permission', _("Can delete permissions")),
-            ('list_permission', _("Can view permissions list")),
             ('set_permission', _("Can set permissions")),
-            ('export_permissions', _("Can export permissions")),
         )
 
     def create(self, user=None, *args, **kwargs):
@@ -236,16 +230,6 @@ class Group(BaseModelMixin, BaseGroupModel):
         ordering = ("name", )
         proxy = True
         default_permissions = ()
-        permissions = (
-            ('add_group', _("Can add group")),
-            ('change_group', _("Can update group")),
-            ('delete_group', _("Can delete group")),
-            ('soft_delete_group', _("Can soft delete group")),
-            ('view_group', _("Can view group")),
-            ('list_group', _("Can view group list")),
-            ('view_trash_group', _("Can view deleted groups")),
-            ('restore_group', _("Can restore group")),
-        )
 
     # description = models.TextField(_('Description'), default='', blank=True)
     # image = ThumbnailerImageField(
@@ -374,14 +358,6 @@ class User(AbstractUser, BaseModel):
         ordering = ("-date_joined", "last_name", "first_name")
         default_permissions = ()
         permissions = (
-            ('add_user', _("Can add user")),
-            ('change_user', _("Can change user")),
-            ('delete_user', _("Can delete user")),
-            ('soft_delete_user', _("Can soft delete user")),
-            ('view_user', _("Can view user")),
-            ('list_user', _("Can view users list")),
-            ('restore_user', _("Can restore user")),
-
             ('change_current_user', _("Can change user profile")),
             ('delete_current_user', _("Can delete user profile")),
             ('soft_delete_current_user', _("Can soft delete user profile")),
@@ -972,17 +948,9 @@ class Notification(models.Model):
 
 class Backup(BaseModel):
 
-    class Meta:
+    class Meta(BaseModel.Meta):
         verbose_name = _("Backup")
         verbose_name_plural = _("Backups")
-        ordering = ("-created_at", )
-        default_permissions = ()
-        permissions = (
-            ('add_backup', _("Can add backup")),
-            ('delete_backup', _("Can delete backup")),
-            ('soft_delete_backup', _("Can soft backup")),
-            ('list_backup', _("Can view backup")),
-        )
 
     name = models.CharField(_("Backup name"), max_length=256, blank=True)
     type = models.CharField(

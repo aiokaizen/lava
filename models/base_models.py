@@ -17,8 +17,8 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
-from lava.utils import Result
 from lava.enums import DeletePolicy
+from lava.utils import Result, camelcase_to_snakecase
 
 
 class BaseModelMixin:
@@ -215,6 +215,33 @@ class BaseModelMixin:
         )
 
     @classmethod
+    def _create_default_permissions(cls):
+
+        from django.utils.text import camel_case_to_spaces
+
+        class_name = cls.__name__
+        verbose_name = cls._meta.verbose_name
+        verbose_name_plural = cls._meta.verbose_name_plural
+        # Snake Case eg: GroupPermission > group_permission
+        sc_class_name = camelcase_to_snakecase(class_name)
+
+        verbose_name = verbose_name or camel_case_to_spaces(class_name)
+        verbose_name_plural = verbose_name_plural or f"{verbose_name}s"
+        return (
+            (f'list_{sc_class_name}', _("Can list %s" % (verbose_name_plural, ))),
+            (f'add_{sc_class_name}', _("Can add %s" % (verbose_name, ))),
+            (f'view_{sc_class_name}', _("Can view %s" % (verbose_name, ))),
+            (f'change_{sc_class_name}', _("Can update %s" % (verbose_name, ))),
+            (f'duplicate_{sc_class_name}', _("Can duplicate %s" % (verbose_name, ))),
+            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name, ))),
+            (f'view_trash_{sc_class_name}', _("Can view deleted %s" % (verbose_name, ))),
+            (f'restore_{sc_class_name}', _("Can restore %s" % (verbose_name, ))),
+            (f'delete_{sc_class_name}', _("Can delete %s" % (verbose_name, ))),
+            (f'import_{sc_class_name}', _("Can import %s list" % (verbose_name_plural, ))),
+            (f'export_{sc_class_name}', _("Can export %s list" % (verbose_name_plural, ))),
+        )
+
+    @classmethod
     def get_all_items(cls):
         return cls.objects.all() | cls.trash.all()
 
@@ -331,22 +358,9 @@ class BaseModelMixin:
 class BaseModel(BaseModelMixin, models.Model):
 
     class Meta:
-        verbose_name = "Base Model"
-        verbose_name_plural = "Base Models"
         abstract = True
         ordering = ('-created_at', )
         default_permissions = ()
-        # _class_name = label_lower.split('.')[1]
-        _class_name = "object"
-        permissions = (
-            ('add_object', _("Can add %s" % (_class_name, ))),
-            ('change_object', _("Can update %s" % (_class_name, ))),
-            ('delete_object', _("Can delete %s" % (_class_name, ))),
-            ('soft_delete_object', _("Can soft delete %s" % (_class_name, ))),
-            ('view_object', _("Can view %s" % (_class_name, ))),
-            ('list_object', _("Can list %s" % (_class_name, ))),
-            ('restore_object', _("Can restore %s" % (_class_name, ))),
-        )
 
     created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
     created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
