@@ -1,20 +1,29 @@
+from typing import Union
+
 from rest_framework.permissions import IsAuthenticated
 
 from lava.enums import PermissionActionName
+from lava.utils.utils import camelcase_to_snakecase
 
 
 # Generic Model PERMISSIONS
-def has_permission(model, user, action:PermissionActionName):
+def has_permission(user, model, action: Union[PermissionActionName, str]):
     """
     Checks if a user has the permission to perform the action on the specified model.
+    If action type is 'str' the model param is not used.
     """
     app_label = model._meta.app_label
-    permission_name = f"{action.value}_{model.__name__.lower()}"
+    permission_name = action
+
+    if not isinstance(action, str):
+        model_name = camelcase_to_snakecase(model.__name__)
+        permission_name = f"{action.value}_{model_name}"
+
     has_perm = user.has_perm(f"{app_label}.{permission_name}")
     return has_perm
 
 
-def get_model_base_permission_class(model, action:PermissionActionName):
+def get_model_permission_class(model, action: Union[PermissionActionName, str]):
     """
     Returns a PermissionClass that checks if a user has the permission to perform
     the action on the specified model.
@@ -25,7 +34,7 @@ def get_model_base_permission_class(model, action:PermissionActionName):
         def has_permission(self, request, view):
             is_authenticated = super().has_permission(request, view)
             user = request.user
-            return is_authenticated and has_permission(model, user, action)
+            return is_authenticated and has_permission(user, model, action)
 
     return PermissionClass
 

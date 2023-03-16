@@ -14,7 +14,7 @@ from lava.enums import PermissionActionName
 from lava.messages import ACTION_NOT_ALLOWED
 from lava.pagination import LavaPageNumberPagination
 from lava.serializers.serializers import ResultSerializer
-from lava.services.permissions import get_model_base_permission_class
+from lava.services.permissions import get_model_permission_class
 from lava.services.class_permissions import ActionNotAllowed
 from lava.utils import Result
 
@@ -22,6 +22,7 @@ from lava.utils import Result
 class BaseModelViewSet(ModelViewSet):
 
     pagination_class = LavaPageNumberPagination
+    permission_classes = [permissions.IsAuthenticated]
 
     serializer_class = None
     list_serializer_class = None
@@ -87,39 +88,39 @@ class BaseModelViewSet(ModelViewSet):
 
         if self.action == 'create':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.Add)
+                get_model_permission_class(ActiveModel, PermissionActionName.Add)
             ])
         elif self.action in ['update', 'partial_update']:
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.Change)
+                get_model_permission_class(ActiveModel, PermissionActionName.Change)
             ])
         elif self.action == 'destroy':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.SoftDelete)
+                get_model_permission_class(ActiveModel, PermissionActionName.SoftDelete)
             ])
         elif self.action == 'retrieve':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.View)
+                get_model_permission_class(ActiveModel, PermissionActionName.View)
             ])
         elif self.action == 'list':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.List)
+                get_model_permission_class(ActiveModel, PermissionActionName.List)
             ])
         elif self.action in ['view_trash', 'view_trash_item']:
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.ViewTrash)
+                get_model_permission_class(ActiveModel, PermissionActionName.ViewTrash)
             ])
         elif self.action == 'hard_delete':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.Delete)
+                get_model_permission_class(ActiveModel, PermissionActionName.Delete)
             ])
         elif self.action == 'restore':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.Restore)
+                get_model_permission_class(ActiveModel, PermissionActionName.Restore)
             ])
         elif self.action == 'duplicate':
             permission_classes.extend([
-                get_model_base_permission_class(ActiveModel, PermissionActionName.Duplicate)
+                get_model_permission_class(ActiveModel, PermissionActionName.Duplicate)
             ])
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]

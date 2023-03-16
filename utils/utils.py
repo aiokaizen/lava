@@ -5,6 +5,7 @@ from datetime import datetime
 import unicodedata
 import zipfile
 import subprocess
+import re
 
 from PIL import Image as PILImage
 
@@ -55,7 +56,7 @@ class odict(dict):
         dict.__init__(self, *args, **kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
-    
+
     def __setitem__(self, __key, __value):
         key = slugify(__key).replace('-', '_')
         setattr(self, key, __value)
@@ -86,7 +87,7 @@ def contains_arabic_chars(val:str):
         unicode_name = unicodedata.name(c).lower()
         if 'arabic' in unicode_name:
             return True
-    
+
     return False
 
 
@@ -162,7 +163,7 @@ class Result(imdict):
             result_dict.get("class_name", "") != "lava.utils.Result"
         ):
             raise TypeError("Invalid result dict format.")
-        
+
         tag = result_dict["result"]
         is_success = True if tag == "success" else False
 
@@ -192,7 +193,12 @@ class Result(imdict):
         if self.instance:
             res_dict["object_id"] = self.instance.id
         return res_dict
-    
+
+
+def camelcase_to_snakecase(value):
+    pattern = re.compile(r'(?<!^)(?=[A-Z])')
+    return pattern.sub('_', value).lower()
+
 
 def mask_number(n):
     """This function disguises an ID before using it in a public context."""
@@ -244,7 +250,7 @@ def get_or_create(klass, action_user=None, default_value=None, create_parmas=Non
         result = instance.create(user=action_user, **create_parmas)
         if not result:
             raise LavaBaseException(result)
-    
+
     return instance
 
 
@@ -341,7 +347,7 @@ def get_image(image_path, target_width=None, target_height=None, margin=None, co
         image.save(tmp_image_filename)
         image.close()
         image = PILImage.open(tmp_image_filename)
-    
+
     return image
 
 
@@ -448,15 +454,15 @@ def zipdir(target_dir, output=None, mode='w', skip_dirs=None):
                 if path_includes_dir(root, skip_dir):
                     skip_root = True
                     break
-            
+
             if skip_root:
                 continue
 
             for file in files:
                 zipf.write(
-                    os.path.join(root, file), 
+                    os.path.join(root, file),
                     os.path.relpath(
-                        os.path.join(root, file), 
+                        os.path.join(root, file),
                         os.path.join(target_dir, '..')
                     )
                 )
@@ -481,7 +487,7 @@ def zipf(filename, output=None, ziph=None):
         zipf.write(
             filename,
             os.path.relpath(
-                filename, 
+                filename,
                 os.path.join(output_parent_dir)
             )
         )
