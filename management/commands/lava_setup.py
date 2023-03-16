@@ -25,14 +25,17 @@ class Command(BaseCommand):
 
         no_logs = options["no_logs"]
 
-        # Create the group 'ADMINS' if it does not exist
-        admins_group, _created = Group.objects.get_or_create(name="ADMINS")
-        Group.objects.get_or_create(name="STANDARD")  # Default group for signed up users
 
-        # Create default permissions
+        # Create base model default permissions
+        models_count = 0
+        perms_per_model = 0
         for model in apps.get_models():
             if hasattr(model, '_create_default_permissions'):
-                for code_name, verbose_name in model._create_default_permissions():
+                default_permissions = model._create_default_permissions()
+                models_count += 1
+                if models_count == 1:
+                    perms_per_model = len(default_permissions)
+                for code_name, verbose_name in default_permissions:
                     content_type = ContentType.objects.get_for_model(model)
                     Permission.objects.get_or_create(
                         codename=code_name,
@@ -42,8 +45,20 @@ class Command(BaseCommand):
                         }
                     )
 
+        perms_count = Permission.objects.count()
+        assert perms_count >= models_count * perms_per_model, (
+            f"The number of permissions created ({perms_count}) is less than the minimum "
+            f"enticipated number ({models_count * perms_per_model})"
+        )
+
+        # Create the group 'ADMINS' if it does not exist
+        admins_group, _created = Group.objects.get_or_create(name="ADMINS")
+        Group.objects.get_or_create(name="STANDARD")  # Default group for signed up users
+
         # Add all available permissions to group ADMINS
-        admins_group.permissions.add(*Permission.objects.all().values_list('id', flat=True))
+        admins_group.permissions.add(
+            *Permission.objects.all().values_list('id', flat=True)
+        )
 
         # Create notifications groups
         NotificationGroup.create_notification_groups()
