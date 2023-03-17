@@ -14,6 +14,7 @@ from lava.serializers import (
     PreferencesSerializer,
 )
 from lava.models import Notification, Preferences, User
+from lava.serializers.serializers import PermissionSerializer
 from lava.utils import Result
 from lava.services import permissions as lava_permissions
 
@@ -63,7 +64,8 @@ def update_device_id(request):
 def get_user_permissions(request):
     user = request.user
     perms = user.get_all_permissions()
-    return Response(perms)
+    serializer = PermissionSerializer(perms, many=True)
+    return Response(serializer.data)
 
 
 class PreferencesViewSet(mixins.ListModelMixin, GenericViewSet):
