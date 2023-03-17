@@ -1139,7 +1139,4 @@ class Backup(BaseModel):
 
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
 
-        if user and not can_list_backup(user):
-            return base_queryset.none()
-
         return base_queryset.filter(filter_params)

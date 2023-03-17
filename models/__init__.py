@@ -3,3 +3,4 @@ from .models import (
     LogEntry, Backup, NotificationGroup
 )
 from .base_models import BaseModel
+from .utility_models import Address
