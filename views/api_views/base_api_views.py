@@ -324,20 +324,17 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
-        permission_classes = super().permission_classes()
 
-        if self.action == 'create':
-            permission_classes = [ActionNotAllowed]
-        elif self.action in ['update', 'partial_update']:
-            permission_classes = [ActionNotAllowed]
-        elif self.action == 'destroy':
-            permission_classes = [ActionNotAllowed]
-        elif self.action in ['view_trash', 'view_trash_item']:
-            permission_classes = [ActionNotAllowed]
-        elif self.action == 'hard_delete':
-            permission_classes = [ActionNotAllowed]
-        elif self.action == 'restore':
-            permission_classes = [ActionNotAllowed]
-        elif self.action == 'duplicate':
-            permission_classes = [ActionNotAllowed]
+        permission_classes = [ActionNotAllowed]
+        ActiveModel = self.queryset.model
+
+        if self.action == 'retrieve':
+            permission_classes.extend([
+                get_model_permission_class(ActiveModel, PermissionActionName.View)
+            ])
+        elif self.action == 'list':
+            permission_classes.extend([
+                get_model_permission_class(ActiveModel, PermissionActionName.List)
+            ])
+
         return [permission() for permission in permission_classes]
