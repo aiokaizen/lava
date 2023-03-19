@@ -14,6 +14,7 @@ from lava.serializers import (
     NotificationSerializer,
     PreferencesSerializer,
 )
+from lava.serializers.serializers import ListIDsSerializer
 from lava.utils import Result
 from lava.services import permissions as lava_permissions
 
@@ -132,15 +133,20 @@ class NotificationViewSet(ReadOnlyModelViewSet):
 
         return Response(serializer.data)
 
+    @action(detail=False, methods=["GET"])
+    def unread(self, request, *args, **kwargs):
+        self.user = request.user
+        queryset = self.user.get_unread_notifications()
+        serializer = self.get_serializer(instance=queryset, user=self.user, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=["POST"])
     def mark_as_read(self, request, *args, **kwargs):
         user = request.user
         self.user = user
-        data = request.data
-        notification_ids = []
-        if "notifications" in data:
-            notification_ids = data["notifications"]
-
+        serializer = ListIDsSerializer(data=request.data, model=Notification, trash=False)
+        serializer.is_valid(raise_exception=True)
+        queryset = serializer.validated_data["list_ids"]
         result = Notification.mark_as_read_bulk(queryset, self.user)
         if not result:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)

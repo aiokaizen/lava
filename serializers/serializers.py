@@ -34,6 +34,30 @@ class ResultSerializer(serializers.Serializer):
         ]
 
 
+class ListIDsSerializer(serializers.Serializer):
+
+    list_ids = serializers.ListField(label=_("IDs"), required=True)
+
+    def __init__(self, instance=None, data=empty, model=None, trash=False, **kwargs):
+        assert model is not None, (
+            "Make sure that `model` parameter is different that None."
+        )
+        self.model = model
+        self.trash = trash
+        super().__init__(instance, data, **kwargs)
+
+    def validate_list_ids(self, value):
+        manager = self.model.trash if self.trash else self.model.objects
+        try:
+            qset = manager.filter(pk__in=value)
+        except ValueError:
+            raise serializers.ValidationError(_("One or more IDs is not valid."))
+
+        if len(value) != qset.count():
+            raise serializers.ValidationError(_("One or more IDs is not valid."))
+        return qset
+
+
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -114,7 +138,7 @@ class PermissionSerializer(BaseModelSerializer):
         read_only_fields = [
             "id", "codename"
         ]
-    
+
     @extend_schema_field(str)
     def get_codename(self, obj):
         return f"{obj.content_type.app_label}.{obj.content_type.model}.{obj.codename}"

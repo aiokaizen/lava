@@ -697,6 +697,12 @@ class User(BaseModel, AbstractUser):
         )
         return notifications
 
+    def get_unread_notifications(self):
+        notifications = Notification.objects.filter(
+            Q(target_users=self.id) | Q(target_groups__in=self.groups.all())
+        ).exclude(seen_by__contains=self.id)
+        return notifications
+
     def send_notification(
         self,
         title,
@@ -879,7 +885,7 @@ class Notification(models.Model):
         """Call this function when a user have seen the notification."""
         if user.id not in self.seen_by:
             self.seen_by.append(user.id)
-            self.save()
+            self.save(update_fields=['seen_by'])
 
     @classmethod
     def mark_as_read_bulk(cls, notifications, user):
@@ -888,6 +894,8 @@ class Notification(models.Model):
         """
         for notification in notifications:
             notification.mark_as_read(user)
+
+        return Result.success(_("The selected notifications have been marked as read."))
 
     def mark_as_not_read(self, user):
         """Call this function when a user marks the notification as not read."""

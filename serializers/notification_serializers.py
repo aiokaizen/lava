@@ -7,6 +7,27 @@ from lava.models import Notification
 from lava.serializers.user_serializers import UserExerptSerializer
 
 
+class BulkNotificationActionSerializer(serializers.ModelSerializer):
+
+    notifications_ids = serializers.ListField(
+        label=_("Notifications ids"), required=True
+    )
+
+    class Meta:
+        model = Notification
+        fields = [
+            "notifications_ids"
+        ]
+
+    def __init__(self, user, instance=None, data=empty, **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self.user = user
+    
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        
+
+
 class NotificationSerializer(serializers.ModelSerializer):
 
     sender = UserExerptSerializer(required=False)
