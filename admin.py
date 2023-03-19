@@ -1,10 +1,13 @@
 from django.contrib import admin, messages
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth.models import (
-    Group as BaseGroupModel
+    Group as BaseGroupModel, Permission
 )
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+
+from rest_framework.authtoken.models import TokenProxy
+from rest_framework.authtoken.admin import TokenAdmin
 
 from admin_interface.models import Theme
 
@@ -12,6 +15,12 @@ from lava.forms.main_forms import LavaUserChangeForm
 from lava.models import (
     Notification, Preferences, User, Group, Backup
 )
+
+
+# Unregister models
+admin.site.unregister(BaseGroupModel)
+admin.site.unregister(TokenProxy)
+admin.site.unregister(Theme)
 
 
 @admin.register(User)
@@ -256,6 +265,21 @@ class BaseModelAdmin(admin.ModelAdmin):
         return self.model.filter(user=request.user, kwargs=request.GET)
 
 
+@admin.register(TokenProxy)
+class LavaTokenAdmin(TokenAdmin):
+    class Meta:
+        app_label = 'lava'
+
+
+@admin.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
+
+    search_fields = ('codename', 'name')
+
+    class Meta:
+        app_label = 'lava'
+
+
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     pass
@@ -274,8 +298,3 @@ class NotificationAdmin(admin.ModelAdmin):
 @admin.register(Preferences)
 class PreferencesAdmin(admin.ModelAdmin):
     pass
-
-
-# Unregister models
-admin.site.unregister(Theme)
-admin.site.unregister(BaseGroupModel)

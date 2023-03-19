@@ -6,7 +6,6 @@ from lava.serializers.group_serializers import (
     GroupListSerializer, GroupGetSerializer, GroupCreateUpdateSerializer
 )
 from lava.models import Group
-from lava.services import class_permissions as lava_permissions
 from lava.views.api_views.base_api_views import BaseModelViewSet
 
 

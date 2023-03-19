@@ -317,7 +317,6 @@ class BaseModelViewSet(ModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
 
-
 class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
 
     pagination_class = LavaPageNumberPagination
@@ -329,12 +328,12 @@ class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
         ActiveModel = self.queryset.model
 
         if self.action == 'retrieve':
-            permission_classes.extend([
+            permission_classes = [
                 get_model_permission_class(ActiveModel, PermissionActionName.View)
-            ])
+            ]
         elif self.action == 'list':
-            permission_classes.extend([
+            permission_classes = [
                 get_model_permission_class(ActiveModel, PermissionActionName.List)
-            ])
+            ]
 
         return [permission() for permission in permission_classes]

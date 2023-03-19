@@ -233,7 +233,7 @@ class BaseModelMixin:
             (f'view_{sc_class_name}', _("Can view %s" % (verbose_name, ))),
             (f'change_{sc_class_name}', _("Can update %s" % (verbose_name, ))),
             (f'duplicate_{sc_class_name}', _("Can duplicate %s" % (verbose_name, ))),
-            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name, ))),
+            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name_plural, ))),
             (f'view_trash_{sc_class_name}', _("Can view deleted %s" % (verbose_name, ))),
             (f'restore_{sc_class_name}', _("Can restore %s" % (verbose_name, ))),
             (f'delete_{sc_class_name}', _("Can delete %s" % (verbose_name, ))),

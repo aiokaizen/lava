@@ -25,6 +25,11 @@ class Command(BaseCommand):
 
         no_logs = options["no_logs"]
 
+        # # Reset permissions:
+        # Permission.objects.all().delete()
+        # from django.utils import translation
+        # translation.activate('fr')
+        # print("current lang:", translation.get_language())
 
         # Create base model default permissions
         models_count = 0
@@ -35,8 +40,11 @@ class Command(BaseCommand):
                 models_count += 1
                 if models_count == 1:
                     perms_per_model = len(default_permissions)
+                # print(f"\nCreating permissions for {model.__name__}:")
                 for code_name, verbose_name in default_permissions:
                     content_type = ContentType.objects.get_for_model(model)
+                    # if code_name.startswith('list_') or code_name.startswith('add_'):
+                    #     print(f"\t{code_name}\t{verbose_name}")
                     Permission.objects.get_or_create(
                         codename=code_name,
                         content_type=content_type,

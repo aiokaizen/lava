@@ -20,7 +20,8 @@ def has_permission(user, model, action: Union[PermissionActionName, str]):
         permission_name = f"{action.value}_{model_name}"
 
     has_perm = user.has_perm(f"{app_label}.{permission_name}")
-    return has_perm
+    has_auth_perm = user.has_perm(f"auth.{permission_name}")
+    return has_perm or has_auth_perm
 
 
 def get_model_permission_class(model, action: Union[PermissionActionName, str]):
@@ -73,10 +74,10 @@ def can_export_permission(user):
 
 # ActivityJournal permissions
 def can_list_logentry(user):
-    has_perm = user.has_perm('lava.list_logentry')
+    has_perm = user.has_perm('lava.list_log_entry')
     return has_perm
 
 
 def can_export_logentry(user):
-    has_perm = user.has_perm('lava.export_logentry')
+    has_perm = user.has_perm('lava.export_log_entry')
     return has_perm

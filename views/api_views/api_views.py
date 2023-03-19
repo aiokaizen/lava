@@ -5,16 +5,15 @@ from rest_framework import permissions, generics, status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
-from lava.messages import HTTP_403_MESSAGE
 
+from lava.messages import HTTP_403_MESSAGE
+from lava.models import Notification, Preferences, User
 from lava.serializers import (
-    ChangePasswordFormSerializer,
+    PermissionSerializer,
     UserSerializer,
     NotificationSerializer,
     PreferencesSerializer,
 )
-from lava.models import Notification, Preferences, User
-from lava.serializers.serializers import PermissionSerializer
 from lava.utils import Result
 from lava.services import permissions as lava_permissions
 
@@ -110,8 +109,6 @@ class NotificationViewSet(ReadOnlyModelViewSet):
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
-        # if self.action == 'scan_ticket':
-        #     permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
@@ -134,6 +131,20 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         Notification.mark_as_read_bulk(queryset, self.user)
 
         return Response(serializer.data)
+
+    @action(detail=False, methods=["POST"])
+    def mark_as_read(self, request, *args, **kwargs):
+        user = request.user
+        self.user = user
+        data = request.data
+        notification_ids = []
+        if "notifications" in data:
+            notification_ids = data["notifications"]
+
+        result = Notification.mark_as_read_bulk(queryset, self.user)
+        if not result:
+            return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
+        return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["POST"])
     def send(self, request, *args, **kwargs):
