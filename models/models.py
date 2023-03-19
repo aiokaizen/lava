@@ -146,7 +146,7 @@ class LogEntry(BaseLogEntryModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None, include_admin_entries=False):
+    def filter(cls, user=None, kwargs=None, include_admin_entries=False, trash=False):
         filter_params = cls.get_filter_params(kwargs)
         exclude_params = {}
 
@@ -348,7 +348,7 @@ class NotificationGroup(Group):
         return queryset
 
 
-class User(AbstractUser, BaseModel):
+class User(BaseModel, AbstractUser):
 
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
@@ -656,7 +656,7 @@ class User(AbstractUser, BaseModel):
             self.account.delete()
 
         preferences = self.preferences
-        result = super().delete_alias(user=user, soft_delete=soft_delete)
+        result = super().delete(user=user, soft_delete=soft_delete)
         if result.is_error:
             return result
         if preferences:

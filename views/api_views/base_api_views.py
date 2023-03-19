@@ -317,10 +317,7 @@ class BaseModelViewSet(ModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
 
-class ReadOnlyBaseModelViewSet(ReadOnlyModelViewSet):
-
-    pagination_class = LavaPageNumberPagination
-    permission_classes = [permissions.IsAuthenticated]
+class ReadOnlyBaseModelViewSet(BaseModelViewSet):
 
     def get_permissions(self):
 

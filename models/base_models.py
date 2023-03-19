@@ -101,13 +101,6 @@ class BaseModelMixin:
         super().delete()
         return Result.success(self.delete_success_message)
 
-    def delete_alias(self, user=None, soft_delete=True):
-        """
-        This method is used in case of multi-inheritance, using super().delete()
-        in that case may call models.Model.delete() instead.
-        """
-        return self.delete(user=user, soft_delete=soft_delete)
-
     def duplicate(self, user=None, override_values=dict):
         klass = self.__class__
         new = klass()
