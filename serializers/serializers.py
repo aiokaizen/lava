@@ -1,5 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
+from django.http import QueryDict
+from django.apps import apps
 
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -142,3 +144,31 @@ class PermissionSerializer(BaseModelSerializer):
     @extend_schema_field(str)
     def get_codename(self, obj):
         return f"{obj.content_type.app_label}.{obj.content_type.model}.{obj.codename}"
+
+
+class ChoicesSerializer(serializers.Serializer):
+
+    class_name = serializers.ChoiceField(label="Class name", choices=lava_settings.CLASS_NAME_CHOICES)
+    query = serializers.CharField(label="Query")
+
+    class Meta:
+        fields = [
+            'class_name',
+            'query',
+        ]
+    
+    def validate_query(self, value):
+        if len(value) < 3:
+            raise serializers.ValidationError(_("The query parametter must have a length of 3 or more."))
+        return value
+
+    def validate(self, data):
+        validated_data = super().validate(data)
+        class_name = lava_settings.CLASS_NAME_CHOICES_MAPPING[validated_data['class_name']]
+        model = apps.get_model(*class_name.split('.'))
+        query = validated_data['query']
+        self.choices = [{
+            "id": obj.pk,
+            "label": getattr(obj, 'get_choices_display', lambda : None)() or str(obj),
+        } for obj in model.filter(kwargs=QueryDict(f'query={query}'))]
+        return validated_data

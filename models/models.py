@@ -421,6 +421,9 @@ class User(BaseModel, AbstractUser):
 
     objects = LavaUserManager()
 
+    def get_choices_display(self):
+        return f"{self.first_name} {self.last_name}"
+
     def groups_names(self):
         return self.groups.all().values_list("name", flat=True) if self.id else []
 

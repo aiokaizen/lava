@@ -166,3 +166,18 @@ NOTIFICATION_GROUPS_NAMES = {
         getattr(settings, 'NOTIFICATION_GROUPS_NAMES', {})
     )
 }
+
+
+CLASS_NAME_CHOICES = (
+    ("users", _("Users")),
+    ("groups", _("Groups")),
+    ("permissions", _("Permissions")),
+    *getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES", [])
+)
+
+CLASS_NAME_CHOICES_MAPPING = {
+    "users": 'lava.User',
+    "groups": 'lava.Group',
+    "permissions": 'lava.Permission',
+    **getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES_MAPPING", {})
+}
