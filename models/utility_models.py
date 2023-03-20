@@ -32,13 +32,18 @@ class Address(BaseModel):
 
     def in_use(self):
         """ returns True if the address is already used in the system. """
+        for field in self._meta.get_fields():
+            if not isinstance(field, models.ForeignObjectRel):
+                continue
+
+            if field.multiple:  # ManyToOne or ManyToMany Relation
+                if getattr(self, field.get_accessor_name()).exists():
+                    return True
+            else:  # OneToOne Relation
+                if getattr(self, field.get_accessor_name(), None):
+                    return True
 
         return False
-        # return (
-        #     Person.objects.filter(address=self.address).exists() or
-        #     Entity.objects.filter(address=self.address).exists() or
-        #     Store.objects.filter(address=self.address).exists()
-        # )
 
     @classmethod
     def get_filter_params(cls, user=None, kwargs=None):
