@@ -10,7 +10,7 @@ import re
 from PIL import Image as PILImage
 
 from django.conf import settings
-from django.utils.text import slugify
+from django.utils.text import slugify as base_slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.context import make_context
@@ -21,6 +21,12 @@ from templated_mail.mail import BaseEmailMessage
 from lava.exceptions import LavaBaseException
 
 from lava import settings as lava_settings
+
+
+
+def slugify(value, allow_unicode=False, separator='_'):
+    result = base_slugify(value, allow_unicode).replace('-', separator)
+    return result
 
 
 class imdict(dict):
