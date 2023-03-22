@@ -156,10 +156,10 @@ class ChoicesSerializer(serializers.Serializer):
             'class_name',
             'query',
         ]
-    
+
     def validate_query(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError(_("The query parametter must have a length of 3 or more."))
+        if len(value) < 2:
+            raise serializers.ValidationError(_("The query parametter must have a length of 2 or more."))
         return value
 
     def validate(self, data):
