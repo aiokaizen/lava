@@ -18,6 +18,7 @@ from django.utils import timezone
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.enums import DeletePolicy
+from lava.error_codes import NOT_CREATED_ERROR_CODE, REQUIRED_ERROR_CODE
 from lava.utils import Result, camelcase_to_snakecase
 
 
@@ -82,6 +83,12 @@ class BaseModelMixin:
         return Result.success(self.update_success_message)
 
     def delete(self, user=None, soft_delete=None):
+
+        if not self.id:
+            return Result.error(
+                _("This object is not yet created"),
+                error_code=NOT_CREATED_ERROR_CODE
+            )
 
         if soft_delete is None:
             soft_delete = False
