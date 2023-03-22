@@ -10,12 +10,12 @@ from lava.serializers.serializers import ChoicesSerializer
 class ChoicesAPI(APIView):
 
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, *args, **kwargs):
-        
-        serializer = ChoicesSerializer(data=request.data)
+
+        serializer = ChoicesSerializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
-        
+
         return Response(serializer.choices)
 
 
