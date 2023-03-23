@@ -73,3 +73,83 @@ class Address(BaseModel):
         base_queryset = super().filter(user=user, kwargs=kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
+
+
+# class SocialMediaAccount(BaseModel):
+
+#     class Meta:
+#         verbose_name = _("Social media account")
+#         verbose_name_plural = _("Social media accounts")
+
+#     name = models.CharField(_("Social media name"), max_length=32)
+#     username = models.CharField(_("Social media username"), max_length=128)
+#     url = models.URLField(_("Social media url"), null=True, blank=True)
+
+#     def __str__(self):
+#         return self.name + (f'@{self.username}' if self.username else '')
+
+
+# class SocialMediaAccounts(BaseModel):
+
+#     class Meta:
+#         verbose_name = _("Social media accounts")
+#         verbose_name_plural = _("Social media accounts")
+
+#     facebook = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("Facebook"), on_delete=models.SET_NULL
+#     )
+#     youtube = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("Youtube"), on_delete=models.SET_NULL
+#     )
+#     instagram = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("Instagram"), on_delete=models.SET_NULL
+#     )
+#     linkedin = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("LinkedIn"), on_delete=models.SET_NULL
+#     )
+#     pinterest = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("Pinterest"), on_delete=models.SET_NULL
+#     )
+#     dribbble = models.OneToOneField(
+#         SocialMediaAccount, verbose_name=_("Dribbble"), on_delete=models.SET_NULL
+#     )
+
+#     def __str__(self):
+#         return "Social media accounts"
+
+#     def create(self, *args, **kwargs):
+#         self.facebook = self.facebook or (
+#             SocialMediaAccount(name="Facebook").create().instance
+#         )
+#         self.youtube = self.youtube or (
+#             SocialMediaAccount(name="Youtube").create().instance
+#         )
+#         self.instagram = self.instagram or (
+#             SocialMediaAccount(name="Instagram").create().instance
+#         )
+#         self.linkedin = self.linkedin or (
+#             SocialMediaAccount(name="Linked In").create().instance
+#         )
+#         self.pinterest = self.pinterest or (
+#             SocialMediaAccount(name="Pinterest").create().instance
+#         )
+#         self.dribbble = self.dribbble or (
+#             SocialMediaAccount(name="Dribbble").create().instance
+#         )
+#         result = super().create(*args, **kwargs)
+#         return result
+
+
+# class ContactInfo(BaseModel):
+
+#     class Meta:
+#         verbose_name = _("Contact info")
+#         verbose_name_plural = _("Contacts info")
+
+#     phone_number = models.CharField(_("Phone number"), max_length=32, default="", blank=True)
+#     phone_number2 = models.CharField(_("Phone numbser 2"), max_length=32, default="", blank=True)
+#     email = models.EmailField(_("E-mail"), default="", blank=True)
+#     website = models.URLField(_("Website"), null=True, blank=True)
+
+#     def __str__(self):
+#         return self.phone_number or self.phone_number2 or self.email or self.website

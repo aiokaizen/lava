@@ -247,6 +247,21 @@ def get_group_photo_filename(instance, filename):
     return "{}/photo.{}".format(folder, ext)
 
 
+def get_entity_logo_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    return f"entity/{slugify(instance.name)}/logo.{ext}"
+
+
+def get_entity_logo_light_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    return f"entity/{slugify(instance.name)}/logo_light.{ext}"
+
+
+def get_person_image_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    name = f"{instance.last_name}{instance.first_name}"
+    return f"person/{slugify(name)}_picture.{ext}"
+
 
 def get_model_file_from_io(filename, is_image=False):
     try:
