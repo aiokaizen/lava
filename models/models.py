@@ -240,19 +240,11 @@ class Group(BaseModel, BaseGroupModel):
         'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
         related_name="sub_groups", null=True, blank=True
     )
+    notification_id = models.CharField(_("Notification group id"), max_length=256, blank=True)
 
-    def create(self, user=None, m2m_fields=None, notification_group=False):
+    objects = GroupManager()
 
-        if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
-            msg = _(
-                "You can not create a group with this name. Please remove the "
-                "prefix '%(prefix)s' from the beginning of the field." % {
-                    "prefix": lava_settings.NOTIFICATION_GROUP_PREFIX
-                }
-            )
-            return Result.error(
-                msg, errors={"name": [msg]}, error_code='invalid'
-            )
+    def create(self, user=None, m2m_fields=None):
 
         result = super().create(user=user, m2m_fields=m2m_fields)
         if result.is_error:
@@ -260,18 +252,7 @@ class Group(BaseModel, BaseGroupModel):
 
         return Result.success(_("Group created successfully."), instance=self)
 
-    def update(self, user=None, update_fields=None, m2m_fields=None, message="", notification_group=False):
-
-        if not notification_group and 'name' in update_fields and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
-            msg = _(
-                "You can not update a group with this name. Please remove the "
-                "prefix '%(prefix)s' from the beginning of the field." % {
-                    "prefix": lava_settings.NOTIFICATION_GROUP_PREFIX
-                }
-            )
-            return Result.error(
-                msg, errors={"name": [msg]}, error_code='invalid'
-            )
+    def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
 
         result = super().update(
             user=user,
@@ -284,11 +265,7 @@ class Group(BaseModel, BaseGroupModel):
 
         return Result.success(_("Group updated successfully."))
 
-    def delete(self, user=None, notification_group=False):
-
-        if not notification_group and self.name.startswith(lava_settings.NOTIFICATION_GROUP_PREFIX):
-            return Result.error(_("You can not delete a this group."))
-
+    def delete(self, user=None):
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
@@ -328,7 +305,11 @@ class NotificationGroup(Group):
     @classmethod
     def create_notification_groups(cls):
         for notification_id, group_data in lava_settings.NOTIFICATION_GROUPS_NAMES.items():
-            group, _created = NotificationGroup.objects.get_or_create(name=group_data.get("name"))
+            group, _created = NotificationGroup.objects.get_or_create(
+                notification_id=notification_id,
+                name=group_data.get("name"),
+                description=group_data.get("description", '')
+            )
         return Result.success(_("All notification groups have been created successfully."))
 
     @classmethod
@@ -391,6 +372,7 @@ class User(BaseModel, AbstractUser):
         blank=True,
         default="",
     )
+    full_name = models.CharField(_("Full name"), max_length=128, blank=True, default="")
     country = models.CharField(_("Country"), max_length=64, blank=True, default="")
     city = models.CharField(_("City"), max_length=64, blank=True, default="")
     street_address = models.TextField(_("Street address"), blank=True, default="")
@@ -465,6 +447,7 @@ class User(BaseModel, AbstractUser):
         elif settings.DJOSER["SEND_ACTIVATION_EMAIL"]:
             self.is_active = False
 
+        self.full_name = f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
         # We log the action manually on success
         result = super().create(user=None)
         if result.is_error:
@@ -603,6 +586,10 @@ class User(BaseModel, AbstractUser):
                     return result
             except Exception as e:
                 return Result(success=False, message=str(e))
+
+        if 'first_name' in update_fields or 'last_name' in update_fields:
+            self.full_name = f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
+            update_fields.append("full_name")
 
         result = super().update(user=user, update_fields=update_fields, message=message, *args, **kwargs)
         if result.is_error:

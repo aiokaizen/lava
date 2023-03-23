@@ -1,15 +1,21 @@
 import os
 import random
 import logging
+from io import BytesIO
 from datetime import datetime
 import unicodedata
 import zipfile
 import subprocess
 import re
+import mimetypes
+
+import requests
 
 from PIL import Image as PILImage
 
 from django.conf import settings
+from django.core.files import File
+from django.core.files.base import ContentFile
 from django.utils.text import slugify as base_slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
@@ -21,7 +27,6 @@ from templated_mail.mail import BaseEmailMessage
 from lava.exceptions import LavaBaseException
 
 from lava import settings as lava_settings
-
 
 
 def slugify(value, allow_unicode=False, separator='_'):
@@ -240,6 +245,69 @@ def get_group_photo_filename(instance, filename):
     ext = filename.split(".")[-1]
     folder = "group/{}".format(instance.id)
     return "{}/photo.{}".format(folder, ext)
+
+
+
+def get_model_file_from_io(filename, is_image=False):
+    try:
+        with open(filename, 'rb') as f:
+            fname, ext = os.path.splitext(os.path.basename(filename))
+
+            file_data = f.read()
+            if is_image:
+                file = PILImage.open(BytesIO(file_data))
+            else:
+                file = BytesIO(file_data)
+            file_io = BytesIO()
+            file.save(file_io, format=file.format)
+            model_file = File(ContentFile(file_io.getvalue()))
+            model_file.name = f"{fname}{ext}"
+            return Result.success(instance=model_file)
+    except Exception as e:
+        return Result.error(str(e))
+
+
+def get_model_file_from_url(url, is_image=False):
+    retries_left = 3
+    response = None
+    e = None
+    while retries_left >= 0:
+        try:
+            response = requests.get(url)
+            e = None
+            break
+        except requests.exceptions.ConnectionError as error:
+            logging.warning(
+                "CONNECTION ERROR: Could not connect to the server. Retrying... "
+                f"(Retries left: {retries_left}"
+            )
+            retries_left -= 1
+            e = error
+
+    if e:
+        logging.error(
+            "ABORT: Could not connect to the server, please check your internet connection."
+        )
+
+    if response.status_code == 200:
+        try:
+            filename = url.split('/')[-1].split('.')[0]
+            filename = slugify(filename)
+            content_type = response.headers['content-type']
+            ext = mimetypes.guess_extension(content_type)
+            if is_image:
+                file = PILImage.open(BytesIO(response.content))
+            else:
+                file = BytesIO(response.content)
+            file_io = BytesIO()
+            file.save(file_io, format=file.format)
+            model_file = File(ContentFile(file_io.getvalue()))
+            model_file.name = f"{filename}{ext}"
+            return Result.success(instance=model_file)
+        except Exception as e:
+            return Result.error(str(e))
+    else:
+        return Result.error(f"Response error {response.status_code}")
 
 
 def get_backup_file_filename(instance, filename):

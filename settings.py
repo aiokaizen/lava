@@ -22,7 +22,7 @@ def init_firebase():
     creds_file_path = FIREBASE_CREDENTIALS_FILE_PATH
     if firebase_admin is None:
         return (False, _("Firebase is not installed"))
-        
+
     if not os.path.exists(creds_file_path):
         logging.error("Firebase credentials file does not exist.")
         return (False, _("Firebase credentials file does not exist."))
@@ -97,6 +97,8 @@ RESULT_TYPE_CHOICES = (
     ("error", _("Error")),
 )
 
+ACTIVATE_PAYEMENTS = getattr(settings, 'ACTIVATE_PAYEMENTS', False)
+
 BACKUP_TYPE_CHOICES = (
     ("full_backup", _("Full backup")),
     ("db_backup", _("Database backup")),
@@ -127,44 +129,32 @@ REMOTE_BACKUP_CONF = getattr(settings, "REMOTE_BACKUP_CONF", {
 })
 TMP_ROOT = getattr(settings, "TMP_ROOT", os.path.join(settings.BASE_DIR, "tmp"))
 
-NOTIFICATION_GROUP_PREFIX = "#NOTIF"
 
 _NOTIFICATION_GROUPS_NAMES = {
     'user_added_alert': {
-        'name': f"{NOTIFICATION_GROUP_PREFIX}{_('User creation notification')}",
+        'name': _('User creation alert'),
         'description': _("This notification is sent when a new user is created."),
     },
     'user_deleted_alert': {
-        'name': f"{NOTIFICATION_GROUP_PREFIX}{_('User deletion notification')}",
+        'name': _('User deletion alert'),
         'description': _("This notification is sent when a user is deleted."),
     },
     'group_added_alert': {
-        'name': f"{NOTIFICATION_GROUP_PREFIX}{_('Group creation notification')}",
+        'name': _('Group creation alert'),
         'description': _("This notification is sent when a new group is created."),
     },
     'group_deleted_alert': {
-        'name': f"{NOTIFICATION_GROUP_PREFIX}{_('Group deletion notification')}",
+        'name': _('Group deletion alert'),
         'description': _("This notification is sent when a group is deleted."),
     },
     'permission_changed_alert': {
-        'name': f"{NOTIFICATION_GROUP_PREFIX}{_('Permission update notification')}",
+        'name': _('Permission update alert'),
         'description': _("This notification is sent when a permission has been affected or revoked from a user or group."),
     }
 }
-
-def prepend_prefix_to_project_notification_groups_names(project_notification_groups_names):
-    # Add NOTIFICATION_GROUP_PREFIX to the beginning of each notification group name.
-    for notification_id in project_notification_groups_names.keys():
-        group_name = project_notification_groups_names[notification_id]["name"]
-        if not group_name.startswith(NOTIFICATION_GROUP_PREFIX):
-            project_notification_groups_names[notification_id]["name"] = f"{NOTIFICATION_GROUP_PREFIX}{group_name}"
-    return project_notification_groups_names
-
 NOTIFICATION_GROUPS_NAMES = {
     **_NOTIFICATION_GROUPS_NAMES,
-    **prepend_prefix_to_project_notification_groups_names(
-        getattr(settings, 'NOTIFICATION_GROUPS_NAMES', {})
-    )
+    **getattr(settings, 'NOTIFICATION_GROUPS_NAMES', {})
 }
 
 
