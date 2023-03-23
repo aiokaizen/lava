@@ -46,7 +46,7 @@ class Address(BaseModel):
         return False
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
 
         filter_params = Q()
 
@@ -69,7 +69,7 @@ class Address(BaseModel):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = cls.get_filter_params(user, kwargs)
+        filter_params = cls.get_filter_params(kwargs)
         base_queryset = super().filter(user=user, kwargs=kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset

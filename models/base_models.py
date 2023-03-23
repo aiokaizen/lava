@@ -260,7 +260,7 @@ class BaseModelMixin:
         return cls.objects.all() | cls.trash.all()
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
 
         filter_params = Q()
         if kwargs is None:
@@ -358,7 +358,7 @@ class BaseModelMixin:
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = BaseModelMixin.get_filter_params(user, kwargs)
+        filter_params = BaseModelMixin.get_filter_params(kwargs)
         ordering = cls.get_ordering_params(kwargs)
         if not trash:
             queryset = cls.objects.filter(filter_params)

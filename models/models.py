@@ -207,7 +207,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         return Result(True, _("The permission has been deleted successfully."))
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
         filter_params = Q()
 
         if "name" in kwargs:
@@ -217,7 +217,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = Permission.get_filter_params(user, kwargs)
+        filter_params = Permission.get_filter_params(kwargs)
         queryset = Permission.objects.filter(filter_params)
 
         return queryset
@@ -276,7 +276,7 @@ class Group(BaseModel, BaseGroupModel):
         return Result(False, "")
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
         filter_params = Q()
         if kwargs is None:
             kwargs = {}
@@ -288,7 +288,7 @@ class Group(BaseModel, BaseGroupModel):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = cls.get_filter_params(user, kwargs)
+        filter_params = cls.get_filter_params(kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
 
@@ -322,7 +322,7 @@ class NotificationGroup(Group):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = cls.get_filter_params(user, kwargs)
+        filter_params = cls.get_filter_params(kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
 
@@ -743,7 +743,7 @@ class User(BaseModel, AbstractUser):
             )
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
 
         filter_params = Q()
 
@@ -776,7 +776,7 @@ class User(BaseModel, AbstractUser):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = User.get_filter_params(user, kwargs)
+        filter_params = User.get_filter_params(kwargs)
 
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
@@ -931,7 +931,7 @@ class Notification(models.Model):
         return Result(True)
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
 
         filter_params = Q()
 
@@ -942,7 +942,7 @@ class Notification(models.Model):
 
     @classmethod
     def filter(cls, user=None, kwargs=None):
-        # filter_params = Notification.get_filter_params(user, kwargs)
+        # filter_params = Notification.get_filter_params(kwargs)
         # return Notification.objects.filter(filter_params)
         return Notification.objects.all()
 
@@ -1121,7 +1121,7 @@ class Backup(BaseModel):
             os.remove(lava_settings.BACKUP_LOCK_TAG_PATH)
 
     @classmethod
-    def get_filter_params(cls, user=None, kwargs=None):
+    def get_filter_params(cls, kwargs=None):
 
         filter_params = Q()
 
@@ -1136,7 +1136,7 @@ class Backup(BaseModel):
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = Backup.get_filter_params(user, kwargs)
+        filter_params = Backup.get_filter_params(kwargs)
 
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
 
