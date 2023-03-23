@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import io
 import os
+import re
 
 from django.contrib.admin.models import (
     DELETION, CHANGE, ADDITION
@@ -61,7 +62,7 @@ class BaseModelMixin:
         if user:
             self.log_action(user, ADDITION)
 
-        return Result(True, self.create_success_message, instance=self)
+        return Result(True, self.get_result_message('create'), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.pk:
@@ -80,7 +81,7 @@ class BaseModelMixin:
         if user:
             self.log_action(user, CHANGE, message)
 
-        return Result.success(self.update_success_message)
+        return Result.success(self.get_result_message('update'))
 
     def delete(self, user=None, soft_delete=None):
 
@@ -100,13 +101,13 @@ class BaseModelMixin:
             res = self.update(user=user, update_fields=['deleted_at'], message="Deletion")
             if res.is_error:
                 return res
-            return Result.success(self.delete_success_message)
+            return Result.success(self.get_result_message('delete'))
 
         if user:
             self.log_action(user, DELETION)
 
         super().delete()
-        return Result.success(self.delete_success_message)
+        return Result.success(self.get_result_message('delete'))
 
     def duplicate(self, user=None, override_values=dict):
         klass = self.__class__
@@ -152,7 +153,7 @@ class BaseModelMixin:
         if result.is_error:
             return result
 
-        return Result.success(self.duplicate_success_message, instance=new)
+        return Result.success(self.get_result_message('duplicate'), instance=new)
 
     def restore(self, user=None):
         if not self.deleted_at:
@@ -163,7 +164,7 @@ class BaseModelMixin:
         if result.is_error:
             return result
 
-        return Result.success(self.restore_success_message)
+        return Result.success(self.get_result_message('restore'))
 
     def get_changed_message(self, m2m_fields=None):
 
@@ -213,6 +214,19 @@ class BaseModelMixin:
             action_flag=action_flag,
             change_message=change_message
         )
+
+    def get_result_message(self, action):
+        message = getattr(self, f"{action}_success_message")
+        str_message = str(message)
+
+        fieldnames = re.findall(r'%\((\w+)\)\w', str_message)
+        if fieldnames:
+            format_dict = {}
+            for fieldname in fieldnames:
+                if hasattr(self, fieldname):
+                    format_dict[fieldname] = getattr(self, fieldname, "")
+            message = (message % format_dict)
+        return message
 
     @classmethod
     def get_or_create(cls, current_user=None, defaults=None, **kwargs):
