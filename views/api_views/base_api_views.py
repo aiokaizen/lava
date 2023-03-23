@@ -7,6 +7,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.fields import empty
 
 from drf_spectacular.utils import extend_schema
 
@@ -192,12 +193,12 @@ class BaseModelViewSet(ModelViewSet):
             for key, value in override_field_values.items():
                 data[key] = value
 
-        serializer = self.get_serializer(instance=instance, data=data, partial=partial)
-
-        serializer.is_valid(raise_exception=True)
+        serializer = self.get_serializer(instance=instance, data=data or empty, partial=partial)
 
         if not request.data:
             return Response(serializer.data)
+
+        serializer.is_valid(raise_exception=True)
 
         self.perform_update(serializer)
 
