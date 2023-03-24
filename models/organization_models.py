@@ -188,15 +188,11 @@ class Entity(BaseModel):
 
         if "query" in kwargs:
             filter_params &= (
-                Q(name__icontains=kwargs.get("query"))|
-                Q(arabic_name__contains=kwargs.get("query"))
+                Q(name__icontains=kwargs.get("query"))
             )
 
         if "name" in kwargs:
             filter_params &= Q(name__icontains=kwargs.get("name"))
-
-        if "arabic_name" in kwargs:
-            filter_params &= Q(arabic_name__contains=kwargs.get("arabic_name"))
 
         if "city" in kwargs:
             city = kwargs["city"]
