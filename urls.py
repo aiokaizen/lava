@@ -70,6 +70,7 @@ if activate_api_urls:
 
         path("api/users/me/", views.UserMeAPIView.as_view(), name="api-user-me"),
         path("api/settings/", views.SettingsListAPI.as_view(), name="api-settings"),
+        path("api/dashboard/", views.DashboardAPIView.as_view(), name="api-dashboard"),
         path("api/maintenance/", views.maintenance, name="api-maintenance"),
         path("api/auth_user_permissions/", views.get_user_permissions, name="api-get-user-permissions"),
         path("api/export_user_permissions/", views.ExportPermissions.as_view() , name="api-export-user-permissions"),

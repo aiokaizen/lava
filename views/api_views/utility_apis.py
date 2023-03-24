@@ -5,6 +5,7 @@ from rest_framework import status
 
 from lava import settings as lava_settings
 from lava.serializers.serializers import ChoicesSerializer
+from lava.services.statistics import collect_statistics
 
 
 class ChoicesAPI(APIView):
@@ -17,6 +18,15 @@ class ChoicesAPI(APIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.choices)
+
+
+class DashboardAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+
+        return Response(collect_statistics())
 
 
 class SettingsListAPI(APIView):
