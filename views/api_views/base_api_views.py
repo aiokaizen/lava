@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema
 from lava.enums import PermissionActionName
 from lava.messages import ACTION_NOT_ALLOWED
 from lava.pagination import LavaPageNumberPagination
-from lava.serializers.serializers import ResultSerializer
+from lava.serializers.serializers import BulkActionSerializer, ResultSerializer
 from lava.services.permissions import get_model_permission_class
 from lava.services.class_permissions import ActionNotAllowed
 from lava.utils import Result
@@ -252,9 +252,18 @@ class BaseModelViewSet(ModelViewSet):
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
-    # # Specify operation ID for get and list APIs
-    # list.operation_id = f"object_viewset_list"
-    # retrieve.operation_id = f"object_viewset_retrieve"
+    @action(detail=False, methods=["POST"])
+    def bulk_action(self, request, *args, **kwargs):
+        user = request.user
+        self.user = user
+        model_class = self.queryset.model
+        trash = getattr(self, 'trash', False)
+        serializer = BulkActionSerializer(data=request.data, model=model_class, trash=trash)
+        serializer.is_valid(raise_exception=True)
+        result = serializer.perform_action(user)
+        if not result:
+            return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
+        return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     # Trash specific Views
     @extend_schema(responses=list_serializer_class or serializer_class)
@@ -269,6 +278,11 @@ class BaseModelViewSet(ModelViewSet):
         self.user = request.user
         self.trash = True
         return super().list(request, *args, **kwargs)
+
+    @action(detail=False, methods=["POST"], url_path="trash/bulk_action")
+    def trash_bulk_action(self, request, *args, **kwargs):
+        self.trash = True
+        return self.bulk_action(request, *args, **kwargs)
 
     @extend_schema(responses=retrieve_serializer_class or serializer_class)
     @action(detail=False, methods=["GET"], url_path='trash/(?P<pk>[^/.]+)')
@@ -303,7 +317,7 @@ class BaseModelViewSet(ModelViewSet):
     @extend_schema(responses=ResultSerializer)
     @action(detail=False, methods=["POST"], url_path='trash/(?P<pk>[^/.]+)/restore')
     def restore(self, request, *args, **kwargs):
-        if "restore" in self.denied_actions:
+        if "trash" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED

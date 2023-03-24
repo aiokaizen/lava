@@ -1003,23 +1003,21 @@ class Backup(BaseModel):
             return Result(False, _("A backup is already running, please wait "
                 "until it's finished before starting a new one."), tag="warning")
 
-        # min_period_between_backups = timedelta(minutes=1)
+        # min_period_between_backups = timedelta(hours=1)
         # daily_limit = 2
         # now = timezone.now()
 
-        # all_backups = (
-        #     Backup.trash.filter(status="completed") |
-        #     Backup.objects.filter(status="completed")
-        # )
+        # all_backups = Backup.get_all_items()
 
-        # today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
         # latest_backup = all_backups.first()
 
         # if not latest_backup:
         #     return Result(True)
 
+        # today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
+
         # if today_backups.count() >= daily_limit:
-        #     return Result(False, _("You can not create more than %s backups per day." % daily_limit))
+        #     return Result(False, _("You can not create more than %d backups per day." % daily_limit))
 
         # latest_backup_time = latest_backup.created_at
         # if now < latest_backup_time + min_period_between_backups:

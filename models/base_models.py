@@ -91,6 +91,11 @@ class BaseModelMixin:
                 error_code=NOT_CREATED_ERROR_CODE
             )
 
+        if self.deleted_at and soft_delete:
+            return Result.warning(
+                _("This object is already deleted.")
+            )
+
         if soft_delete is None:
             soft_delete = False
             if self.default_delete_policy == DeletePolicy.SOFT_DELETE:
@@ -173,7 +178,7 @@ class BaseModelMixin:
 
         changed_message = {"fields": {}}
         klass = self.__class__
-        old_self = klass.objects.get(pk=self.pk)
+        old_self = klass.get_all_items().get(pk=self.pk)
         m2m_fields_dict = {}
         for m2mfield in m2m_fields:
             m2m_fields_dict[m2mfield[0]] = m2mfield[1]
@@ -227,6 +232,41 @@ class BaseModelMixin:
                     format_dict[fieldname] = getattr(self, fieldname, "")
             message = (message % format_dict)
         return message
+
+    @classmethod
+    def bulk_delete(cls, user, queryset, **kwargs):
+        errors = {}
+        soft_delete = not kwargs.get('trash', False)
+        for obj in queryset:
+            result = obj.delete(user, soft_delete=soft_delete)
+            if result.is_error:
+                errors[str(obj)] = result.message
+
+        if errors:
+            return Result.error(
+                _("Some objects were not deleted."), errors=errors
+            )
+
+        return Result.success(_("%(count)s objects have been deleted successfully." % {
+            'count': queryset.count()
+        }))
+
+    @classmethod
+    def bulk_restore(cls, user, queryset, **kwargs):
+        errors = {}
+        for obj in queryset:
+            result = obj.restore(user)
+            if result.is_error:
+                errors[str(obj)] = result.message
+
+        if errors:
+            return Result.error(
+                _("Some objects were not restored."), errors=errors
+            )
+
+        return Result.success(_("%(count)s objects have been restored successfully." % {
+            'count': queryset.count()
+        }))
 
     @classmethod
     def get_or_create(cls, current_user=None, defaults=None, **kwargs):

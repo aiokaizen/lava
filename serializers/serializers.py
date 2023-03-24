@@ -40,6 +40,9 @@ class ListIDsSerializer(serializers.Serializer):
 
     list_ids = serializers.ListField(label=_("IDs"), required=True)
 
+    class Meta:
+        fields = [ "list_ids" ]
+
     def __init__(self, instance=None, data=empty, model=None, trash=False, **kwargs):
         assert model is not None, (
             "Make sure that `model` parameter is different that None."
@@ -53,11 +56,43 @@ class ListIDsSerializer(serializers.Serializer):
         try:
             qset = manager.filter(pk__in=value)
         except ValueError:
-            raise serializers.ValidationError(_("One or more IDs is not valid."))
+            raise serializers.ValidationError(_("One or more ID is not valid."))
 
         if len(value) != qset.count():
-            raise serializers.ValidationError(_("One or more IDs is not valid."))
+            raise serializers.ValidationError(_("One or more ID is not valid."))
         return qset
+
+
+class BulkActionSerializer(ListIDsSerializer):
+
+    action = serializers.CharField()
+
+    class Meta:
+        fields = [ "list_ids", "action" ]
+
+    def validate_action(self, value):
+        action = value
+        if not value.startswith("bulk_") or not hasattr(self.model, action):
+            raise serializers.ValidationError(
+                _("The Selected action is not valid")
+            )
+
+        action = getattr(self.model, action)
+        if not callable(action):
+            raise serializers.ValidationError(
+                _("`%(action_name)s` is not a callable for model `%(model)s`." % {
+                    'model': self.model.__name__,
+                    'action_name': value
+                })
+            )
+
+        return action
+
+    def perform_action(self, user):
+        queryset = self.validated_data["list_ids"]
+        action = self.validated_data["action"]
+        result = action(user, queryset, trash=self.trash)
+        return result
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
