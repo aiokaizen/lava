@@ -1,3 +1,96 @@
 {
-
+    "address": [
+        {
+            "city": "Marrakech",
+            "country": "Morocco",
+            "postal_code": "40000",
+            "street_address": "285 Hay Al Massar"
+        },
+        {
+            "city": "Rabat",
+            "country": "Morocco",
+            "postal_code": "10000",
+            "street_address": "321 Hay Al Tadamon"
+        },
+        {
+            "city": "Casablanca",
+            "country": "Morocco",
+            "postal_code": "20000",
+            "street_address": "12 Boulvard My Youssef"
+        },
+        {
+            "city": "Paris",
+            "country": "France",
+            "postal_code": "12984",
+            "street_address": "89 Boulevard Le compte Albert"
+        },
+        {
+            "country": "Spain",
+            "postal_code": "89774",
+            "street_address": "77 Grant Via"
+        }
+    ],
+    "permission": [
+        {
+            "name": "add_object",
+            "content_type": "name1",
+            "codename": "code name 1"
+        },
+        {
+            "name": "change_object",
+            "content_type": "name1",
+            "codename": "code name 1"
+        },
+        {
+            "name": "delete_object",
+            "content_type": "name1",
+            "codename": "code name 1"
+        }
+    ],
+    "group": [
+        {
+            "name": "group1",
+            "description": "this is a description of group 1",
+            "parent": "parent1"
+        },
+        {
+            "name": "group2",
+            "description": "this is a description of group 2",
+            "parent": "parent2"
+        },
+        {
+            "name": "group3",
+            "description": "this is a description of group 3",
+            "parent": "parent3"
+        }
+    ],
+    "user": [
+        {
+            "first_name": "ouhammi",
+            "last_name": "mohamed",
+            "username": "M.ouhammi",
+            "permission_name": "['List_transaction','Get_transaction']",
+            "email": "ouhammi@ekblocks.com",
+            "gender": "M",
+            "group_name": "manager"
+        },
+        {
+            "first_name": "mouad",
+            "last_name": "goumi",
+            "username": "G.mouad",
+            "permission_name": ["List_transaction","Get_transaction"],
+            "email": "goumi@ekblocks.com",
+            "gender": "M",
+            "group_name": "acounting"
+        },
+        {
+            "first_name": "mouad",
+            "last_name": "kommir",
+            "username": "K.mouad",
+            "permission_name": ["List_transaction","Get_transaction"],
+            "email": "k.mouad@ekblocks.com",
+            "gender": "M",
+            "group_name": "CTO"
+        }
+    ]
 }

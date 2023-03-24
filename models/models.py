@@ -250,7 +250,7 @@ class Group(BaseModel, BaseGroupModel):
         if result.is_error:
             return result
 
-        return Result.success(_("Group created successfully."), instance=self)
+        return Result.success(_("Group has been created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
 
