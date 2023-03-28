@@ -331,12 +331,13 @@ def export_serializer_xlsx(
     serializer = serializer_class(instance=queryset, many=True)
 
     data_content = []
-    for client in serializer.data:
+    for data in serializer.data:
         content = []
         for field_name in field_names:
-            content.append(client.get(field_name, '---'))
+            content.append(data.get(field_name, '---'))
         data_content.append(content)
 
+    
     data = ExportDataType(
         col_titles=columns,
         data=data_content
