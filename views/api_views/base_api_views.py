@@ -186,8 +186,15 @@ class BaseModelViewSet(ModelViewSet):
         self.user = request.user
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        override_field_values = self.get_override_field_values()
         data = request.data
+        if override_field_values and data:
+            data = deepcopy(data)
+            for key, value in override_field_values.items():
+                data[key] = value
+
         serializer = self.get_serializer(instance=instance, data=data or empty, partial=partial)
+
         if not request.data:
             return Response(serializer.data)
 
