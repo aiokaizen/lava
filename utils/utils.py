@@ -2,7 +2,7 @@ import os
 import random
 import logging
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
 import unicodedata
 import zipfile
 import subprocess
@@ -16,6 +16,7 @@ from PIL import Image as PILImage
 from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.utils import timezone
 from django.utils.text import slugify as base_slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
@@ -87,6 +88,17 @@ def strtobool(val:str):
         return False
     else:
         raise ValueError(_("invalid truth value %r") % (val,))
+
+
+def humanize_datetime(datetime):
+    now = timezone.now()
+    if now.date() == datetime.date():
+        return datetime.strftime("%H:%M")
+        # return f"{(now - datetime).seconds()}s ago"
+    elif (now - datetime) < timedelta(days=360):
+        return datetime.strftime("%B, %d")
+
+    return  datetime.strftime("%Y/%m/%d")
 
 
 def contains_arabic_chars(val:str):
@@ -195,7 +207,7 @@ class Result(imdict):
         res_dict = {
             "class_name": 'lava.utils.Result',
             "result": type,
-            "message": self.message
+            "message": str(self.message)
         }
 
         if not self.is_success:

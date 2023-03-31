@@ -16,6 +16,7 @@ from django.db.models import (
 from django.contrib.admin.options import get_content_type_for_model
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.urls import reverse
 
 from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
 from lava.enums import DeletePolicy
@@ -32,6 +33,12 @@ class BaseModelMixin:
     restore_success_message = _("The object has been restored successfully.")
     default_delete_policy = DeletePolicy.SOFT_DELETE
 
+    def get_url(self):
+        try:
+            return reverse(f'{self.__class__.__name__.lower()}-detail', args=[str(self.id)])
+        except:
+            return ""
+
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.pk:
             return Result(False, _("This object is already created."))
@@ -40,7 +47,7 @@ class BaseModelMixin:
         #     try:
         #         self.clean_fields()
         #     except ValidationError as e:
-        #         return Result(False, _("Erreurs de validation."), errors=e.error_dict)
+        #         return Result(False, _("Validation error."), errors=e.error_dict)
 
         self.created_by = user
 
@@ -54,10 +61,13 @@ class BaseModelMixin:
         if file_fields:
             update_fields = []
             for attr, value in file_fields:
+                if not value:
+                    continue
                 setattr(self, attr, value)
                 update_fields.append(attr)
-            self.save(update_fields=update_fields)
 
+            if update_fields:
+                self.save(update_fields=update_fields)
 
         if user:
             self.log_action(user, ADDITION)

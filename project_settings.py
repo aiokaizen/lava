@@ -130,7 +130,7 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 
-    # Desable Browsable API
+    # Disable Browsable API
     'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer']
 }
 

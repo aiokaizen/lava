@@ -18,6 +18,7 @@ from lava.serializers.serializers import BulkActionSerializer, ResultSerializer
 from lava.services.permissions import get_model_permission_class
 from lava.services.class_permissions import ActionNotAllowed
 from lava.utils import Result
+from lava.pagination import get_pagination_class
 
 
 class BaseModelViewSet(ModelViewSet):
@@ -31,8 +32,15 @@ class BaseModelViewSet(ModelViewSet):
     create_serializer_class = None
     update_serializer_class = None
     delete_serializer_class = None
+    page_size = None
 
     denied_actions = []
+
+    @property
+    def paginator(self):
+        if self.page_size:
+            self.pagination_class = get_pagination_class(self.page_size)
+        return super().paginator
 
     def get_override_field_values(self):
         """
@@ -172,7 +180,10 @@ class BaseModelViewSet(ModelViewSet):
             result = serializer.result
             if result.is_error:
                 return Response(result.to_dict(), headers=headers, status=status.HTTP_400_BAD_REQUEST)
-            return Response(result.to_dict(), headers=headers)
+            result_dict = result.to_dict()
+            result_dict["object"] = serializer.data
+            return Response(result_dict, headers=headers)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @extend_schema(responses=ResultSerializer)
@@ -208,7 +219,9 @@ class BaseModelViewSet(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         if hasattr(serializer, 'result'):
-            return Response(serializer.result.to_dict())
+            result_dict = serializer.result.to_dict()
+            result_dict["object"] = serializer.data
+            return Response(result_dict)
         return Response(serializer.data)
 
     @extend_schema(responses=ResultSerializer)

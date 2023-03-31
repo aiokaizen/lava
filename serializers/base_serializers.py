@@ -9,12 +9,12 @@ class BaseModelSerializer(serializers.ModelSerializer):
 
     m2m_field_names = []
     file_field_names = []
-    
+
     def __init__(self, instance=None, data=empty, user=None, **kwargs):
         self.user = user
         super().__init__(instance, data, **kwargs)
 
-    def create(self, validated_data):
+    def create(self, validated_data, **kwargs):
 
         m2m_field_names = getattr(self, 'm2m_field_names', [])
         m2m_fields = [] if m2m_field_names else None
@@ -34,13 +34,13 @@ class BaseModelSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
 
         self.result = instance.create(
-            user=self.user, m2m_fields=m2m_fields, file_fields=file_fields
+            user=self.user, m2m_fields=m2m_fields, file_fields=file_fields, **kwargs
         )
         if self.result.is_error and self.result.errors:
             raise serializers.ValidationError(self.result.errors or self.result.message, self.result.error_code)
         return instance
-    
-    def update(self, instance, validated_data):
+
+    def update(self, instance, validated_data, **kwargs):
 
         update_fields = []
         m2m_field_names = getattr(self, 'm2m_field_names', [])
@@ -53,7 +53,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
                 setattr(instance, attr, value)
                 update_fields.append(attr)
 
-        self.result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields)
+        self.result = instance.update(user=self.user, update_fields=update_fields, m2m_fields=m2m_fields, **kwargs)
         if self.result.is_error:
             raise serializers.ValidationError(self.result.errors or self.result.message, self.result.error_code)
         return instance
