@@ -7,3 +7,6 @@ from .utility_models import Address
 from .organization_models import (
     Account, Bank, BankAccount, Entity
 )
+from .chat_models import (
+    ChatMessage, Conversation
+)

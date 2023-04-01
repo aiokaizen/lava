@@ -7,3 +7,4 @@ from .import_export_views import ExportPermissions, ExportActivityJournal
 from .log_entry_api_views import LogEntryAPIViewSet
 from .utility_apis import SettingsListAPI, ChoicesAPI, DashboardAPIView
 from .backup_api_views import BackupAPIViewSet
+from .chat_api_views import ChatAPIViewSet

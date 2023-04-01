@@ -54,6 +54,7 @@ if activate_api_urls:
     api_router.register(r"api/permissions", views.PermissionAPIViewSet)
     api_router.register(r"api/activity_journal", views.LogEntryAPIViewSet)
     api_router.register(r"api/backup", views.BackupAPIViewSet)
+    api_router.register(r"api/chat", views.ChatAPIViewSet)
 
     api_urlpatterns = [
         # Swagger Documentation URLs

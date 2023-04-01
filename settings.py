@@ -171,3 +171,14 @@ CLASS_NAME_CHOICES_MAPPING = {
     "permissions": 'lava.Permission',
     **getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES_MAPPING", {})
 }
+
+
+# Chat models settings
+TIMEUNIT_CHOICES = [
+    "days", "hours", "minutes"
+]
+
+CHAT_MESSAGE_CHOICES = (
+    ('text', _("Text")),
+    ('image', _("Image")),
+)

@@ -275,6 +275,17 @@ def get_person_image_filename(instance, filename):
     return f"person/{slugify(name)}_picture.{ext}"
 
 
+def get_conversation_logo_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    return f"chat/conversations/{instance.id}/logo.{ext}"
+
+def get_chat_message_image_filename(instance, filename):
+    ext = filename.split(".")[-1]
+    now = timezone.now().strftime("%Y%m%d%H%M%S%z")
+    return f"chat/conversations/{instance.conversation.id}/messages/{instance.id}_{now}.{ext}"
+
+
+
 def get_model_file_from_io(filename, is_image=False):
     try:
         with open(filename, 'rb') as f:
