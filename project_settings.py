@@ -36,8 +36,6 @@ ALLOWED_HOSTS = [
 
 
 INSTALLED_APPS_PREFIX = [
-    "daphne",
-
     "admin_interface",
     "colorfield",
 
@@ -174,15 +172,6 @@ DJOSER = {
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
-
-
-# Channels settings
-ASGI_APPLICATION = "lava.ws.routing.application"
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
-    }
-}
 
 
 # Thumbnails settings

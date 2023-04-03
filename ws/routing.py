@@ -15,7 +15,7 @@ websocket_urlpatterns = [
     path('ws/notifications/', NotificationConsumer.as_asgi()),
 ]
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'librarian.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'librarian.settings.settings_asgi')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
