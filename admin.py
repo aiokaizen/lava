@@ -15,6 +15,7 @@ from lava.models import (
     Notification, Preferences, User, Group, Backup,
     Conversation, ChatMessage
 )
+from lava.utils.utils import pop_list_item
 
 
 # Unregister models
@@ -113,8 +114,8 @@ class UserAdmin(auth_admin.UserAdmin):
         elif obj is not None:  # Modification
             # Remove groups and user_permissions from changed_data because .save() method does not accept related fields
             # to be passed in the update_fields parameter.
-            form.changed_data.pop("groups", None)
-            form.changed_data.pop('user_permissions', None)
+            pop_list_item(form.changed_data, 'groups')
+            pop_list_item(form.changed_data, 'user_permissions')
 
             result = obj.update(user=request.user, update_fields=form.changed_data)
             if not result.success:

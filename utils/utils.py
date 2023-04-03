@@ -105,6 +105,11 @@ def guess_protocol():
     # HOST containing `:` means that the project is running in a dev server
     return 'http' if ':' in lava_settings.HOST else 'https'
 
+def pop_list_item(l: list, value, default=None):
+    try:
+        return l.pop(l.index(value))
+    except ValueError:
+        return default
 
 
 def contains_arabic_chars(val:str):
