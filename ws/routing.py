@@ -4,6 +4,7 @@ from django.core.asgi import get_asgi_application
 from django.urls import path
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'librarian.settings.settings_asgi')
+asgi_application = get_asgi_application()
 
 from channels.routing import ProtocolTypeRouter, URLRouter
 
@@ -18,7 +19,7 @@ websocket_urlpatterns = [
 ]
 
 application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+    "http": asgi_application,
     'websocket': SocketTokenAuthMiddlewareStack(
             URLRouter(
                 websocket_urlpatterns
