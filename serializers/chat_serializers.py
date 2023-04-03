@@ -88,7 +88,10 @@ class ConversationListSerializer(ReadOnlyBaseModelSerializer):
         return instance.get_name(self.user)
 
     def get_logo(self, instance):
-        url = instance.get_logo(self.user).url
+        userphoto = instance.get_logo(self.user)
+        if not userphoto:
+            return ''
+        url = userphoto.url
         request = self.context.get('request', None)
         if request is not None:
             return request.build_absolute_uri(url)
