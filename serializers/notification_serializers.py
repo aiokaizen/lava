@@ -5,6 +5,7 @@ from rest_framework.fields import empty
 
 from lava.models import Notification
 from lava.serializers.user_serializers import UserExerptSerializer
+from lava.utils.utils import humanize_datetime
 
 
 class BulkNotificationActionSerializer(serializers.ModelSerializer):
@@ -22,16 +23,17 @@ class BulkNotificationActionSerializer(serializers.ModelSerializer):
     def __init__(self, user, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
         self.user = user
-    
+
     def validate(self, attrs):
         validated_data = super().validate(attrs)
-        
+
 
 
 class NotificationSerializer(serializers.ModelSerializer):
 
     sender = UserExerptSerializer(required=False)
     seen = serializers.SerializerMethodField(label=_("Seen"))
+    date = serializers.SerializerMethodField()
 
     class Meta:
         model = Notification
@@ -61,6 +63,9 @@ class NotificationSerializer(serializers.ModelSerializer):
     def __init__(self, user, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
         self.user = user
+
+    def get_date(self, instance):
+        return humanize_datetime(instance.date)
 
     def get_seen(self, instance):
         if not instance:

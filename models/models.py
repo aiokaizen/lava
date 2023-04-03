@@ -587,7 +587,7 @@ class User(BaseModel, AbstractUser):
             except Exception as e:
                 return Result(success=False, message=str(e))
 
-        if 'first_name' in update_fields or 'last_name' in update_fields:
+        if update_fields and ('first_name' in update_fields or 'last_name' in update_fields):
             self.full_name = f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
             update_fields.append("full_name")
 

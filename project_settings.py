@@ -29,10 +29,15 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1"
+]
 
 
 INSTALLED_APPS_PREFIX = [
+    "daphne",
+
     "admin_interface",
     "colorfield",
 
@@ -43,6 +48,7 @@ INSTALLED_APPS_PREFIX = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
 ]
 
 INSTALLED_APPS_SUFFIX = [
@@ -170,6 +176,15 @@ X_FRAME_OPTIONS = 'ALLOWALL'
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
 
 
+# Channels settings
+ASGI_APPLICATION = "lava.ws.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+
 # Thumbnails settings
 BASE_THUMBNAIL_ALIASES = {
     **getattr(settings, 'THUMBNAIL_ALIASES', {})
@@ -230,6 +245,7 @@ EXPOSED_URL = "/exposed/"
 EXPOSED_ROOT = os.path.join(settings.BASE_DIR, "exposed")
 
 
+# File patterns for internationalization
 FILE_PATTERNS = {
     '*.html': 'django',
     '*.txt': 'django',

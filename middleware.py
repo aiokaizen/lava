@@ -1,5 +1,15 @@
+import re
+
 from django.shortcuts import reverse, redirect
 from django.conf import settings
+
+from rest_framework.authtoken.models import Token
+
+from channels.db import database_sync_to_async
+from channels.middleware import BaseMiddleware
+from channels.auth import AuthMiddlewareStack
+
+from lava.models import User
 
 
 class MaintenanceModeMiddleware:
@@ -27,3 +37,33 @@ class MaintenanceModeMiddleware:
         response = self.get_response(request)
 
         return response
+
+
+@database_sync_to_async
+def get_user(token_key):
+    try:
+        token = Token.objects.select_related('user').get(key=token_key)
+        return token.user
+    except Token.DoesNotExist:
+        return None
+
+
+class SocketTokenAuthMiddleware(BaseMiddleware):
+
+    def __init__(self, inner):
+        self.inner = inner
+
+    async def __call__(self, scope, receive, send):
+        try:
+            query_string = scope["query_string"].decode("utf-8")
+            match = re.search(r"token=([\w\d]+)", query_string)
+            token_key = match.group(1) if match else ""
+
+            user = await get_user(token_key)
+            if user is not None:
+                scope['user'] = user
+        except (IndexError, ValueError, Token.DoesNotExist):
+            pass
+        return await super().__call__(scope, receive, send)
+
+SocketTokenAuthMiddlewareStack = lambda inner: SocketTokenAuthMiddleware(AuthMiddlewareStack(inner))

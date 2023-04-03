@@ -137,8 +137,12 @@ class NotificationViewSet(ReadOnlyModelViewSet):
     def unread(self, request, *args, **kwargs):
         self.user = request.user
         queryset = self.user.get_unread_notifications()
-        serializer = self.get_serializer(instance=queryset, user=self.user, many=True)
-        return Response(serializer.data)
+        unread_count = queryset.count()
+        serializer = self.get_serializer(instance=queryset[:5], user=self.user, many=True)
+        return Response({
+            'notifications': serializer.data,
+            'unread': unread_count
+        })
 
     @action(detail=False, methods=["POST"])
     def mark_as_read(self, request, *args, **kwargs):

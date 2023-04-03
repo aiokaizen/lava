@@ -103,16 +103,18 @@ class UserAdmin(auth_admin.UserAdmin):
         if not change:  # Creation
             photo = obj.photo
             cover = obj.cover_picture
-            result = obj.create(user=request.user, photo=photo, cover=cover)
-            if not result.success:
+            obj.photo = None
+            obj.cover = None
+            result = obj.create(
+                user=request.user, file_fields=(('photo', photo), ('cover', cover))
+            )
+            if not result.is_success:
                 raise Exception(result.message)
         elif obj is not None:  # Modification
-            if "groups" in form.changed_data:
-                # Remove groups from changed_data because .save() method does not accept related fields
-                # to be passed in the update_fields parameter.
-                form.changed_data.remove("groups")
-            if 'user_permissions' in form.changed_data:
-                form.changed_data.remove('user_permissions')
+            # Remove groups and user_permissions from changed_data because .save() method does not accept related fields
+            # to be passed in the update_fields parameter.
+            form.changed_data.pop("groups", None)
+            form.changed_data.pop('user_permissions', None)
 
             result = obj.update(user=request.user, update_fields=form.changed_data)
             if not result.success:
@@ -154,6 +156,9 @@ class UserAdmin(auth_admin.UserAdmin):
 
 class BaseModelAdmin(admin.ModelAdmin):
 
+    m2m_field_names = []
+    file_field_names = []
+
     fieldsets = (
         (
             _("Base attributes"),
@@ -181,10 +186,17 @@ class BaseModelAdmin(admin.ModelAdmin):
         "restore"
     ]
 
+    def save_related(self, request, form, formsets, change):
+        # Desable save related behaviour, since we save our related
+        # fields using the create() method.
+
+        # return super().save_related(request, form, formsets, change)
+        pass
+
     def save_model(self, request, obj, form, change):
         if not change:  # Creation
-            result = obj.create()
-            if not result.success:
+            result = self.create(request.user, obj, form.cleaned_data)
+            if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
@@ -192,8 +204,8 @@ class BaseModelAdmin(admin.ModelAdmin):
                     lvl
                 )
         elif obj is not None:  # Modification
-            result = obj.update(update_fields=form.changed_data)
-            if not result.success:
+            result = self.update(request.user, obj, form.changed_data, form.cleaned_data)
+            if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
@@ -201,11 +213,42 @@ class BaseModelAdmin(admin.ModelAdmin):
                     lvl
                 )
 
+    def create(self, user, obj, validated_data, **kwargs):
+
+        m2m_field_names = getattr(self, 'm2m_field_names', [])
+        m2m_fields = [] if m2m_field_names else None
+
+        file_field_names = getattr(self, 'file_field_names', [])
+        file_fields = [] if file_field_names else None
+
+        for attr, value in validated_data.items():
+            if attr in m2m_field_names:
+                m2m_fields.append((attr, value))
+            elif attr in file_field_names:
+                file_fields.append((attr, value))
+                setattr(obj, attr, None)
+
+        return obj.create(
+            user=user, m2m_fields=m2m_fields, file_fields=file_fields, **kwargs
+        )
+
+    def update(self, user, obj, update_fields, validated_data, **kwargs):
+
+        m2m_field_names = getattr(self, 'm2m_field_names', [])
+        m2m_fields = []
+
+        for attr, value in validated_data.items():
+            if attr in m2m_field_names:
+                m2m_fields.append((attr, value))
+
+        return obj.update(user=user, update_fields=update_fields, m2m_fields=m2m_fields, **kwargs)
+
+
     @admin.action(description=_('Soft delete'))
     def soft_delete(self, request, queryset):
         for obj in queryset:
             result = obj.soft_delete(user=request.user)
-            if not result.success:
+            if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
@@ -225,7 +268,7 @@ class BaseModelAdmin(admin.ModelAdmin):
     def restore(self, request, queryset):
         for obj in queryset:
             result = obj.restore(user=request.user)
-            if not result.success:
+            if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
@@ -247,7 +290,7 @@ class BaseModelAdmin(admin.ModelAdmin):
     def delete_queryset(self, request, queryset):
         for obj in queryset:
             result = obj.delete(user=request.user, soft_delete=False)
-            if not result.success:
+            if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
@@ -265,17 +308,21 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(admin.ModelAdmin):
+class GroupAdmin(BaseModelAdmin):
     pass
 
 
 @admin.register(Backup)
-class BackupAdmin(admin.ModelAdmin):
+class BackupAdmin(BaseModelAdmin):
     pass
 
 
 @admin.register(Notification)
-class NotificationAdmin(admin.ModelAdmin):
+class NotificationAdmin(BaseModelAdmin):
+    m2m_field_names = ['target_users', 'target_groups']
+    file_field_names = []
+    fieldsets = None
+    readonly_fields = ()
     icon_name = "notifications"
 
 
@@ -285,10 +332,10 @@ class PreferencesAdmin(admin.ModelAdmin):
 
 
 @admin.register(Conversation)
-class ConversationAdmin(admin.ModelAdmin):
+class ConversationAdmin(BaseModelAdmin):
     pass
 
 
 @admin.register(ChatMessage)
-class ChatMessageAdmin(admin.ModelAdmin):
+class ChatMessageAdmin(BaseModelAdmin):
     pass

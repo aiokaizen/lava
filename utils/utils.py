@@ -101,6 +101,12 @@ def humanize_datetime(datetime):
     return  datetime.strftime("%Y/%m/%d")
 
 
+def guess_protocol():
+    # HOST containing `:` means that the project is running in a dev server
+    return 'http' if ':' in lava_settings.HOST else 'https'
+
+
+
 def contains_arabic_chars(val:str):
     """
     Returns True if the string in the argument contains any arabic characters.

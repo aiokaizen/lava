@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -18,7 +18,10 @@ class Conversation(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("Conversation")
         verbose_name_plural = _("Conversations")
-        ordering = ('-pinned_at', '-messages__created_at')
+        ordering = (
+            '-pinned_at',
+            F('last_updated_at').desc(nulls_last=True),
+        )
 
     name = models.CharField(_("Name"), max_length=100, blank=True)
     is_group_conversation = models.BooleanField(_("Group conversation"), default=False)
@@ -184,7 +187,11 @@ class ChatMessage(BaseModel):
         if str(user.id) not in self.conversation.members.keys():
             return Result.error(_("You can not send messages to this conversation!"))
 
-        return super().create(user, *args, **kwargs)
+        result = super().create(user, *args, **kwargs)
+        # Trigger update to modify last_updated_at for ordering purposes
+        # @TODO: This method is not optimal, think about changing it later
+        self.conversation.update()
+        return result
 
     def mark_as_read(self, user):
         if user.id not in self.read_by:
