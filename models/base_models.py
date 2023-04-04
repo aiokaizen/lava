@@ -18,10 +18,11 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
 
-from lava.managers import DefaultBaseModelManager, TrashBaseModelManager
+from lava.managers import DefaultModelBaseManager, DefaultModelTrashManager
 from lava.enums import DeletePolicy
 from lava.error_codes import NOT_CREATED_ERROR_CODE, REQUIRED_ERROR_CODE
 from lava.utils import Result, camelcase_to_snakecase
+from lava import settings as lava_settings
 
 
 class BaseModelMixin:
@@ -38,6 +39,9 @@ class BaseModelMixin:
             return reverse(f'{self.__class__.__name__.lower()}-detail', args=[str(self.id)])
         except:
             return ""
+
+    def get_absolute_url(self):
+        return f"{lava_settings.HOST}{self.get_url()}"
 
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.pk:
@@ -101,7 +105,7 @@ class BaseModelMixin:
                 error_code=NOT_CREATED_ERROR_CODE
             )
 
-        if self.deleted_at and soft_delete:
+        if getattr(self, 'deleted_at', None) and soft_delete:
             return Result.warning(
                 _("This object is already deleted.")
             )
@@ -445,5 +449,5 @@ class BaseModel(BaseModelMixin, models.Model):
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
-    objects = DefaultBaseModelManager()
-    trash = TrashBaseModelManager()
+    objects = DefaultModelBaseManager()
+    trash = DefaultModelTrashManager()

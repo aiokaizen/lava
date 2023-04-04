@@ -7,7 +7,7 @@ class BaseModelManager(Manager):
     pass
 
 
-class DefaultBaseModelManager(BaseModelManager):
+class DefaultModelBaseManager(BaseModelManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -16,7 +16,7 @@ class DefaultBaseModelManager(BaseModelManager):
 
 
 
-class TrashBaseModelManager(BaseModelManager):
+class DefaultModelTrashManager(BaseModelManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -32,7 +32,7 @@ class LavaUserManager(BaseModelManager, UserManager):
         return queryset
 
 
-class GroupManager(DefaultBaseModelManager):
+class GroupManager(DefaultModelBaseManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -40,7 +40,7 @@ class GroupManager(DefaultBaseModelManager):
         return queryset
 
 
-class NotificationGroupManager(DefaultBaseModelManager):
+class NotificationGroupManager(DefaultModelBaseManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()

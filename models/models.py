@@ -23,14 +23,14 @@ from django.contrib.admin.models import (
     ADDITION, CHANGE, DELETION
 )
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from django.utils import timezone
 
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from lava import settings as lava_settings
 from lava import validators as lava_validators
-from lava.error_codes import UNIMPLEMENTED, UNKNOWN
+from lava.error_codes import REQUIRED_ERROR_CODE, UNIMPLEMENTED, UNKNOWN
 from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE, ACTION_NOT_ALLOWED
 from lava.models.base_models import BaseModel, BaseModelMixin
 from lava.utils import (
@@ -45,8 +45,10 @@ from lava.utils import (
     get_group_photo_filename
 )
 from lava.managers import (
-    GroupManager, NotificationGroupManager, LavaUserManager
+    GroupManager, NotificationGroupManager, LavaUserManager,
+    DefaultModelBaseManager
 )
+from lava.ws.services import send_ws_backup_status, send_ws_notification
 
 try:
     from firebase_admin import messaging
@@ -243,6 +245,7 @@ class Group(BaseModel, BaseGroupModel):
     notification_id = models.CharField(_("Notification group id"), max_length=256, blank=True)
 
     objects = GroupManager()
+    all_objects = DefaultModelBaseManager()
 
     def create(self, user=None, m2m_fields=None):
 
@@ -265,7 +268,7 @@ class Group(BaseModel, BaseGroupModel):
 
         return Result.success(_("Group updated successfully."))
 
-    def delete(self, user=None):
+    def delete(self, user=None, **kwargs):
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
@@ -311,14 +314,6 @@ class NotificationGroup(Group):
                 description=group_data.get("description", '')
             )
         return Result.success(_("All notification groups have been created successfully."))
-
-    @classmethod
-    def get_notification_group(cls, group_name):
-
-        try:
-            return NotificationGroup.objects.get(name=group_name)
-        except Group.DoesNotExist:
-            return None
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
@@ -711,7 +706,7 @@ class User(BaseModel, AbstractUser):
         )
 
         result = notification.create(
-            target_users=target_users, target_groups=target_groups
+            m2m_fields=(('target_users', target_users), ('target_groups', target_groups))
         )
         if not result.success:
             return result
@@ -787,7 +782,7 @@ class User(BaseModel, AbstractUser):
         return base_queryset.filter(filter_params)
 
 
-class Notification(models.Model):
+class Notification(BaseModelMixin, models.Model):
 
     class Meta:
         verbose_name = _("Notification")
@@ -852,21 +847,25 @@ class Notification(models.Model):
         devices_lists = list(target_users.values_list("device_id_list", flat=True))
         return list(itertools.chain(*devices_lists))
 
-    def create(self, target_users=None, target_groups=None, send_notification=False):
-        if not target_users and not target_groups:
-            return Result(
-                False, _("You must specify either target users or target groups.")
+    def create(self, send_notification=True, **kwargs):
+        can_create = False
+        for field, value in kwargs.get('m2m_fields', ()):
+            if field in ['target_users', 'target_groups'] and value:
+                can_create = True
+                break
+
+        if not can_create:
+            msg = _("You must specify either target users or target groups.")
+            return Result.error(
+                msg, errors={"target_users": [msg]}, error_code=REQUIRED_ERROR_CODE
             )
 
-        self.save()
-
-        if target_users:
-            self.target_users.set(target_users)
-
-        if target_groups:
-            self.target_groups.set(target_groups)
+        result = super().create(**kwargs)
+        if not result.is_success:
+            return result
 
         if send_notification:
+            send_ws_notification(self)
             self.send_firebase_notification()
 
         return Result(True, _("The notification has been created successfully."), instance=self)
@@ -899,10 +898,10 @@ class Notification(models.Model):
         """
         if messaging is None:
             logging.warning("Firebase is not installed.")
-            return Result(False)
+            return Result.warning("Firebase is not installed.")
         if not lava_settings.FIREBASE_ACTIVATED:
             logging.warning("Firebase is not activated.")
-            return Result(False)
+            return Result.warning("Firebase is not activated.")
 
         registration_tokens = self.get_target_devices()
         data_object = None
@@ -1078,28 +1077,34 @@ class Backup(BaseModel):
 
             if user:
                 notif = Notification(
-                    title=_("Backup complete"),
-                    content=_("A %s that was started on %s is finished successfully." % (
-                        self.get_type_display(), self.created_at.strftime("%c")
-                    )),
+                    title=gettext("Backup complete"),
+                    content=gettext("A %(name)s that was started on %(date)s is finished successfully." % {
+                        'name': self.get_type_display(), 'date': self.created_at.strftime("%c")
+                    }),
                 )
-                notif.create(target_users=[user])
+                target_groups = [NotificationGroup.objects.get(
+                    notification_id=lava_settings.BACKUP_COMPLETED_NOTIFICATION_ID
+                )]
+                m2m_fields = [('target_users', [user]), ('target_groups', target_groups)]
+                notif.create(m2m_fields=m2m_fields)
 
         except Exception as e:
             if user:
                 notif = Notification(
-                    title=_("Backup failed"),
-                    content=_("A %s that was started on %s has failed.\nError: %s" % (
+                    title=gettext("Backup failed"),
+                    content=gettext("A %s that was started on %s has failed.\nError: %s" % (
                         self.get_type_display(), self.created_at.strftime("%c"), e
                     )),
                 )
-                notif.create(target_users=[user])
+                m2m_fields = [('target_users', [user])]
+                notif.create(m2m_fields=m2m_fields)
 
             # Change status to failed
             self.status = "failed"
             self.save(update_fields=["status"])
 
         finally:
+            send_ws_backup_status(self)
             Backup.unlock()
 
     def restore_backup(self, user=None):

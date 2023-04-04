@@ -749,7 +749,7 @@ msgstr ""
 
 #: models/models.py:1082
 msgid "Backup complete"
-msgstr "Sauvegarde terminée"
+msgstr "La sauvegarde est terminée"
 
 #: models/models.py:1083
 #, python-format
@@ -758,7 +758,7 @@ msgstr "Un %s qui a été démarré sur %s est terminé avec succès."
 
 #: models/models.py:1092
 msgid "Backup failed"
-msgstr "Détails sauvegarde"
+msgstr "La sauvegarde a échoué"
 
 #: models/models.py:1093
 #, python-format

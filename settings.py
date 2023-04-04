@@ -130,6 +130,7 @@ REMOTE_BACKUP_CONF = getattr(settings, "REMOTE_BACKUP_CONF", {
 TMP_ROOT = getattr(settings, "TMP_ROOT", os.path.join(settings.BASE_DIR, "tmp"))
 
 
+BACKUP_COMPLETED_NOTIFICATION_ID = 'backup_completed_alert'
 _NOTIFICATION_GROUPS_NAMES = {
     'user_added_alert': {
         'name': _('User creation alert'),
@@ -150,6 +151,10 @@ _NOTIFICATION_GROUPS_NAMES = {
     'permission_changed_alert': {
         'name': _('Permission update alert'),
         'description': _("This notification is sent when a permission has been affected or revoked from a user or group."),
+    },
+    BACKUP_COMPLETED_NOTIFICATION_ID: {
+        'name': _('Backup completed alert'),
+        'description': _("This notification is sent when a backup is completed."),
     }
 }
 NOTIFICATION_GROUPS_NAMES = {

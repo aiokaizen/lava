@@ -161,6 +161,8 @@ class ChatConsumer(BaseConsumer):
 
 class NotificationConsumer(BaseConsumer):
 
+    channel_layer_alias = 'notification'
+
     async def connect(self):
         await super().prepare_connection()
         user_groups = await database_sync_to_async (
@@ -231,4 +233,31 @@ class NotificationConsumer(BaseConsumer):
         await self.send(text_data=json.dumps({
             'action': 'error_message',
             'error': error
+        }))
+
+
+class BackUpConsumer(BaseConsumer):
+
+    channel_layer_alias = 'backup'
+
+    async def connect(self):
+        await super().prepare_connection()
+        user_groups = await database_sync_to_async (
+            list
+        )(self.user.groups.all())
+
+        self.user_groups_names = []
+        for group in user_groups:
+            user_group_name = f'user_group_{group.id}'
+            await self.channel_layer.group_add(
+                user_group_name,
+                self.channel_name
+            )
+            self.user_groups_names.append(user_group_name)
+        await self.accept()
+
+    async def backup_status(self, event):
+        await self.send(text_data=json.dumps({
+            'action': 'backup_status',
+            'message': event['backup']
         }))

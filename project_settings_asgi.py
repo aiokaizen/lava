@@ -11,5 +11,11 @@ ASGI_APPLICATION = "lava.ws.routing.application"
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': "channels.layers.InMemoryChannelLayer"
+    },
+    'notification': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    },
+    'backup': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
     }
 }

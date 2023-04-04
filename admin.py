@@ -6,14 +6,12 @@ from django.contrib.auth.models import (
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework.authtoken.admin import TokenAdmin
-
 from admin_interface.models import Theme
 
 from lava.forms.main_forms import LavaUserChangeForm
 from lava.models import (
     Notification, Preferences, User, Group, Backup,
-    Conversation, ChatMessage
+    Conversation, ChatMessage, NotificationGroup
 )
 from lava.utils.utils import pop_list_item
 
@@ -105,9 +103,9 @@ class UserAdmin(auth_admin.UserAdmin):
             photo = obj.photo
             cover = obj.cover_picture
             obj.photo = None
-            obj.cover = None
+            obj.cover_picture = None
             result = obj.create(
-                user=request.user, file_fields=(('photo', photo), ('cover', cover))
+                user=request.user, photo=photo, cover=cover
             )
             if not result.is_success:
                 raise Exception(result.message)
@@ -313,6 +311,11 @@ class GroupAdmin(BaseModelAdmin):
     pass
 
 
+@admin.register(NotificationGroup)
+class NotificationGroupAdmin(BaseModelAdmin):
+    pass
+
+
 @admin.register(Backup)
 class BackupAdmin(BaseModelAdmin):
     pass
@@ -325,6 +328,7 @@ class NotificationAdmin(BaseModelAdmin):
     fieldsets = None
     readonly_fields = ()
     icon_name = "notifications"
+    actions = []
 
 
 @admin.register(Preferences)
