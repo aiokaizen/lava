@@ -81,6 +81,8 @@ class ChatConsumer(BaseConsumer):
         await self.accept()
 
     async def receive(self, text_data):
+        if not text_data:
+            return
         data = json.loads(text_data)
         action = data.get('action')
         if action == 'send_message':
@@ -180,6 +182,8 @@ class NotificationConsumer(BaseConsumer):
         await self.accept()
 
     async def receive(self, text_data):
+        if not text_data:
+            return
         data = json.loads(text_data)
         action = data.get('action')
         # if action == 'send_notification':

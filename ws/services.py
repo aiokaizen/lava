@@ -44,7 +44,7 @@ def send_ws_notification(instance):
             message={
                 "type": "notification_message",
                 "message": {
-                    "title": instance.title,
+                    "title": str(instance.title),
                     "sender": {
                         "id": instance.sender.id,
                         "first_name": instance.sender.first_name,
@@ -52,7 +52,7 @@ def send_ws_notification(instance):
                         "photo": photo
                     } if instance.sender else None,
                     "date": humanize_datetime(instance.date),
-                    "content": instance.content,
+                    "content": str(instance.content),
                     "category": instance.category,
                     "url": instance.url,
                 }
