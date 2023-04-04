@@ -243,6 +243,21 @@ FILE_PATTERNS = {
 }
 
 
+# Channels settings
+ASGI_APPLICATION = "lava.ws.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    },
+    'notification': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    },
+    'backup': {
+        'BACKEND': "channels.layers.InMemoryChannelLayer"
+    }
+}
+
+
 # Maintenance mode
 MAINTENANCE_MODE = int(os.environ.get(f"{PROJECT_NAME.upper()}_MAINTENANCE_MODE", 0))
 MAINTENANCE_BYPASS_QUERY = os.environ.get(
