@@ -250,10 +250,10 @@ CHANNEL_LAYERS = {
         'BACKEND': "channels.layers.InMemoryChannelLayer"
     },
     'notification': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        'BACKEND': "lava.ws.layers.NotificationInMemoryChannelLayer"
     },
     'backup': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
+        'BACKEND': "lava.ws.layers.BackUpInMemoryChannelLayer"
     }
 }
 

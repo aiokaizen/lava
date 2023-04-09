@@ -1059,6 +1059,9 @@ class Backup(BaseModel):
             if self.type == "db_backup":
                 zipdir(settings.MEDIA_ROOT, abs_filepath, skip_dirs=['backup'])
             elif self.type == "full_backup":
+                # Current Git branch             : git rev-parse --abbrev-ref HEAD
+                # Current Git commit             : git rev-parse --verify HEAD
+                # Current Git commit (Short hash): git rev-parse --short HEAD
                 reqs_filename = generate_requirements()
                 zipdir(settings.BASE_DIR, abs_filepath, skip_dirs=[
                     "venv", "tmp", "log", ".idea", "backup"

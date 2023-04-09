@@ -79,7 +79,7 @@ class Command(BaseCommand):
             settings.BASE_DIR,
             'lava/static/lava/assets/images/logo/logo_hybrid_white.png'
         )
-        
+
         try:
             theme = Theme.objects.get(name=default_theme_name)
             theme.name = default_theme_name
@@ -216,3 +216,4 @@ class Command(BaseCommand):
                     File(favicon)
                 )
             logging.info("The default theme has been initialized successfully.")
+
