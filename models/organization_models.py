@@ -61,8 +61,9 @@ class Bank(BaseModel):
         abstract = not lava_settings.ACTIVATE_PAYEMENTS
 
     name = models.CharField(_("Name"), max_length=256, unique=True)
-    swift_code = models.CharField(_("BIC / SWIFT"), max_length=256, blank=True)
     country = models.CharField(_("Country"), max_length=256, default='Morocco', blank=True)
+    routing_number = models.CharField(_("Routing number"), max_length=9, blank=True)
+    swift_code = models.CharField(_("BIC / SWIFT"), max_length=256, blank=True)
 
     def __str__(self):
         return f"{self.name}"

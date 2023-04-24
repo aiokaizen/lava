@@ -29,7 +29,7 @@ class Home(View):
     page_id = 'home'
 
     def get_permissions(self, request):
-        pass 
+        pass
 
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
@@ -172,7 +172,8 @@ class ResetPasswordConfirm(View):
         web_url = protocol + request.get_host()
         post_url = web_url + "/auth/users/reset_password_confirm/"
 
-        form = SetPasswordForm(user=None, data=request.POST, files=request.FILES)
+        form = SetPasswordForm(
+            user=None, data=request.POST, files=request.FILES)
         if not form.is_valid():
             return render(
                 request,
