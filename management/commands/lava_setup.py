@@ -20,28 +20,30 @@ class Command(BaseCommand):
             action='store_true',
             help='If this argument is set, the function will not print anything to the console.',
         )
+        parser.add_argument(
+            '--reset-perms',
+            action='store_true',
+            help='If this argument is set, all permissions will be removed and recreated (This action is irreversible!!).',
+        )
 
     def handle(self, *args, **options):
 
         no_logs = options["no_logs"]
+        reset_perms = options["reset_perms"]
 
-        # # Reset permissions:
-        # Permission.objects.all().delete()
+        # Reset permissions:
+        if reset_perms:
+            Permission.objects.all().delete()
         # from django.utils import translation
         # translation.activate('fr')
         # print("current lang:", translation.get_language())
 
         # Create base model default permissions
-        models_count = 0
-        perms_per_model = 0
         for model in apps.get_models():
+            content_type = ContentType.objects.get_for_model(model)
             if hasattr(model, '_create_default_permissions'):
                 default_permissions = model._create_default_permissions()
-                models_count += 1
-                if models_count == 1:
-                    perms_per_model = len(default_permissions)
                 for code_name, verbose_name in default_permissions:
-                    content_type = ContentType.objects.get_for_model(model)
                     Permission.objects.get_or_create(
                         codename=code_name,
                         content_type=content_type,
@@ -49,12 +51,27 @@ class Command(BaseCommand):
                             'name': verbose_name,
                         }
                     )
+            else:
+                # Create other models default permissions
+                opts = model._meta
 
-        perms_count = Permission.objects.count()
-        assert perms_count >= models_count * perms_per_model, (
-            f"The number of permissions created ({perms_count}) is less than the minimum "
-            f"enticipated number ({models_count * perms_per_model})"
-        )
+                for perm in opts.default_permissions:
+                    codename = f"{perm}_{opts.model_name}"
+                    name = f"Can {perm} {opts.verbose_name}"
+                    Permission.objects.get_or_create(
+                        codename=codename,
+                        name=name,
+                        content_type=content_type,
+                    )
+
+                for perm in opts.permissions:
+                    codename = perm[0]
+                    name = perm[1]
+                    Permission.objects.get_or_create(
+                        codename=codename,
+                        name=name,
+                        content_type=content_type,
+                    )
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(name="ADMINS")

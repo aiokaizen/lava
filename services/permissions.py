@@ -3,7 +3,6 @@ from typing import Union
 from rest_framework.permissions import IsAuthenticated
 
 from lava.enums import PermissionActionName
-from lava.utils.utils import camelcase_to_snakecase
 
 
 # Generic Model PERMISSIONS
@@ -16,7 +15,7 @@ def has_permission(user, model, action: Union[PermissionActionName, str]):
     permission_name = action
 
     if not isinstance(action, str):
-        model_name = camelcase_to_snakecase(model.__name__)
+        model_name = model.__name__.lower()
         permission_name = f"{action.value}_{model_name}"
 
     has_perm = user.has_perm(f"{app_label}.{permission_name}")

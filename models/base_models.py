@@ -21,7 +21,7 @@ from django.urls import reverse
 from lava.managers import DefaultModelBaseManager, DefaultModelTrashManager
 from lava.enums import DeletePolicy
 from lava.error_codes import NOT_CREATED_ERROR_CODE, REQUIRED_ERROR_CODE
-from lava.utils import Result, camelcase_to_snakecase
+from lava.utils import Result
 from lava import settings as lava_settings
 
 
@@ -305,7 +305,7 @@ class BaseModelMixin:
         verbose_name = cls._meta.verbose_name
         verbose_name_plural = cls._meta.verbose_name_plural
         # Snake Case eg: GroupPermission > group_permission
-        sc_class_name = camelcase_to_snakecase(class_name)
+        sc_class_name = class_name.lower()
 
         verbose_name = verbose_name or camel_case_to_spaces(class_name)
         verbose_name_plural = verbose_name_plural or f"{verbose_name}s"
