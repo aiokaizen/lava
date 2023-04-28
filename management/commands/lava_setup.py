@@ -33,6 +33,7 @@ class Command(BaseCommand):
 
         # Reset permissions:
         if reset_perms:
+            logging.info("Resetting all permissions")
             Permission.objects.all().delete()
         # from django.utils import translation
         # translation.activate('fr')
@@ -40,6 +41,7 @@ class Command(BaseCommand):
 
         # Create base model default permissions
         for model in apps.get_models():
+            opts = model._meta
             content_type = ContentType.objects.get_for_model(model)
             if hasattr(model, '_create_default_permissions'):
                 default_permissions = model._create_default_permissions()
@@ -53,8 +55,6 @@ class Command(BaseCommand):
                     )
             else:
                 # Create other models default permissions
-                opts = model._meta
-
                 for perm in opts.default_permissions:
                     codename = f"{perm}_{opts.model_name}"
                     name = f"Can {perm} {opts.verbose_name}"
@@ -64,14 +64,16 @@ class Command(BaseCommand):
                         content_type=content_type,
                     )
 
-                for perm in opts.permissions:
-                    codename = perm[0]
-                    name = perm[1]
-                    Permission.objects.get_or_create(
-                        codename=codename,
-                        name=name,
-                        content_type=content_type,
-                    )
+            # Create other permissions (From Meta.permissions)
+            print("Creating permissions for model:", model.__name__)
+            for perm in opts.permissions:
+                codename = perm[0]
+                name = perm[1]
+                Permission.objects.get_or_create(
+                    codename=codename,
+                    name=name,
+                    content_type=content_type,
+                )
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(name="ADMINS")
