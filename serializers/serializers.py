@@ -41,7 +41,7 @@ class ListIDsSerializer(serializers.Serializer):
     list_ids = serializers.ListField(label=_("IDs"), required=True)
 
     class Meta:
-        fields = [ "list_ids" ]
+        fields = ["list_ids"]
 
     def __init__(self, instance=None, data=empty, model=None, trash=False, **kwargs):
         assert model is not None, (
@@ -56,10 +56,12 @@ class ListIDsSerializer(serializers.Serializer):
         try:
             qset = manager.filter(pk__in=value)
         except ValueError:
-            raise serializers.ValidationError(_("One or more ID is not valid."))
+            raise serializers.ValidationError(
+                _("One or more ID is not valid."))
 
         if len(value) != qset.count():
-            raise serializers.ValidationError(_("One or more ID is not valid."))
+            raise serializers.ValidationError(
+                _("One or more ID is not valid."))
         return qset
 
 
@@ -68,7 +70,7 @@ class BulkActionSerializer(ListIDsSerializer):
     action = serializers.CharField()
 
     class Meta:
-        fields = [ "list_ids", "action" ]
+        fields = ["list_ids", "action"]
 
     def validate_action(self, value):
         action = value
@@ -132,7 +134,8 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
 
     def validate_old_password(self, value):
         if not self.instance.check_password(value):
-            raise serializers.ValidationError(_("The current password does not match!"))
+            raise serializers.ValidationError(
+                _("The current password does not match!"))
 
     def validate_new_password(self, value):
         validate_password(value, self.instance)
@@ -183,7 +186,8 @@ class PermissionSerializer(BaseModelSerializer):
 
 class ChoicesSerializer(serializers.Serializer):
 
-    class_name = serializers.ChoiceField(label="Class name", choices=lava_settings.CLASS_NAME_CHOICES)
+    class_name = serializers.ChoiceField(
+        label="Class name", choices=lava_settings.CLASS_NAME_CHOICES)
     query = serializers.CharField(label="Query")
 
     class Meta:
@@ -194,7 +198,8 @@ class ChoicesSerializer(serializers.Serializer):
 
     def validate_query(self, value):
         if len(value) < 2:
-            raise serializers.ValidationError(_("The query parametter must have a length of 2 or more."))
+            raise serializers.ValidationError(
+                _("The query parametter must have a length of 2 or more."))
         return value
 
     def validate(self, data):
@@ -204,6 +209,6 @@ class ChoicesSerializer(serializers.Serializer):
         query = validated_data['query']
         self.choices = [{
             "id": obj.pk,
-            "label": getattr(obj, 'get_choices_display', lambda : None)() or str(obj),
+            "label": getattr(obj, 'get_choices_display', lambda: None)() or str(obj),
         } for obj in model.filter(kwargs=QueryDict(f'query={query}'))]
         return validated_data

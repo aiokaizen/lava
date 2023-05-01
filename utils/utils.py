@@ -1,4 +1,5 @@
 import os
+import json
 import random
 import logging
 from io import BytesIO
@@ -30,8 +31,8 @@ from lava.exceptions import LavaBaseException
 from lava import settings as lava_settings
 
 
-def slugify(value, allow_unicode=False, separator='_'):
-    result = base_slugify(value, allow_unicode).replace('-', separator)
+def slugify(value, allow_unicode=False, separator="_"):
+    result = base_slugify(value, allow_unicode).replace("-", separator)
     return result
 
 
@@ -70,21 +71,21 @@ class odict(dict):
             setattr(self, key, value)
 
     def __setitem__(self, __key, __value):
-        key = slugify(__key).replace('-', '_')
+        key = slugify(__key).replace("-", "_")
         setattr(self, key, __value)
         return super().__setitem__(__key, __value)
 
 
-def strtobool(val:str):
+def strtobool(val: str):
     """Convert a string representation of truth to true (1) or false (0).
     True values are 'y', 'yes', 't', 'true', 'on', and '1'; false values
     are 'n', 'no', 'f', 'false', 'off', and '0'.  Raises ValueError if
     'val' is anything else.
     """
     val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
+    if val in ("y", "yes", "t", "true", "on", "1"):
         return True
-    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
+    elif val in ("n", "no", "f", "false", "off", "0"):
         return False
     else:
         raise ValueError(_("invalid truth value %r") % (val,))
@@ -98,12 +99,13 @@ def humanize_datetime(datetime):
     elif (now - datetime) < timedelta(days=360):
         return datetime.strftime("%B, %d")
 
-    return  datetime.strftime("%Y/%m/%d")
+    return datetime.strftime("%Y/%m/%d")
 
 
 def guess_protocol():
     # HOST containing `:` means that the project is running in a dev server
-    return 'http' if ':' in lava_settings.HOST else 'https'
+    return "http" if ":" in lava_settings.HOST else "https"
+
 
 def pop_list_item(l: list, value, default=None):
     try:
@@ -112,14 +114,14 @@ def pop_list_item(l: list, value, default=None):
         return default
 
 
-def contains_arabic_chars(val:str):
+def contains_arabic_chars(val: str):
     """
     Returns True if the string in the argument contains any arabic characters.
     Otherwise, it returns False
     """
     for c in val:
         unicode_name = unicodedata.name(c).lower()
-        if 'arabic' in unicode_name:
+        if "arabic" in unicode_name:
             return True
 
     return False
@@ -192,9 +194,9 @@ class Result(imdict):
     @classmethod
     def from_dict(cls, result_dict):
         if (
-            "result" not in result_dict or
-            "message" not in result_dict or
-            result_dict.get("class_name", "") != "lava.utils.Result"
+            "result" not in result_dict
+            or "message" not in result_dict
+            or result_dict.get("class_name", "") != "lava.utils.Result"
         ):
             raise TypeError("Invalid result dict format.")
 
@@ -216,9 +218,9 @@ class Result(imdict):
             type = "warning"
 
         res_dict = {
-            "class_name": 'lava.utils.Result',
+            "class_name": "lava.utils.Result",
             "result": type,
-            "message": str(self.message)
+            "message": str(self.message),
         }
 
         if not self.is_success:
@@ -230,8 +232,8 @@ class Result(imdict):
 
 
 def camelcase_to_snakecase(value):
-    pattern = re.compile(r'(?<!^)(?=[A-Z])')
-    return pattern.sub('_', value).lower()
+    pattern = re.compile(r"(?<!^)(?=[A-Z])")
+    return pattern.sub("_", value).lower()
 
 
 def mask_number(n):
@@ -290,16 +292,16 @@ def get_conversation_logo_filename(instance, filename):
     ext = filename.split(".")[-1]
     return f"chat/conversations/{instance.id}/logo.{ext}"
 
+
 def get_chat_message_image_filename(instance, filename):
     ext = filename.split(".")[-1]
     now = timezone.now().strftime("%Y%m%d%H%M%S%z")
     return f"chat/conversations/{instance.conversation.id}/messages/{instance.id}_{now}.{ext}"
 
 
-
 def get_model_file_from_io(filename, is_image=False):
     try:
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             fname, ext = os.path.splitext(os.path.basename(filename))
 
             file_data = f.read()
@@ -340,9 +342,9 @@ def get_model_file_from_url(url, is_image=False):
 
     if response.status_code == 200:
         try:
-            filename = url.split('/')[-1].split('.')[0]
+            filename = url.split("/")[-1].split(".")[0]
             filename = slugify(filename)
-            content_type = response.headers['content-type']
+            content_type = response.headers["content-type"]
             ext = mimetypes.guess_extension(content_type)
             if is_image:
                 file = PILImage.open(BytesIO(response.content))
@@ -363,7 +365,9 @@ def get_backup_file_filename(instance, filename):
     return "backup/{}".format(instance.get_filename())
 
 
-def get_or_create(klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs):
+def get_or_create(
+    klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs
+):
     try:
         instance = klass.objects.get(*args, **kwargs)
     except klass.DoesNotExist:
@@ -380,15 +384,23 @@ def get_or_create(klass, action_user=None, default_value=None, create_parmas=Non
 def send_html_email(
     request, template, recipients, sender=None, context=None, fail_silently=False
 ):
-
     email = BaseEmailMessage(request, context=context, template_name=template)
 
     email.send(to=recipients, from_email=sender, fail_silently=fail_silently)
 
 
 def send_mass_html_email(
-    request, template, subject, recipients, sender=None, context=None,
-    user=None, password=None, fail_silently=False, connection=None, datatuple=None
+    request,
+    template,
+    subject,
+    recipients,
+    sender=None,
+    context=None,
+    user=None,
+    password=None,
+    fail_silently=False,
+    connection=None,
+    datatuple=None,
 ):
     """
     Given a datatuple of (subject, text_content, html_content, from_email,
@@ -413,21 +425,24 @@ def send_mass_html_email(
                 template,
                 make_context(
                     BaseEmailMessage(
-                        request, context={**context, 'to': recipient}, template_name=template
+                        request,
+                        context={**context, "to": recipient},
+                        template_name=template,
                     ).get_context_data(),
-                    request
-                ).flatten()
+                    request,
+                ).flatten(),
             ),
             sender,
             recipient,
-        ) for recipient in recipients
+        )
+        for recipient in recipients
     ]
 
     messages = []
 
     for subject, text, html, from_email, recipient in datatuple:
         if type(recipient) not in [list, tuple]:
-            recipient = (recipient, )
+            recipient = (recipient,)
         message = EmailMultiAlternatives(subject, text, from_email, recipient)
         message.attach_alternative(html, "text/html")
         messages.append(message)
@@ -445,8 +460,10 @@ def add_margin_to_image(pil_img, top, right, bottom, left, color):
     return result
 
 
-def get_image(image_path, target_width=None, target_height=None, margin=None, color="#00000000"):
-    """ margin: tuple (top, right, bottom, left)"""
+def get_image(
+    image_path, target_width=None, target_height=None, margin=None, color="#00000000"
+):
+    """margin: tuple (top, right, bottom, left)"""
 
     image = PILImage.open(image_path)
     tmp_image_filename = os.path.join(get_tmp_root(), f"tmp_image.png")
@@ -518,10 +535,12 @@ def _is_username_valid(username):
         return True
 
 
-def hex_to_rgb(hex_value:str):
-    assert hex_value.startswith("#"), "Invalid color format, please enter a hex color value"
+def hex_to_rgb(hex_value: str):
+    assert hex_value.startswith(
+        "#"
+    ), "Invalid color format, please enter a hex color value"
     hex_value = hex_value[1:]
-    return tuple(int(hex_value[i:i + 2], 16) for i in (0, 2, 4))
+    return tuple(int(hex_value[i : i + 2], 16) for i in (0, 2, 4))
 
 
 def adjust_color(color, amount=0.5):
@@ -546,21 +565,23 @@ def adjust_color(color, amount=0.5):
 def path_is_parent(parent_path, child_path):
     parent_path = os.path.abspath(parent_path)
     child_path = os.path.abspath(child_path)
-    return os.path.commonpath([parent_path]) == os.path.commonpath([parent_path, child_path])
+    return os.path.commonpath([parent_path]) == os.path.commonpath(
+        [parent_path, child_path]
+    )
 
 
 def path_includes_dir(parent_path, dir_name):
     return (
-        f"{os.sep}{dir_name}{os.sep}" in parent_path or
-        parent_path.startswith(f"{dir_name}{os.sep}") or
-        parent_path.endswith(f"{os.sep}{dir_name}")
+        f"{os.sep}{dir_name}{os.sep}" in parent_path
+        or parent_path.startswith(f"{dir_name}{os.sep}")
+        or parent_path.endswith(f"{os.sep}{dir_name}")
     )
 
 
-def zipdir(target_dir, output=None, mode='w', skip_dirs=None):
+def zipdir(target_dir, output=None, mode="w", skip_dirs=None):
     """
-        Zip all files in a directory located at target_dir.
-        Outputs the zip into output our the parent directory.
+    Zip all files in a directory located at target_dir.
+    Outputs the zip into output our the parent directory.
     """
 
     if not skip_dirs:
@@ -585,72 +606,104 @@ def zipdir(target_dir, output=None, mode='w', skip_dirs=None):
                 zipf.write(
                     os.path.join(root, file),
                     os.path.relpath(
-                        os.path.join(root, file),
-                        os.path.join(target_dir, '..')
-                    )
+                        os.path.join(root, file), os.path.join(target_dir, "..")
+                    ),
                 )
 
     return output
 
 
 def zipf(filename, output=None, ziph=None):
-    """ Zip the file with the path filename into the output zip. """
+    """Zip the file with the path filename into the output zip."""
 
     if not output:
-        file_name, ext = os.path.splitext(filename)
-        output = os.path.join(
-            os.path.dirname(filename),
-            f"{file_name}.zip"
-        )
+        file_name, _ext = os.path.splitext(filename)
+        output = os.path.join(os.path.dirname(filename), f"{file_name}.zip")
 
     output_parent_dir = os.path.dirname(output)
 
     try:
-        zipf = ziph if ziph else zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED)
-        zipf.write(
-            filename,
-            os.path.relpath(
-                filename,
-                os.path.join(output_parent_dir)
-            )
-        )
+        zipf = ziph if ziph else zipfile.ZipFile(output, "a", zipfile.ZIP_DEFLATED)
+        zipf.write(filename, os.path.relpath(filename, os.path.join(output_parent_dir)))
     finally:
         if not ziph:
             zipf.close()
 
 
-def dump_pgdb(output_filename=None, db="default"):
+def exec_command(command, command_dir=None, stdout=None):
+    capture_output = True if not stdout else False
+    result = subprocess.run(
+        [command],
+        cwd=command_dir,
+        shell=True,
+        stdout=stdout,
+        capture_output=capture_output,
+    )
+    if stdout:
+        return None
+    return result.stdout, result.stderr
 
+
+def dump_pgdb(output_filename=None, db="default"):
     db_name = settings.DATABASES[db]["NAME"]
     username = settings.DATABASES[db]["USER"]
     password = settings.DATABASES[db]["PASSWORD"]
     host = settings.DATABASES[db]["HOST"]
     port = settings.DATABASES[db]["PORT"]
-    port = f' -p {port}' if port else ''
+    port = f" -p {port}" if port else ""
 
     now = datetime.now().strftime("%Y%m%d%H%M%S")
-    filename = output_filename or f"{db_name}_backup_{now}.sql"
+    filename = output_filename or os.path.join(
+        settings.BASE_DIR, f"{db_name}_backup_{now}.sql"
+    )
 
-    with open(filename, 'w') as output:
-        subprocess.Popen(
-            [f"PGPASSWORD='{password}' pg_dump -h {host}{port} -U {username} {db_name}"],
+    with open(filename, "w") as output:
+        exec_command(
+            (
+                f"PGPASSWORD='{password}' pg_dump -h {host}{port} "
+                f"-U {username} {db_name}"
+            ),
             stdout=output,
-            shell=True
         )
     return filename
 
 
 def generate_requirements(out=None):
-
     base_dir = settings.BASE_DIR
     filename = out or os.path.join(base_dir, "all_requirements.txt")
 
-    with open(filename, 'w') as output:
-        process = subprocess.Popen(
-            [f"pip freeze"],
-            stdout=output,
-            shell=True
-        )
-        process.wait()
+    with open(filename, "w") as output:
+        # process = subprocess.Popen(["pip freeze"], stdout=output, shell=True)
+        # process.wait()
+        exec_command("pip freeze", stdout=output)
+
+    return filename
+
+
+def generate_repo_backup(repo=None, out=None):
+    base_dir = settings.BASE_DIR
+    repository_root = base_dir if not repo else os.path.join(base_dir, repo)
+    filename = out or os.path.join(base_dir, "repositories.json")
+    repo_name = repo or "main"
+    repositories = {}
+
+    if os.path.exists(filename):
+        with open(filename, "r") as data:
+            repositories = json.load(data)
+
+    repositories[repo_name] = {"branch": "", "commit": ""}
+
+    # Current Git branch name
+    out, _err = exec_command(
+        "git rev-parse --abbrev-ref HEAD", command_dir=repository_root
+    )
+    repositories[repo_name]["branch"] = out.decode().strip()
+
+    # Current Git commit short hash (Emmit the --short to get the full hash.)
+    out, _err = exec_command("git rev-parse --short HEAD", command_dir=repository_root)
+    repositories[repo_name]["commit"] = out.decode().strip()
+
+    with open(filename, "w") as output:
+        json.dump(repositories, output)
 
     return filename

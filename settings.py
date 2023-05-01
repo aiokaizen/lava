@@ -12,11 +12,12 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
-LOG_ROOT = getattr(settings, "LOG_ROOT ", os.path.join(settings.BASE_DIR, 'log'))
+LOG_ROOT = getattr(settings, "LOG_ROOT ", os.path.join(settings.BASE_DIR, "log"))
 
 FIREBASE_CREDENTIALS_FILE_PATH = os.path.join(
     settings.BASE_DIR, "firebase-adminsdk-private-key.json"
 )
+
 
 def init_firebase():
     creds_file_path = FIREBASE_CREDENTIALS_FILE_PATH
@@ -31,7 +32,7 @@ def init_firebase():
         creds = credentials.Certificate(creds_file_path)
         # cred = credentials.RefreshToken(creds_file_path)
         default_app = firebase_admin.initialize_app(creds)
-        return (True, '')
+        return (True, "")
     except Exception as e:
         logging.error(e)
         return (False, str(e))
@@ -77,7 +78,7 @@ GROUPS_ASSOCIATED_MODELS = getattr(
     },
 )
 
-HOST = getattr(settings, 'HOST', 'localhost:8000')
+HOST = getattr(settings, "HOST", "localhost:8000")
 
 EKBLOCKS_COLOR = "#1cab98"
 
@@ -97,7 +98,7 @@ RESULT_TYPE_CHOICES = (
     ("error", _("Error")),
 )
 
-ACTIVATE_PAYEMENTS = getattr(settings, 'ACTIVATE_PAYEMENTS', False)
+ACTIVATE_PAYEMENTS = getattr(settings, "ACTIVATE_PAYEMENTS", False)
 
 BACKUP_TYPE_CHOICES = (
     ("full_backup", _("Full backup")),
@@ -110,56 +111,61 @@ BACKUP_STATUS_CHOICES = (
     ("failed", _("Failed")),
 )
 
-BACKUP_LOCK_TAG_PATH = os.path.join(
-    settings.BASE_DIR, ".back_up_in_progress"
-)
+BACKUP_LOCK_TAG_PATH = os.path.join(settings.BASE_DIR, ".back_up_in_progress")
+
+_INNER_REPOSITORIES = getattr(settings, "INNER_REPOSITORIES", [])
+INNER_REPOSITORIES = [*_INNER_REPOSITORIES, "lava"]
 
 BREADCRUMBS_DEPTH_LEVEL = getattr(settings, "BREADCRUMBS_DEPTH_LEVEL", 3)
 
-LOGO_FILE_PATH = getattr(
-    settings, "LOGO_FILE_PATH", "lava/assets/images/logo/logo.png"
-)
+LOGO_FILE_PATH = getattr(settings, "LOGO_FILE_PATH", "lava/assets/images/logo/logo.png")
 
 FIREBASE_ACTIVATED = init_firebase()[0]
 
-REMOTE_BACKUP_CONF = getattr(settings, "REMOTE_BACKUP_CONF", {
-    "server_name": "backup_server",  # IP address or domain name
-    "login_user": "ekadmin",
-    "backup_folder": "/var/backup/lava"
-})
+REMOTE_BACKUP_CONF = getattr(
+    settings,
+    "REMOTE_BACKUP_CONF",
+    {
+        "server_name": "backup_server",  # IP address or domain name
+        "login_user": "ekadmin",
+        "backup_folder": "/var/backup/lava",
+    },
+)
 TMP_ROOT = getattr(settings, "TMP_ROOT", os.path.join(settings.BASE_DIR, "tmp"))
 
 
-BACKUP_COMPLETED_NOTIFICATION_ID = 'backup_completed_alert'
+BACKUP_COMPLETED_NOTIFICATION_ID = "backup_completed_alert"
 _NOTIFICATION_GROUPS_NAMES = {
-    'user_added_alert': {
-        'name': _('User creation alert'),
-        'description': _("This notification is sent when a new user is created."),
+    "user_added_alert": {
+        "name": _("User creation alert"),
+        "description": _("This notification is sent when a new user is created."),
     },
-    'user_deleted_alert': {
-        'name': _('User deletion alert'),
-        'description': _("This notification is sent when a user is deleted."),
+    "user_deleted_alert": {
+        "name": _("User deletion alert"),
+        "description": _("This notification is sent when a user is deleted."),
     },
-    'group_added_alert': {
-        'name': _('Group creation alert'),
-        'description': _("This notification is sent when a new group is created."),
+    "group_added_alert": {
+        "name": _("Group creation alert"),
+        "description": _("This notification is sent when a new group is created."),
     },
-    'group_deleted_alert': {
-        'name': _('Group deletion alert'),
-        'description': _("This notification is sent when a group is deleted."),
+    "group_deleted_alert": {
+        "name": _("Group deletion alert"),
+        "description": _("This notification is sent when a group is deleted."),
     },
-    'permission_changed_alert': {
-        'name': _('Permission update alert'),
-        'description': _("This notification is sent when a permission has been affected or revoked from a user or group."),
+    "permission_changed_alert": {
+        "name": _("Permission update alert"),
+        "description": _(
+            "This notification is sent when a permission has been affected or revoked from a user or group."
+        ),
     },
     BACKUP_COMPLETED_NOTIFICATION_ID: {
-        'name': _('Backup completed alert'),
-        'description': _("This notification is sent when a backup is completed."),
-    }
+        "name": _("Backup completed alert"),
+        "description": _("This notification is sent when a backup is completed."),
+    },
 }
 NOTIFICATION_GROUPS_NAMES = {
     **_NOTIFICATION_GROUPS_NAMES,
-    **getattr(settings, 'NOTIFICATION_GROUPS_NAMES', {})
+    **getattr(settings, "NOTIFICATION_GROUPS_NAMES", {}),
 }
 
 
@@ -167,23 +173,21 @@ CLASS_NAME_CHOICES = (
     ("users", _("Users")),
     ("groups", _("Groups")),
     ("permissions", _("Permissions")),
-    *getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES", [])
+    *getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES", []),
 )
 
 CLASS_NAME_CHOICES_MAPPING = {
-    "users": 'lava.User',
-    "groups": 'lava.Group',
-    "permissions": 'lava.Permission',
-    **getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES_MAPPING", {})
+    "users": "lava.User",
+    "groups": "lava.Group",
+    "permissions": "lava.Permission",
+    **getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES_MAPPING", {}),
 }
 
 
 # Chat models settings
-TIMEUNIT_CHOICES = [
-    "days", "hours", "minutes"
-]
+TIMEUNIT_CHOICES = ["days", "hours", "minutes"]
 
 CHAT_MESSAGE_CHOICES = (
-    ('text', _("Text")),
-    ('image', _("Image")),
+    ("text", _("Text")),
+    ("image", _("Image")),
 )

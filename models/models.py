@@ -20,7 +20,8 @@ from django.contrib.auth.models import (
 )
 from django.contrib.admin.models import (
     LogEntry as BaseLogEntryModel,
-    ADDITION, CHANGE, DELETION
+    ADDITION,
+    DELETION
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _, gettext
@@ -40,13 +41,18 @@ from lava.utils import (
     generate_password,
     strtobool,
     get_backup_file_filename,
-    zipdir, zipf, dump_pgdb,
+    zipdir,
+    zipf,
+    dump_pgdb,
     generate_requirements,
-    get_group_photo_filename
+    generate_repo_backup,
+    get_group_photo_filename,
 )
 from lava.managers import (
-    GroupManager, NotificationGroupManager, LavaUserManager,
-    DefaultModelBaseManager
+    GroupManager,
+    NotificationGroupManager,
+    LavaUserManager,
+    DefaultModelBaseManager,
 )
 from lava.ws.services import send_ws_backup_status, send_ws_notification
 
@@ -57,7 +63,6 @@ except ImportError:
 
 
 class Preferences(models.Model):
-
     LIST_LAYOUT_CHOICES = (
         ("list", _("List")),
         ("cards", _("Cards")),
@@ -101,20 +106,18 @@ class Preferences(models.Model):
 
 
 class LogEntry(BaseLogEntryModel):
-
     class Meta:
-        verbose_name = _('Log entry')
-        verbose_name_plural = _('Log entries')
-        ordering = ['-action_time']
+        verbose_name = _("Log entry")
+        verbose_name_plural = _("Log entries")
+        ordering = ["-action_time"]
         default_permissions = ()
         permissions = (
-            ('list_log_entry', _("Can view activity journal")),
-            ('export_log_entry', _("Can export activity journal")),
+            ("list_log_entry", _("Can view activity journal")),
+            ("export_log_entry", _("Can export activity journal")),
         )
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
-
         filters = Q()
         filter_params = Q()
         if kwargs is None:
@@ -127,10 +130,9 @@ class LogEntry(BaseLogEntryModel):
             filters |= Q(action_flag=kwargs["action_type"])
 
         if "content_type" in kwargs:
-            app_name, model = kwargs["content_type"].split('.')
-            filters |= (
-                Q(content_type__app_label=app_name) &
-                Q(content_type__model=model)
+            app_name, model = kwargs["content_type"].split(".")
+            filters |= Q(content_type__app_label=app_name) & Q(
+                content_type__model=model
             )
 
         if "action_time" in kwargs:
@@ -152,7 +154,7 @@ class LogEntry(BaseLogEntryModel):
         filter_params = cls.get_filter_params(kwargs)
         exclude_params = {}
 
-        admin_users = User.objects.filter(username__in=['ekadmin', 'eksuperuser'])
+        admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
         if user not in admin_users:
             exclude_params["user__in"] = admin_users
 
@@ -162,35 +164,30 @@ class LogEntry(BaseLogEntryModel):
                 **exclude_params
             )
 
-        queryset = cls.objects.filter(filter_params).exclude(
-            **exclude_params
-        )
+        queryset = cls.objects.filter(filter_params).exclude(**exclude_params)
         return queryset | base_queryset
 
 
 class Permission(BaseModelMixin, BasePermissionModel):
-
     class Meta:
-        verbose_name = _('permission')
-        verbose_name_plural = _('permissions')
-        ordering = ['content_type__app_label', 'content_type__model', 'codename']
+        verbose_name = _("permission")
+        verbose_name_plural = _("permissions")
+        ordering = ["content_type__app_label", "content_type__model", "codename"]
         proxy = True
         default_permissions = ()
-        permissions = (
-            ('set_permission', _("Can set permissions")),
-        )
+        permissions = (("set_permission", _("Can set permissions")),)
 
     def create(self, user=None, *args, **kwargs):
-
         return Result(False, _("You can not create a new permission."))
 
         result = super().create(user=user, *args, **kwargs)
         if result.is_error:
             return result
-        return Result(True, _("The permission has been created successfully."), instance=self)
+        return Result(
+            True, _("The permission has been created successfully."), instance=self
+        )
 
     def update(self, user=None, update_fields=None, *args, **kwargs):
-
         if len(update_fields or []) > 0:
             update_fields = ["name"]
 
@@ -200,7 +197,6 @@ class Permission(BaseModelMixin, BasePermissionModel):
         return Result(True, _("The permission has been updated successfully."))
 
     def delete(self, user=None, *args, **kwargs):
-
         return Result(False, _("You can not delete a permission."))
 
         result = super().delete(user=user, soft_delete=False)
@@ -226,29 +222,31 @@ class Permission(BaseModelMixin, BasePermissionModel):
 
 
 class Group(BaseModel, BaseGroupModel):
-
     class Meta(BaseModel.Meta):
-        verbose_name = _('Group')
-        verbose_name_plural = _('Groups')
+        verbose_name = _("Group")
+        verbose_name_plural = _("Groups")
         default_permissions = ()
 
-    description = models.TextField(_('Description'), blank=True)
+    description = models.TextField(_("Description"), blank=True)
     image = ThumbnailerImageField(
-        _("Image"),
-        upload_to=get_group_photo_filename,
-        null=True, blank=True
+        _("Image"), upload_to=get_group_photo_filename, null=True, blank=True
     )
     parent = models.ForeignKey(
-        'self', verbose_name=_("Parent"), on_delete=models.PROTECT,
-        related_name="sub_groups", null=True, blank=True
+        "self",
+        verbose_name=_("Parent"),
+        on_delete=models.PROTECT,
+        related_name="sub_groups",
+        null=True,
+        blank=True,
     )
-    notification_id = models.CharField(_("Notification group id"), max_length=256, blank=True)
+    notification_id = models.CharField(
+        _("Notification group id"), max_length=256, blank=True
+    )
 
     objects = GroupManager()
     all_objects = DefaultModelBaseManager()
 
     def create(self, user=None, m2m_fields=None):
-
         result = super().create(user=user, m2m_fields=m2m_fields)
         if result.is_error:
             return result
@@ -256,12 +254,11 @@ class Group(BaseModel, BaseGroupModel):
         return Result.success(_("Group has been created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
-
         result = super().update(
             user=user,
             update_fields=update_fields,
             m2m_fields=m2m_fields,
-            message=message
+            message=message,
         )
         if result.is_error:
             return result
@@ -299,7 +296,6 @@ class Group(BaseModel, BaseGroupModel):
 
 
 class NotificationGroup(Group):
-
     class Meta:
         proxy = True
 
@@ -307,13 +303,18 @@ class NotificationGroup(Group):
 
     @classmethod
     def create_notification_groups(cls):
-        for notification_id, group_data in lava_settings.NOTIFICATION_GROUPS_NAMES.items():
+        for (
+            notification_id,
+            group_data,
+        ) in lava_settings.NOTIFICATION_GROUPS_NAMES.items():
             group, _created = NotificationGroup.objects.get_or_create(
                 notification_id=notification_id,
                 name=group_data.get("name"),
-                description=group_data.get("description", '')
+                description=group_data.get("description", ""),
             )
-        return Result.success(_("All notification groups have been created successfully."))
+        return Result.success(
+            _("All notification groups have been created successfully.")
+        )
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
@@ -325,14 +326,13 @@ class NotificationGroup(Group):
 
 
 class User(BaseModel, AbstractUser):
-
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
         default_permissions = ()
         permissions = (
-            ('change_current_user', _("Can change user profile")),
-            ('delete_current_user', _("Can delete user profile")),
-            ('soft_delete_current_user', _("Can soft delete user profile")),
+            ("change_current_user", _("Can change user profile")),
+            ("delete_current_user", _("Can delete user profile")),
+            ("soft_delete_current_user", _("Can soft delete user profile")),
         )
 
     user_permissions = models.ManyToManyField(
@@ -377,8 +377,11 @@ class User(BaseModel, AbstractUser):
     fax = models.CharField(_("Fax"), max_length=32, default="", blank=True)
     job = models.CharField(_("Job title"), max_length=64, blank=True, default="")
     cover_picture = ThumbnailerImageField(
-        _("Cover picture"), upload_to=get_user_cover_filename, blank=True, null=True,
-        help_text=_("Preferred image dimentions: (1200 x 250)")
+        _("Cover picture"),
+        upload_to=get_user_cover_filename,
+        blank=True,
+        null=True,
+        help_text=_("Preferred image dimentions: (1200 x 250)"),
     )
     preferences = models.OneToOneField(
         Preferences, on_delete=models.PROTECT, blank=True
@@ -406,7 +409,7 @@ class User(BaseModel, AbstractUser):
 
     def get_all_permissions(self):
         user_perms_ids = self.user_permissions.all().values_list("id", flat=True)
-        groups_perms_ids = self.groups.all().values_list('permissions__id', flat=True)
+        groups_perms_ids = self.groups.all().values_list("permissions__id", flat=True)
         return Permission.objects.filter(pk__in=[*user_perms_ids, *groups_perms_ids])
 
     def create(
@@ -422,9 +425,10 @@ class User(BaseModel, AbstractUser):
         generate_tmp_password=False,
         link_payments_app=True,
     ):
-
         if self.id:
-            return Result(success=False, message=_("User is already created."), tag="warning")
+            return Result(
+                success=False, message=_("User is already created."), tag="warning"
+            )
 
         if not hasattr(self, "preferences"):
             self.preferences = Preferences.objects.create()
@@ -442,7 +446,9 @@ class User(BaseModel, AbstractUser):
         elif settings.DJOSER["SEND_ACTIVATION_EMAIL"]:
             self.is_active = False
 
-        self.full_name = f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
+        self.full_name = (
+            f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
+        )
         # We log the action manually on success
         result = super().create(user=None)
         if result.is_error:
@@ -481,7 +487,9 @@ class User(BaseModel, AbstractUser):
             except Exception as e:
                 self.delete(soft_delete=False)
                 logging.error(e)
-                return Result(success=False, message=UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN)
+                return Result(
+                    success=False, message=UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN
+                )
 
         if user:
             self.log_action(user, ADDITION)
@@ -489,12 +497,17 @@ class User(BaseModel, AbstractUser):
         return Result(
             success=True,
             message=_("User has been created successfully."),
-            instance=self
+            instance=self,
         )
 
     def link_payments_app(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
+            return Result(
+                False,
+                _("Payments application is not installed"),
+                tag="warning",
+                error_code=UNIMPLEMENTED,
+            )
 
         res = self.create_account()
         if res.is_error:
@@ -508,7 +521,12 @@ class User(BaseModel, AbstractUser):
 
     def create_account(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
+            return Result(
+                False,
+                _("Payments application is not installed"),
+                tag="warning",
+                error_code=UNIMPLEMENTED,
+            )
         if hasattr(self, "account"):
             return Result(False, _("Account already created"), tag="warning")
 
@@ -523,7 +541,12 @@ class User(BaseModel, AbstractUser):
 
     def create_braintree_customer(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(False, _("Payments application is not installed"), tag="warning", error_code=UNIMPLEMENTED)
+            return Result(
+                False,
+                _("Payments application is not installed"),
+                tag="warning",
+                error_code=UNIMPLEMENTED,
+            )
         if hasattr(self, "customer"):
             return Result(False, _("Customer already created"), tag="warning")
 
@@ -535,13 +558,18 @@ class User(BaseModel, AbstractUser):
             if result.is_error:
                 return result
             self.customer = bt_customer
-            return Result(True, _("Associated BrainTree customer was created successfully."))
+            return Result(
+                True, _("Associated BrainTree customer was created successfully.")
+            )
         except Exception as e:
             logging.error(e)
-            return Result(False, _(
+            return Result(
+                False,
+                _(
                     "Unable to connect to one of our servers, "
                     "please try again later. We apologize for the inconvenience."
-                ),)
+                ),
+            )
 
     def create_associated_objects(self, associated_object_attributes=None):
         model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
@@ -554,7 +582,7 @@ class User(BaseModel, AbstractUser):
                     "This functionality is not valid for a user with many or no groups."
                 ),
                 tag="warning",
-                error_code=UNIMPLEMENTED
+                error_code=UNIMPLEMENTED,
             )
         group = groups.first()
         if group.name in model_mapping.keys():
@@ -572,7 +600,15 @@ class User(BaseModel, AbstractUser):
             success=True, message=_("Associated object was created successfully.")
         )
 
-    def update(self, user=None, update_fields=None, extra_attributes=None, message='', *args, **kwargs):
+    def update(
+        self,
+        user=None,
+        update_fields=None,
+        extra_attributes=None,
+        message="",
+        *args,
+        **kwargs,
+    ):
         groups = self.groups.all()
         if extra_attributes and groups.count() == 1:
             try:
@@ -582,11 +618,17 @@ class User(BaseModel, AbstractUser):
             except Exception as e:
                 return Result(success=False, message=str(e))
 
-        if update_fields and ('first_name' in update_fields or 'last_name' in update_fields):
-            self.full_name = f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
+        if update_fields and (
+            "first_name" in update_fields or "last_name" in update_fields
+        ):
+            self.full_name = (
+                f"{self.first_name + ' ' if self.first_name else ''}{self.last_name}"
+            )
             update_fields.append("full_name")
 
-        result = super().update(user=user, update_fields=update_fields, message=message, *args, **kwargs)
+        result = super().update(
+            user=user, update_fields=update_fields, message=message, *args, **kwargs
+        )
         if result.is_error:
             return result
 
@@ -603,7 +645,7 @@ class User(BaseModel, AbstractUser):
                 message=_(
                     "This functionality is not valid for a user with many or no groups."
                 ),
-                error_code=UNIMPLEMENTED
+                error_code=UNIMPLEMENTED,
             )
 
         group = groups.first()
@@ -631,7 +673,7 @@ class User(BaseModel, AbstractUser):
         if soft_delete:
             # self.is_active = False
             self.deleted_at = timezone.now()
-            self.update(user=user, update_fields=['deleted_at'], message="Soft Delete")
+            self.update(user=user, update_fields=["deleted_at"], message="Soft Delete")
             return Result(success=True, message=success_message)
 
         # Unlink from payments app
@@ -663,13 +705,14 @@ class User(BaseModel, AbstractUser):
             # for some reason?
             return super().set_password(raw_password)
 
-        result = self.update(user=user, update_fields=["password"], message="Password Change")
+        result = self.update(
+            user=user, update_fields=["password"], message="Password Change"
+        )
         if result.is_error:
             return result
         return Result(True, _("Password has been changed successfully."))
 
     def restore(self, user=None):
-
         result = super().restore(user=user)
         if result.is_error:
             return result
@@ -698,7 +741,6 @@ class User(BaseModel, AbstractUser):
         target_groups=None,
         system_alert=False,
     ):
-
         sender = self if not system_alert else None
 
         notification = Notification(
@@ -706,7 +748,10 @@ class User(BaseModel, AbstractUser):
         )
 
         result = notification.create(
-            m2m_fields=(('target_users', target_users), ('target_groups', target_groups))
+            m2m_fields=(
+                ("target_users", target_users),
+                ("target_groups", target_groups),
+            )
         )
         if not result.success:
             return result
@@ -739,7 +784,6 @@ class User(BaseModel, AbstractUser):
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
-
         filter_params = Q()
 
         if kwargs is None:
@@ -747,9 +791,9 @@ class User(BaseModel, AbstractUser):
 
         if "query" in kwargs:
             filter_params &= (
-                Q(first_name__icontains=kwargs.get("query")) |
-                Q(last_name__icontains=kwargs.get("query")) |
-                Q(username__icontains=kwargs.get("query"))
+                Q(first_name__icontains=kwargs.get("query"))
+                | Q(last_name__icontains=kwargs.get("query"))
+                | Q(username__icontains=kwargs.get("query"))
             )
 
         if "first_name" in kwargs:
@@ -783,12 +827,17 @@ class User(BaseModel, AbstractUser):
 
 
 class Notification(BaseModelMixin, models.Model):
-
     class Meta:
         verbose_name = _("Notification")
         verbose_name_plural = _("Notifications")
         ordering = ("-date",)
         default_permissions = ()
+        permissions = (
+            ("list_notification", _("Can list notifications")),
+            ("add_notification", _("Can add notification")),
+            ("view_notification", _("Can view notification")),
+            ("delete_notification", _("Can delete notification")),
+        )
 
     # empty sender means that the notification was generated by the system.
     sender = models.ForeignKey(
@@ -843,8 +892,8 @@ class Notification(BaseModelMixin, models.Model):
 
     def create(self, send_notification=True, **kwargs):
         can_create = False
-        for field, value in kwargs.get('m2m_fields', ()):
-            if field in ['target_users', 'target_groups'] and value:
+        for field, value in kwargs.get("m2m_fields", ()):
+            if field in ["target_users", "target_groups"] and value:
                 can_create = True
                 break
 
@@ -862,13 +911,15 @@ class Notification(BaseModelMixin, models.Model):
             send_ws_notification(self)
             self.send_firebase_notification()
 
-        return Result(True, _("The notification has been created successfully."), instance=self)
+        return Result(
+            True, _("The notification has been created successfully."), instance=self
+        )
 
     def mark_as_read(self, user):
         """Call this function when a user have seen the notification."""
         if user.id not in self.seen_by:
             self.seen_by.append(user.id)
-            self.save(update_fields=['seen_by'])
+            self.save(update_fields=["seen_by"])
 
     @classmethod
     def mark_as_read_bulk(cls, notifications, user):
@@ -925,7 +976,6 @@ class Notification(BaseModelMixin, models.Model):
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
-
         filter_params = Q()
 
         if kwargs is None:
@@ -941,40 +991,39 @@ class Notification(BaseModelMixin, models.Model):
 
 
 class Backup(BaseModel):
-
     class Meta(BaseModel.Meta):
         verbose_name = _("Backup")
         verbose_name_plural = _("Backups")
 
     name = models.CharField(_("Backup name"), max_length=256, blank=True)
     type = models.CharField(
-        _("Backup type"), max_length=16, default="full_backup",
-        choices=lava_settings.BACKUP_TYPE_CHOICES
+        _("Backup type"),
+        max_length=16,
+        default="full_backup",
+        choices=lava_settings.BACKUP_TYPE_CHOICES,
     )
     status = models.CharField(
-        _("Status"), max_length=16, default="running",
-        choices=lava_settings.BACKUP_STATUS_CHOICES
+        _("Status"),
+        max_length=16,
+        default="running",
+        choices=lava_settings.BACKUP_STATUS_CHOICES,
     )
     backup_file = models.FileField(
-        _("Backup file"), null=True, blank=True,
-        upload_to=get_backup_file_filename
+        _("Backup file"), null=True, blank=True, upload_to=get_backup_file_filename
     )
 
     def __str__(self):
         return self.name
 
     def get_filename(self):
-        return (
-            f"{self.created_at.strftime('%Y%m%d%H%M%S')}_"
-            f"{self.type}.zip"
-        )
+        return f"{self.created_at.strftime('%Y%m%d%H%M%S')}_" f"{self.type}.zip"
 
     def create(self, user=None, *args, **kwargs):
         return self.start_backup(user=user, *args, **kwargs)
 
     def update(self, *args, **kwargs):
-        if 'message' not in kwargs:
-            """ Allow modification for inner actions only (eg: soft_delete()). """
+        if "message" not in kwargs:
+            """Allow modification for inner actions only (eg: soft_delete())."""
             return Result(False, ACTION_NOT_ALLOWED)
         return super().update(*args, **kwargs)
 
@@ -991,10 +1040,15 @@ class Backup(BaseModel):
         return Result(True, _("Backup has been deleted successfully."))
 
     def can_start_backup(self):
-
         if Backup.is_locked():
-            return Result(False, _("A backup is already running, please wait "
-                "until it's finished before starting a new one."), tag="warning")
+            return Result(
+                False,
+                _(
+                    "A backup is already running, please wait "
+                    "until it's finished before starting a new one."
+                ),
+                tag="warning",
+            )
 
         # min_period_between_backups = timedelta(hours=1)
         # daily_limit = 2
@@ -1023,10 +1077,7 @@ class Backup(BaseModel):
         if not result.success:
             return result
 
-        self.name = (
-            f"{self.created_at.strftime('%c')} "
-            f"{self.get_type_display()}"
-        )
+        self.name = f"{self.created_at.strftime('%c')} {self.get_type_display()}"
         result = super().create(user, *args, **kwargs)
         if result.is_error:
             return result
@@ -1034,9 +1085,12 @@ class Backup(BaseModel):
         Backup.lock()
 
         backup = self
-        threading.Thread(target=backup.run_backup, args=(user, )).start()
+        threading.Thread(target=backup.run_backup, args=(user,)).start()
 
-        return Result(True, _("Backup has been started, you will get notified once it is finished."))
+        return Result(
+            True,
+            _("Backup has been started, you will get notified once it is finished."),
+        )
 
     def run_backup(self, user=None):
         try:
@@ -1046,23 +1100,25 @@ class Backup(BaseModel):
             if not os.path.exists(backup_dir):
                 os.makedirs(backup_dir)
 
-            # This sleep was put here for testing purposes only.
-            # Remove it once Backup interface is complete.
-            sleep(10)
+            # Always backup database
+            zipdir(settings.MEDIA_ROOT, abs_filepath, skip_dirs=["backup"])
+            ziph = zipfile.ZipFile(abs_filepath, "a", zipfile.ZIP_DEFLATED)
 
-            if self.type == "db_backup":
-                zipdir(settings.MEDIA_ROOT, abs_filepath, skip_dirs=['backup'])
-            elif self.type == "full_backup":
-                # Current Git branch             : git rev-parse --abbrev-ref HEAD
-                # Current Git commit             : git rev-parse --verify HEAD
-                # Current Git commit (Short hash): git rev-parse --short HEAD
+            if self.type == "full_backup":
                 reqs_filename = generate_requirements()
-                zipdir(settings.BASE_DIR, abs_filepath, skip_dirs=[
-                    "venv", "tmp", "log", ".idea", "backup"
-                ])
-                os.remove(reqs_filename)
 
-            ziph = zipfile.ZipFile(abs_filepath, 'a', zipfile.ZIP_DEFLATED)
+                repository_file = (
+                    generate_repo_backup()
+                )  # Generate repo backup for main repository
+                for inner_repo in lava_settings.INNER_REPOSITORIES:
+                    # Generate repo backup for inner repositories (lava, cash_flow, payments, ...)
+                    generate_repo_backup(inner_repo)
+
+                zipf(repository_file, ziph=ziph)
+                zipf(reqs_filename, ziph=ziph)
+
+                os.remove(reqs_filename)
+                os.remove(repository_file)
             db_filename = dump_pgdb()
             zipf(db_filename, ziph=ziph)
 
@@ -1075,25 +1131,35 @@ class Backup(BaseModel):
             if user:
                 notif = Notification(
                     title=gettext("Backup complete"),
-                    content=gettext("A %(name)s that was started on %(date)s is finished successfully." % {
-                        'name': self.get_type_display(), 'date': self.created_at.strftime("%c")
-                    }),
+                    content=gettext(
+                        "A %(name)s that was started on %(date)s is finished successfully."
+                        % {
+                            "name": self.get_type_display(),
+                            "date": self.created_at.strftime("%c"),
+                        }
+                    ),
                 )
-                target_groups = [NotificationGroup.objects.get(
-                    notification_id=lava_settings.BACKUP_COMPLETED_NOTIFICATION_ID
-                )]
-                m2m_fields = [('target_users', [user]), ('target_groups', target_groups)]
+                target_groups = [
+                    NotificationGroup.objects.get(
+                        notification_id=lava_settings.BACKUP_COMPLETED_NOTIFICATION_ID
+                    )
+                ]
+                m2m_fields = [
+                    ("target_users", [user]),
+                    ("target_groups", target_groups),
+                ]
                 notif.create(m2m_fields=m2m_fields)
 
         except Exception as e:
             if user:
                 notif = Notification(
                     title=gettext("Backup failed"),
-                    content=gettext("A %s that was started on %s has failed.\nError: %s" % (
-                        self.get_type_display(), self.created_at.strftime("%c"), e
-                    )),
+                    content=gettext(
+                        "A %s that was started on %s has failed.\nError: %s"
+                        % (self.get_type_display(), self.created_at.strftime("%c"), e)
+                    ),
                 )
-                m2m_fields = [('target_users', [user])]
+                m2m_fields = [("target_users", [user])]
                 notif.create(m2m_fields=m2m_fields)
 
             # Change status to failed
@@ -1105,7 +1171,9 @@ class Backup(BaseModel):
             Backup.unlock()
 
     def restore_backup(self, user=None):
-        return Result.error("You can not restore a backup, this functionality is not implemented yet.")
+        return Result.error(
+            "You can not restore a backup, this functionality is not implemented yet."
+        )
 
     @classmethod
     def is_locked(cls):
@@ -1122,13 +1190,12 @@ class Backup(BaseModel):
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
-
         filter_params = Q()
 
         if kwargs is None:
             kwargs = {}
 
-        if "query" in kwargs or 'name' in kwargs:
+        if "query" in kwargs or "name" in kwargs:
             name = kwargs.get("query") or kwargs.get("name")
             filter_params &= Q(name__icontains=name)
 
