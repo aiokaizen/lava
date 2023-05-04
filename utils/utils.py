@@ -243,6 +243,13 @@ def mask_number(n):
     return n
 
 
+def try_parse(value, t):
+    try:
+        return t(value)
+    except ValueError:
+        return None
+
+
 def unmask_number(mask):
     if isinstance(mask, int):
         return mask - 747251
@@ -666,6 +673,11 @@ def dump_pgdb(output_filename=None, db="default"):
             stdout=output,
         )
     return filename
+
+
+def load_pgdb(backup_filename, db_name="default"):
+    exec_command(f"nohup python restore_backup.py -b {backup_filename} -d {db_name}")
+    return Result.success()
 
 
 def generate_requirements(out=None):
