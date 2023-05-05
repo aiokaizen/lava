@@ -22,7 +22,6 @@ from lava.pagination import get_pagination_class
 
 
 class BaseModelViewSet(ModelViewSet):
-
     pagination_class = LavaPageNumberPagination
     permission_classes = [permissions.IsAuthenticated]
 
@@ -50,33 +49,35 @@ class BaseModelViewSet(ModelViewSet):
 
     def get_queryset(self):
         ActiveModel = self.queryset.model
-        trash = getattr(self, 'trash', False)
-        user = getattr(self, 'user', None)
+        trash = getattr(self, "trash", False)
+        user = getattr(self, "user", None)
         return ActiveModel.filter(user=user, trash=trash, kwargs=self.request.GET)
 
     def get_serializer_class(self):
         self.serializer_class = self.list_serializer_class or self.serializer_class
-        if self.action == 'retrieve' and self.retrieve_serializer_class:
+        if self.action == "retrieve" and self.retrieve_serializer_class:
             self.serializer_class = self.retrieve_serializer_class
-        elif self.action == 'create' and self.create_serializer_class:
+        elif self.action == "create" and self.create_serializer_class:
             self.serializer_class = self.create_serializer_class
-        elif self.action in ['update', 'partial_update'] and self.update_serializer_class:
+        elif (
+            self.action in ["update", "partial_update"] and self.update_serializer_class
+        ):
             self.serializer_class = self.update_serializer_class
-        elif self.action == 'destroy' and self.delete_serializer_class:
+        elif self.action == "destroy" and self.delete_serializer_class:
             self.serializer_class = self.delete_serializer_class
-        elif self.action == 'metadata':
+        elif self.action == "metadata":
             self.serializer_class = self.get_metadata_serializer_class()
         return self.serializer_class
 
     def get_serializer(self, *args, **kwargs):
         serializer_class = self.get_serializer_class()
-        kwargs.setdefault('context', self.get_serializer_context())
-        serializer = serializer_class(*args, user=getattr(self, 'user', None), **kwargs)
+        kwargs.setdefault("context", self.get_serializer_context())
+        serializer = serializer_class(*args, user=getattr(self, "user", None), **kwargs)
         return serializer
 
     def get_metadata_serializer_class(self):
         serializer_class = None
-        display_mode = self.request.GET.get("mode") == 'display'
+        display_mode = self.request.GET.get("mode") == "display"
 
         if self.detail:
             if display_mode:
@@ -95,42 +96,54 @@ class BaseModelViewSet(ModelViewSet):
         permission_classes = self.permission_classes or []
         ActiveModel = self.queryset.model
 
-        if self.action == 'create':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.Add)
-            ])
-        elif self.action in ['update', 'partial_update']:
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.Change)
-            ])
-        elif self.action == 'destroy':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.SoftDelete)
-            ])
-        elif self.action == 'retrieve':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.View)
-            ])
-        elif self.action == 'list':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.List)
-            ])
-        elif self.action in ['view_trash', 'view_trash_item']:
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.ViewTrash)
-            ])
-        elif self.action == 'hard_delete':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.Delete)
-            ])
-        elif self.action == 'restore':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.Restore)
-            ])
-        elif self.action == 'duplicate':
-            permission_classes.extend([
-                get_model_permission_class(ActiveModel, PermissionActionName.Duplicate)
-            ])
+        if self.action == "create":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.Add)]
+            )
+        elif self.action in ["update", "partial_update"]:
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.Change)]
+            )
+        elif self.action == "destroy":
+            permission_classes.extend(
+                [
+                    get_model_permission_class(
+                        ActiveModel, PermissionActionName.SoftDelete
+                    )
+                ]
+            )
+        elif self.action == "retrieve":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.View)]
+            )
+        elif self.action == "list":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.List)]
+            )
+        elif self.action in ["view_trash", "view_trash_item"]:
+            permission_classes.extend(
+                [
+                    get_model_permission_class(
+                        ActiveModel, PermissionActionName.ViewTrash
+                    )
+                ]
+            )
+        elif self.action == "hard_delete":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.Delete)]
+            )
+        elif self.action == "restore":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.Restore)]
+            )
+        elif self.action == "duplicate":
+            permission_classes.extend(
+                [
+                    get_model_permission_class(
+                        ActiveModel, PermissionActionName.Duplicate
+                    )
+                ]
+            )
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]
 
@@ -140,17 +153,21 @@ class BaseModelViewSet(ModelViewSet):
         if "list" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
+        if request.GET.get("page_size", None) == "all":
+            qset = self.get_queryset()
+            serializer = self.get_serializer(qset, many=True)
+            return serializer.data
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         if "retrieve" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -161,7 +178,7 @@ class BaseModelViewSet(ModelViewSet):
         if "create" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -176,26 +193,32 @@ class BaseModelViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        if hasattr(serializer, 'result'):
+        if hasattr(serializer, "result"):
             result = serializer.result
             if result.is_error:
-                return Response(result.to_dict(), headers=headers, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    result.to_dict(),
+                    headers=headers,
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             result_dict = result.to_dict()
             result_dict["object"] = serializer.data
             return Response(result_dict, headers=headers)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     @extend_schema(responses=ResultSerializer)
     def update(self, request, *args, **kwargs):
         if "update" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         override_field_values = self.get_override_field_values()
         data = request.data
@@ -204,7 +227,9 @@ class BaseModelViewSet(ModelViewSet):
             for key, value in override_field_values.items():
                 data[key] = value
 
-        serializer = self.get_serializer(instance=instance, data=data or empty, partial=partial)
+        serializer = self.get_serializer(
+            instance=instance, data=data or empty, partial=partial
+        )
 
         if not request.data:
             return Response(serializer.data)
@@ -213,12 +238,12 @@ class BaseModelViewSet(ModelViewSet):
 
         self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
+        if getattr(instance, "_prefetched_objects_cache", None):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        if hasattr(serializer, 'result'):
+        if hasattr(serializer, "result"):
             result_dict = serializer.result.to_dict()
             result_dict["object"] = serializer.data
             return Response(result_dict)
@@ -229,7 +254,7 @@ class BaseModelViewSet(ModelViewSet):
         if "destroy" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -243,7 +268,7 @@ class BaseModelViewSet(ModelViewSet):
         if "metadata" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -255,7 +280,7 @@ class BaseModelViewSet(ModelViewSet):
         if "duplicate" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -270,8 +295,10 @@ class BaseModelViewSet(ModelViewSet):
         user = request.user
         self.user = user
         model_class = self.queryset.model
-        trash = getattr(self, 'trash', False)
-        serializer = BulkActionSerializer(data=request.data, model=model_class, trash=trash)
+        trash = getattr(self, "trash", False)
+        serializer = BulkActionSerializer(
+            data=request.data, model=model_class, trash=trash
+        )
         serializer.is_valid(raise_exception=True)
         result = serializer.perform_action(user)
         if not result:
@@ -285,7 +312,7 @@ class BaseModelViewSet(ModelViewSet):
         if "trash" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -298,12 +325,12 @@ class BaseModelViewSet(ModelViewSet):
         return self.bulk_action(request, *args, **kwargs)
 
     @extend_schema(responses=retrieve_serializer_class or serializer_class)
-    @action(detail=False, methods=["GET"], url_path='trash/(?P<pk>[^/.]+)')
+    @action(detail=False, methods=["GET"], url_path="trash/(?P<pk>[^/.]+)")
     def view_trash_item(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -311,12 +338,12 @@ class BaseModelViewSet(ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @extend_schema(responses=ResultSerializer)
-    @action(detail=False, methods=["POST"], url_path='trash/(?P<pk>[^/.]+)/delete')
+    @action(detail=False, methods=["POST"], url_path="trash/(?P<pk>[^/.]+)/delete")
     def hard_delete(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -328,12 +355,12 @@ class BaseModelViewSet(ModelViewSet):
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
     @extend_schema(responses=ResultSerializer)
-    @action(detail=False, methods=["POST"], url_path='trash/(?P<pk>[^/.]+)/restore')
+    @action(detail=False, methods=["POST"], url_path="trash/(?P<pk>[^/.]+)/restore")
     def restore(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
-                status=status.HTTP_405_METHOD_NOT_ALLOWED
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
         self.user = request.user
@@ -346,17 +373,15 @@ class BaseModelViewSet(ModelViewSet):
 
 
 class ReadOnlyBaseModelViewSet(BaseModelViewSet):
-
     def get_permissions(self):
-
         permission_classes = [ActionNotAllowed]
         ActiveModel = self.queryset.model
 
-        if self.action == 'retrieve':
+        if self.action == "retrieve":
             permission_classes = [
                 get_model_permission_class(ActiveModel, PermissionActionName.View)
             ]
-        elif self.action == 'list':
+        elif self.action == "list":
             permission_classes = [
                 get_model_permission_class(ActiveModel, PermissionActionName.List)
             ]

@@ -47,6 +47,7 @@ from lava.utils import (
     generate_requirements,
     generate_repo_backup,
     get_group_photo_filename,
+    exec_command,
 )
 from lava.managers import (
     GroupManager,
@@ -1170,7 +1171,21 @@ class Backup(BaseModel):
             send_ws_backup_status(self)
             Backup.unlock()
 
-    def restore_backup(self, user=None):
+    def restore_backup(self, user=None, db="default"):
+        # filename = get_backup_file_filename(self, "_")
+        # backup_file = os.path.join(settings.MEDIA_ROOT, filename)
+        # database_name = db
+        # restore_script_path = os.path.join(settings.BASE_DIR, 'lava/scripts/restore_backup.py')
+        # exec_command(
+        #     f"sudo python {restore_script_path} -b {backup_file} -d {database_name}"
+        # )
+
+        # Challenges:
+        #     - Must delete the old database and load the new one?
+        #     - Must stop the server and then restart it back up.
+        #     - Can be achieved by running a script with nohup
+        #     - Need the sudo permissions in order to do that.
+
         return Result.error(
             "You can not restore a backup, this functionality is not implemented yet."
         )
