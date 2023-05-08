@@ -16,18 +16,17 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--no-logs',
-            action='store_true',
-            help='If this argument is set, the function will not print anything to the console.',
+            "--no-logs",
+            action="store_true",
+            help="If this argument is set, the function will not print anything to the console.",
         )
         parser.add_argument(
-            '--reset-perms',
-            action='store_true',
-            help='If this argument is set, all permissions will be removed and recreated (This action is irreversible!!).',
+            "--reset-perms",
+            action="store_true",
+            help="If this argument is set, all permissions will be removed and recreated (This action is irreversible!!).",
         )
 
     def handle(self, *args, **options):
-
         no_logs = options["no_logs"]
         reset_perms = options["reset_perms"]
 
@@ -43,15 +42,15 @@ class Command(BaseCommand):
         for model in apps.get_models():
             opts = model._meta
             content_type = ContentType.objects.get_for_model(model)
-            if hasattr(model, '_create_default_permissions'):
+            if hasattr(model, "_create_default_permissions"):
                 default_permissions = model._create_default_permissions()
                 for code_name, verbose_name in default_permissions:
                     Permission.objects.get_or_create(
                         codename=code_name,
                         content_type=content_type,
-                        defaults= {
-                            'name': verbose_name,
-                        }
+                        defaults={
+                            "name": verbose_name,
+                        },
                     )
             else:
                 # Create other models default permissions
@@ -60,28 +59,29 @@ class Command(BaseCommand):
                     name = f"Can {perm} {opts.verbose_name}"
                     Permission.objects.get_or_create(
                         codename=codename,
-                        name=name,
                         content_type=content_type,
+                        defaults={"name": name},
                     )
 
             # Create other permissions (From Meta.permissions)
-            print("Creating permissions for model:", model.__name__)
             for perm in opts.permissions:
                 codename = perm[0]
                 name = perm[1]
                 Permission.objects.get_or_create(
                     codename=codename,
-                    name=name,
                     content_type=content_type,
+                    defaults={"name": name},
                 )
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(name="ADMINS")
-        Group.objects.get_or_create(name="STANDARD")  # Default group for signed up users
+        Group.objects.get_or_create(
+            name="STANDARD"
+        )  # Default group for signed up users
 
         # Add all available permissions to group ADMINS
         admins_group.permissions.add(
-            *Permission.objects.all().values_list('id', flat=True)
+            *Permission.objects.all().values_list("id", flat=True)
         )
 
         # Create notifications groups
@@ -100,7 +100,12 @@ class Command(BaseCommand):
                 is_staff=True,
                 is_superuser=True,
             )
-            eksuperuser.create(groups=[admins_group], password="admin_super_1234", force_is_active=True, link_payments_app=False)
+            eksuperuser.create(
+                groups=[admins_group],
+                password="admin_super_1234",
+                force_is_active=True,
+                link_payments_app=False,
+            )
             logging.info("eksuperuser was created successfully!")
 
         try:
@@ -114,5 +119,10 @@ class Command(BaseCommand):
                 last_name="Administrator",
                 is_staff=True,
             )
-            ekadmin.create(groups=[admins_group], password="admin_1234", force_is_active=True, link_payments_app=False)
+            ekadmin.create(
+                groups=[admins_group],
+                password="admin_1234",
+                force_is_active=True,
+                link_payments_app=False,
+            )
             logging.info("ekadmin was created successfully!")
