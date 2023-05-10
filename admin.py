@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from admin_interface.models import Theme
 
-from lava.forms.main_forms import LavaUserChangeForm
+from lava.forms.main_forms import LavaUserChangeForm, LavaUserCreationForm
 from lava.models import (
     Notification, Preferences, User, Group, Backup,
     Conversation, ChatMessage, NotificationGroup
@@ -25,6 +25,8 @@ admin.site.unregister(Theme)
 class UserAdmin(auth_admin.UserAdmin):
 
     form = LavaUserChangeForm
+    add_form = LavaUserCreationForm
+
     fieldsets = (
         (None, {"fields": ("username", "password", "tmp_pwd")}),
         (
@@ -60,7 +62,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "is_staff",
                     "is_superuser",
                     "groups",
-                    "user_permissions",
+                    # "user_permissions",
                 ),
             },
         ),
@@ -105,7 +107,7 @@ class UserAdmin(auth_admin.UserAdmin):
             obj.photo = None
             obj.cover_picture = None
             result = obj.create(
-                user=request.user, photo=photo, cover=cover
+                user=request.user, photo=photo, cover=cover, password=form.cleaned_data["password1"]
             )
             if not result.is_success:
                 raise Exception(result.message)
@@ -307,7 +309,7 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(BaseModelAdmin):
+class GroupAdmin(auth_admin.GroupAdmin):
     pass
 
 

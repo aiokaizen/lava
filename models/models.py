@@ -705,7 +705,7 @@ class User(BaseModel, AbstractUser):
             # Django calls User().set_password(rp) to increase request time span
             # for some reason?
             return super().set_password(raw_password)
-
+        
         result = self.update(
             user=user, update_fields=["password"], message="Password Change"
         )

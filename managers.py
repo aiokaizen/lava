@@ -36,7 +36,7 @@ class GroupManager(DefaultModelBaseManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(notification_id='')
+        queryset = queryset.filter(notification_id='').exclude(name="ADMINS")
         return queryset
 
 

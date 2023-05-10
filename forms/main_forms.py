@@ -15,6 +15,23 @@ class LavaUserChangeForm(UserChangeForm):
                 raise ValidationError(_("You can't change the group for this user."))
 
         return self.cleaned_data["groups"]
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
+
+
+class LavaUserCreationForm(UserCreationForm):
+
+    def save(self, commit=True):
+        user = super(UserCreationForm, self).save(commit=False)
+        # user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
 
 
 class LoginForm(AuthenticationForm):
