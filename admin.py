@@ -188,11 +188,16 @@ class BaseModelAdmin(admin.ModelAdmin):
     ]
 
     def save_related(self, request, form, formsets, change):
-        # Desable save related behaviour, since we save our related
+        # Disable save related behaviour, since we save our related
         # fields using the create() method.
-
-        # return super().save_related(request, form, formsets, change)
-        pass
+        has_m2m_fields = True if self.model._meta.many_to_many else False
+        if self.inlines and has_m2m_fields:
+            raise Exception(
+                "You can not specify inlines with a model that contains ManyToMany fields."
+            )
+            
+        if self.inlines:
+            return super().save_related(request, form, formsets, change)
 
     def save_model(self, request, obj, form, change):
         if not change:  # Creation
