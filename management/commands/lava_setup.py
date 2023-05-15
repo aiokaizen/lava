@@ -105,6 +105,7 @@ class Command(BaseCommand):
                 password="admin_super_1234",
                 force_is_active=True,
                 link_payments_app=False,
+                create_associated_objects=False,
             )
             logging.info("eksuperuser was created successfully!")
 
@@ -124,5 +125,6 @@ class Command(BaseCommand):
                 password="admin_1234",
                 force_is_active=True,
                 link_payments_app=False,
+                create_associated_objects=False,
             )
             logging.info("ekadmin was created successfully!")
