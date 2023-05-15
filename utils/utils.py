@@ -246,7 +246,7 @@ def mask_number(n):
 def try_parse(value, t):
     try:
         return t(value)
-    except ValueError:
+    except (ValueError, TypeError):
         return None
 
 
