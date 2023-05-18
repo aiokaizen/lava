@@ -268,3 +268,31 @@ MAINTENANCE_BYPASS_QUERY = os.environ.get(
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DATE_INPUT_FORMATS = [
+    "%Y-%m-%d",
+    "%d-%m-%Y",
+    "%m/%d/%Y",  # '2006-10-25', '25-10-2006', '10/25/2006'
+    "%b %d %Y",
+    "%b %d, %Y",  # 'Oct 25 2006', 'Oct 25, 2006'
+    "%d %b %Y",
+    "%d %b, %Y",  # '25 Oct 2006', '25 Oct, 2006'
+    "%B %d %Y",
+    "%B %d, %Y",  # 'October 25 2006', 'October 25, 2006'
+    "%d %B %Y",
+    "%d %B, %Y",  # '25 October 2006', '25 October, 2006'
+]
+
+DATETIME_INPUT_FORMATS = [
+    "%d/%m/%Y %H:%M",  # '10/25/2006 14:30'
+    "%d/%m/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
+    "%d/%m/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
+
+    "%m-%d-%Y %H:%M",  # '25-10-2006 14:30'
+    "%m-%d-%Y %H:%M:%S",  # '25-10-2006 14:30:59'
+    "%m-%d-%Y %H:%M:%S.%f",  # '25-10-2006 14:30:59.000200'
+
+    "%Y-%m-%d %H:%M",  # '2006-10-25 14:30'
+    "%Y-%m-%d %H:%M:%S",  # '2006-10-25 14:30:59'
+    "%Y-%m-%d %H:%M:%S.%f",  # '2006-10-25 14:30:59.000200'
+]
