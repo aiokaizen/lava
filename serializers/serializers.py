@@ -188,7 +188,7 @@ class ChoicesSerializer(serializers.Serializer):
 
     class_name = serializers.ChoiceField(
         label="Class name", choices=lava_settings.CLASS_NAME_CHOICES)
-    query = serializers.CharField(label="Query")
+    query = serializers.CharField(label="Query", required=False)
     id = serializers.IntegerField(required=False)
 
     class Meta:
