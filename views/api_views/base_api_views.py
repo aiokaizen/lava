@@ -160,7 +160,7 @@ class BaseModelViewSet(ModelViewSet):
         if request.GET.get("page_size", None) == "all":
             qset = self.get_queryset()
             serializer = self.get_serializer(qset, many=True)
-            return serializer.data
+            return Response(serializer.data)
         return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
