@@ -209,8 +209,11 @@ class ChoicesSerializer(serializers.Serializer):
         validated_data = super().validate(data)
         class_name = lava_settings.CLASS_NAME_CHOICES_MAPPING[validated_data['class_name']]
         model = apps.get_model(*class_name.split('.'))
-        query = validated_data['query']
+        query = validated_data.get('query')
         id = validated_data.get('id')
+
+        if query == "":
+            return []
 
         self.choices = [{
             "id": obj.pk,
