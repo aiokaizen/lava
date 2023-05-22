@@ -18,10 +18,9 @@ class Command(BaseCommand):
         if 'admin_interface' not in sys.modules:
             logging.error("Admin interface is not installed in this project!")
             return
-        
+
         # Setup defaults
         default_theme_name = "EKBlocks default theme"
-        active = True
         title = "This is a test"
         title_visible = False
         logo_max_width = 150
@@ -44,7 +43,7 @@ class Command(BaseCommand):
         show_fieldsets_as_tabs = False
         show_inlines_as_tabs = False
         recent_actions_visible = True
-        form_submit_sticky = False
+        form_submit_sticky = True
         form_pagination_sticky = False
         title_color = "#FFFFFF"
         logo_color = "#FFFFFF"
@@ -83,7 +82,6 @@ class Command(BaseCommand):
         try:
             theme = Theme.objects.get(name=default_theme_name)
             theme.name = default_theme_name
-            theme.active = active
             theme.title = title
             theme.title_visible = title_visible
             theme.logo_max_width = logo_max_width
@@ -133,6 +131,7 @@ class Command(BaseCommand):
             theme.related_modal_background_opacity = related_modal_background_opacity
             theme.save()
             theme.logo.delete()
+            theme.set_active()
             theme.favicon.delete()
             with open(logo_path, 'rb') as logo_file:
                 theme.logo.save(
@@ -147,7 +146,6 @@ class Command(BaseCommand):
         except Theme.DoesNotExist:
             theme = Theme(
                 name=default_theme_name,
-                active=active,
                 title=title,
                 title_visible=title_visible,
                 logo_max_width=logo_max_width,
@@ -172,7 +170,7 @@ class Command(BaseCommand):
                 recent_actions_visible=recent_actions_visible,
                 form_submit_sticky=form_submit_sticky,
                 form_pagination_sticky=form_pagination_sticky,
-                
+
                 # Default colors
                 title_color=title_color,
                 logo_color=logo_color,
@@ -204,6 +202,7 @@ class Command(BaseCommand):
             )
 
             theme.save()
+            theme.set_active()
 
             with open(logo_path, 'rb') as logo_file:
                 theme.logo.save(
@@ -216,4 +215,3 @@ class Command(BaseCommand):
                     File(favicon)
                 )
             logging.info("The default theme has been initialized successfully.")
-
