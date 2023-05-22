@@ -8,7 +8,9 @@ from django.utils.translation import gettext_lazy as _
 
 from admin_interface.models import Theme
 
-from lava.forms.main_forms import LavaUserChangeForm, LavaUserCreationForm
+from lava.forms.main_forms import (
+    LavaUserChangeForm, LavaUserCreationForm
+)
 from lava.models import (
     Notification, Preferences, User, Group, Backup,
     Conversation, ChatMessage, NotificationGroup
@@ -66,7 +68,15 @@ class UserAdmin(auth_admin.UserAdmin):
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
+        (
+            _("Important dates"), {
+                "fields": (
+                    "last_login",
+                    "date_joined",
+                    "deleted_at"
+                )
+            }
+        ),
     )
     readonly_fields = [
         "tmp_pwd", "last_login", "date_joined", "deleted_at",
@@ -117,7 +127,9 @@ class UserAdmin(auth_admin.UserAdmin):
             pop_list_item(form.changed_data, 'groups')
             pop_list_item(form.changed_data, 'user_permissions')
 
-            result = obj.update(user=request.user, update_fields=form.changed_data)
+            result = obj.update(
+                user=request.user, update_fields=form.changed_data
+            )
             if not result.success:
                 raise Exception(result.message)
 
@@ -136,7 +148,9 @@ class UserAdmin(auth_admin.UserAdmin):
                     lvl
                 )
 
-        self.message_user(request, "The selected users were successfully linked to payments.", messages.SUCCESS)
+        self.message_user(
+            request, "The selected users were successfully linked to payments.", messages.SUCCESS
+        )
 
     def delete_queryset(self, request, queryset):
         for user in queryset:
@@ -149,7 +163,9 @@ class UserAdmin(auth_admin.UserAdmin):
                     lvl
                 )
 
-        self.message_user(request, "The selected users were successfully deleted.", messages.SUCCESS)
+        self.message_user(
+            request, "The selected users were successfully deleted.", messages.SUCCESS
+        )
 
     def get_queryset(self, request):
         return User.filter(user=request.user, kwargs=request.GET)
@@ -195,7 +211,7 @@ class BaseModelAdmin(admin.ModelAdmin):
             raise Exception(
                 "You can not specify inlines with a model that contains ManyToMany fields."
             )
-            
+
         if self.inlines:
             return super().save_related(request, form, formsets, change)
 
@@ -210,7 +226,9 @@ class BaseModelAdmin(admin.ModelAdmin):
                     lvl
                 )
         elif obj is not None:  # Modification
-            result = self.update(request.user, obj, form.changed_data, form.cleaned_data)
+            result = self.update(
+                request.user, obj, form.changed_data, form.cleaned_data
+            )
             if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
@@ -249,7 +267,6 @@ class BaseModelAdmin(admin.ModelAdmin):
 
         return obj.update(user=user, update_fields=update_fields, m2m_fields=m2m_fields, **kwargs)
 
-
     @admin.action(description=_('Soft delete'))
     def soft_delete(self, request, queryset):
         for obj in queryset:
@@ -268,7 +285,9 @@ class BaseModelAdmin(admin.ModelAdmin):
                     lvl
                 )
 
-        self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
+        self.message_user(request, _(
+            "The selected objects were successfully deleted."
+        ), messages.SUCCESS)
 
     @admin.action(description=_('Restore'))
     def restore(self, request, queryset):
@@ -307,14 +326,16 @@ class BaseModelAdmin(admin.ModelAdmin):
                     lvl
                 )
 
-        self.message_user(request, _("The selected objects were successfully deleted."), messages.SUCCESS)
+        self.message_user(request, _(
+            "The selected objects were successfully deleted."
+        ), messages.SUCCESS)
 
     def get_queryset(self, request):
         return self.model.filter(user=request.user, kwargs=request.GET)
 
 
 @admin.register(Group)
-class GroupAdmin(auth_admin.GroupAdmin):
+class GroupAdmin(BaseModelAdmin):
     pass
 
 
