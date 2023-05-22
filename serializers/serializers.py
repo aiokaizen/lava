@@ -218,14 +218,15 @@ class ChoicesSerializer(serializers.Serializer):
         self.choices = [{
             "id": obj.pk,
             "label": getattr(obj, 'get_choices_display', lambda: None)() or str(obj),
-        } for obj in model.filter(kwargs=QueryDict(f'query={query}'))]
+        } for obj in model.filter(kwargs=QueryDict(f'query={query}')) if obj.id != id]
+
         if id:
             # Remove this code later
             single_obj = model.objects.filter(id=id).first()
             if single_obj:
                 self.choices = [
                     {
-                        "id": single_obj.id, 
+                        "id": single_obj.id,
                         "label": getattr(single_obj, 'get_choices_display', lambda: None)() or str(single_obj),
                     },
                     *self.choices
