@@ -100,7 +100,7 @@ class UserAdmin(auth_admin.UserAdmin):
         url = (
             obj.photo.url
             if obj.photo
-            else "/static/ektools/assets/img/user_avatar.png"
+            else "/static/lava/assets/images/logo/user_avatar.png"
         )
         style = f"""
             width: 30px; height: 30px; border-radius:50%; background-color: #fafafa;
