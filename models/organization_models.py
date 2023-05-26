@@ -149,6 +149,7 @@ class Entity(BaseModel):
     rc = models.CharField(_("RC"), max_length=10, null=True, blank=True)
     ifisc = models.CharField(_("IF"), max_length=10, null=True, blank=True)  # Identifiant fiscale
     tp = models.CharField(_("TP"), max_length=10, null=True, blank=True)
+    preferences = models.JSONField(_("Preferences"), default=dict)
 
     def __str__(self):
         return self.name
