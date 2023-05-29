@@ -26,6 +26,5 @@ class LogEntrySerializer(ReadOnlyBaseModelSerializer):
             "change_message",
         ]
         extra_kwargs = {
-            "action_time": {"format": "%m/%d/%Y %H:%M:%S"},
+            "action_time": {"format": "%Y/%m/%d %H:%M:%S"},
         }
-    

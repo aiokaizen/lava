@@ -52,7 +52,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "sender", "date", "seen"]
         extra_kwargs = {
             "date": {
-                "format": "%m/%d/%Y %H:%M:%S",
+                "format": "%Y/%m/%d %H:%M:%S",
             },
             "writeonly_fields": [
                 "target_groups",

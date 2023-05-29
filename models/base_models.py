@@ -128,9 +128,10 @@ class BaseModelMixin:
         super().delete()
         return Result.success(self.get_result_message('delete'))
 
-    def duplicate(self, user=None, override_values=dict):
+    def duplicate(self, user=None, override_values=None):
         klass = self.__class__
         new = klass()
+        override_values = override_values or {}
 
         ignore_fields = [
             'id',
