@@ -3,6 +3,7 @@ from django.db.models import Sum, Count, IntegerField
 from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Cast, Coalesce, TruncDate
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from lava.models import *
 from lava.serializers.backup_serializers import BackupSerializer
@@ -79,11 +80,26 @@ def get_indicators():
     backups_count = backup_list.count()
 
     
-    statistics = {
-        "users_count": users_count,
-        "groups_count": groups_count,
-        "backups_count": backups_count
-    }
+    statistics = [
+        {
+            "title": _('Utilisateurs'),
+            "value": users_count,
+            "status": None,
+            "subtitle": _('Total des utilisateurs')
+        },
+        {
+            "title": _("Groupes"),
+            "value":  groups_count,
+            "status": None,
+            "subtitle": _("Total des groupes")
+        },
+        {
+            "title": _('Sauvegardes'),
+            "value": backups_count,
+            "status": None,
+            "subtitle": _('Total des sauvegardes')
+        },
+    ]
     return statistics
 
 def get_spaces():
