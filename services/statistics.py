@@ -121,11 +121,7 @@ def get_active_users():
     
     connected_users_serializer = UserListSerializer(connected_users, many=True)    
 
-    active_users =  {
-        'active_users' : connected_users_serializer.data,
-        
-    }
-    return active_users
+    return connected_users_serializer.data
 
 def get_latest_actions():
 
@@ -133,8 +129,5 @@ def get_latest_actions():
 
     latest_actions_serializer = LogEntrySerializer(latest_actions, many=True)
     
-    latest_actions = {
-        'latest_actions' : latest_actions_serializer.data
-    }
-    return latest_actions
+    return latest_actions_serializer.data
     
