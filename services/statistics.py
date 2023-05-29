@@ -115,3 +115,26 @@ def get_spaces():
     }
     return statistics
 
+def get_active_users():
+
+    connected_users = User.filter(kwargs={"is_active": "True"})[:7]
+    
+    connected_users_serializer = UserListSerializer(connected_users, many=True)    
+
+    active_users =  {
+        'active_users' : connected_users_serializer.data,
+        
+    }
+    return active_users
+
+def get_latest_actions():
+
+    latest_actions = LogEntry.objects.all()[:7]
+
+    latest_actions_serializer = LogEntrySerializer(latest_actions, many=True)
+    
+    latest_actions = {
+        'latest_actions' : latest_actions_serializer.data
+    }
+    return latest_actions
+    

@@ -7,7 +7,7 @@ from rest_framework.decorators import action
 
 from lava import settings as lava_settings
 from lava.serializers.serializers import ChoicesSerializer
-from lava.services.statistics import collect_statistics, get_daily_actions, get_indicators, get_spaces
+from lava.services.statistics import get_daily_actions, get_indicators, get_spaces, get_active_users, get_latest_actions
 
 
 class ChoicesAPI(APIView):
@@ -37,6 +37,14 @@ class DashboardAPIViewSet(ViewSet):
     @action(methods=['GET'], detail=False)
     def spaces(self, request):
         return Response(get_spaces())
+    
+    @action(methods=['GET'], detail=False)
+    def active_users(self, request):
+        return Response(get_active_users())
+
+    @action(methods=['GET'], detail=False)
+    def latest_actions(self, request):
+        return Response(get_latest_actions())
     
 
 class SettingsListAPI(APIView):
