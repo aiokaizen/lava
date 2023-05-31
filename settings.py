@@ -183,6 +183,11 @@ CLASS_NAME_CHOICES_MAPPING = {
     **getattr(settings, "CHOICES_API_CLASS_NAME_CHOICES_MAPPING", {}),
 }
 
+HIDE_ADMINS_GROUP = getattr(settings, "HIDE_ADMINS_GROUP", False)
+HIDE_PERMISSIONS_FIELDS_FROM_ADMIN = getattr(
+    settings, "HIDE_PERMISSIONS_FIELDS_FROM_ADMIN", False
+)
+
 
 # Chat models settings
 TIMEUNIT_CHOICES = ["days", "hours", "minutes"]

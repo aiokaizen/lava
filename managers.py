@@ -1,6 +1,8 @@
 from django.db.models import Manager
 from django.contrib.auth.models import UserManager
 
+from lava import settings as lava_settings
+
 
 class BaseModelManager(Manager):
 
@@ -36,7 +38,9 @@ class GroupManager(DefaultModelBaseManager):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(notification_id='').exclude(name="ADMINS")
+        queryset = queryset.filter(notification_id='')
+        if lava_settings.HIDE_ADMINS_GROUP:
+            return queryset.exclude(name="ADMINS")
         return queryset
 
 

@@ -11,7 +11,7 @@ from lava.utils.xlsx_utils import ExportDataType, export_xlsx
 
 def export_permissions():
     """
-    This function creates a tmp file that contains all the groups and the 
+    This function creates a tmp file that contains all the groups and the
     permissions affected to them and returns a result that has the tmp file path
     as it's instance.
     """
@@ -36,13 +36,13 @@ def export_permissions():
             value = 'X' if has_perm else ''
             perms.append(value)
         data_content.append(perms)
-    
+
     data = ExportDataType(
         row_titles=rows,
         col_titles=columns,
         data=data_content
     )
-    
+
     result = export_xlsx(
         data,
         header_title=header_title,
@@ -110,7 +110,7 @@ def export_activity_journal(
 
     for action in journal:
         data_content.append([
-            action.action_time.strftime("%d/%m/%Y %H:%M:%S"),
+            action.action_time.strftime("%Y/%m/%d %H:%M:%S"),
             f"{action.user.first_name} {action.user.last_name}",
             # action.user.id,
             action.get_action_flag_display(),
@@ -119,12 +119,12 @@ def export_activity_journal(
             action.object_id,
             action.change_message
         ])
-    
+
     data = ExportDataType(
         col_titles=columns,
         data=data_content
     )
-    
+
     result = export_xlsx(
         data,
         header_title=header_title,

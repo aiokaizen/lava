@@ -16,11 +16,24 @@ from lava.models import (
     Conversation, ChatMessage, NotificationGroup
 )
 from lava.utils.utils import pop_list_item
+from lava import settings as lava_settings
 
 
 # Unregister models
 admin.site.unregister(BaseGroupModel)
 admin.site.unregister(Theme)
+
+
+def get_user_permissions_fields():
+    permissions_fields = [
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "groups",
+    ]
+    if not lava_settings.HIDE_PERMISSIONS_FIELDS_FROM_ADMIN:
+        permissions_fields.append("user_permissions")
+    return tuple(permissions_fields)
 
 
 @admin.register(User)
@@ -59,13 +72,7 @@ class UserAdmin(auth_admin.UserAdmin):
         (
             _("Permissions"),
             {
-                "fields": (
-                    "is_active",
-                    "is_staff",
-                    "is_superuser",
-                    "groups",
-                    # "user_permissions",
-                ),
+                "fields": get_user_permissions_fields(),
             },
         ),
         (
@@ -169,6 +176,7 @@ class UserAdmin(auth_admin.UserAdmin):
 
     def get_queryset(self, request):
         return User.filter(user=request.user, kwargs=request.GET)
+
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -335,7 +343,7 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(BaseModelAdmin):
+class GroupAdmin(auth_admin.GroupAdmin):
     pass
 
 

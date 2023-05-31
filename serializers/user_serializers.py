@@ -83,8 +83,8 @@ class UserGetSerializer(ReadOnlyBaseModelSerializer):
         ]
         extra_kwargs = {
             "birth_day": {"format": "%m/%d/%Y"},
-            "last_login": {"format": "%m/%d/%Y %H:%M:%S"},
-            "date_joined": {"format": "%m/%d/%Y %H:%M:%S"},
+            "last_login": {"format": "%Y/%m/%d %H:%M:%S"},
+            "date_joined": {"format": "%Y/%m/%d %H:%M:%S"},
         }
 
 
@@ -173,8 +173,8 @@ class UserUpdateSerializer(BaseModelSerializer):
                 "format": "%m/%d/%Y",
                 "input_formats": settings.DATE_INPUT_FORMATS,
             },
-            "last_login": {"format": "%m/%d/%Y %H:%M:%S"},
-            "date_joined": {"format": "%m/%d/%Y %H:%M:%S"},
+            "last_login": {"format": "%Y/%m/%d %H:%M:%S"},
+            "date_joined": {"format": "%Y/%m/%d %H:%M:%S"},
         }
 
     def validate(self, value):
@@ -305,8 +305,8 @@ class UserSerializer(serializers.ModelSerializer):
                 "format": "%m/%d/%Y",
                 "input_formats": settings.DATE_INPUT_FORMATS,
             },
-            "last_login": {"format": "%m/%d/%Y %H:%M:%S"},
-            "date_joined": {"format": "%m/%d/%Y %H:%M:%S"},
+            "last_login": {"format": "%Y/%m/%d %H:%M:%S"},
+            "date_joined": {"format": "%Y/%m/%d %H:%M:%S"},
         }
 
     def validate(self, value):
