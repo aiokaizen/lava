@@ -150,6 +150,7 @@ class Entity(BaseModel):
     ifisc = models.CharField(_("IF"), max_length=10, null=True, blank=True)  # Identifiant fiscale
     tp = models.CharField(_("TP"), max_length=10, null=True, blank=True)
     preferences = models.JSONField(_("Preferences"), default=dict)
+    is_current = models.BooleanField(_("Entité local"), default=False, blank=True)
 
     def __str__(self):
         return self.name
@@ -208,3 +209,4 @@ class Entity(BaseModel):
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
+
