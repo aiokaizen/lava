@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -33,14 +35,16 @@ class Account(BaseModel):
         return f"{self.name}"
 
     def debit_account(self, user, amount):
-        self.balance -= amount
+        amount = amount or 0
+        self.balance -= Decimal(amount)
         result = self.update(user, update_fields=["balance"], message="Debit Account")
         if result.is_error:
             return result
         return Result.success(_("Account has been debitted successfully."))
 
     def credit_account(self, user, amount):
-        self.balance += amount
+        amount = amount or 0
+        self.balance += Decimal(amount)
         result = self.update(user, update_fields=["balance"], message="Credit Account")
         if result.is_error:
             return result

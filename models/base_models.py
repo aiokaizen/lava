@@ -352,14 +352,14 @@ class BaseModelMixin:
         if "created_after" in kwargs:
             try:
                 date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
-                filter_params &= Q(created_at__date__gte=date)
+                filter_params &= Q(created_at__date__lte=date)
             except ValueError:
                 pass
 
         if "created_before" in kwargs:
             try:
                date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
-               filter_params &= Q(created_at__date__lte=date)
+               filter_params &= Q(created_at__date__gte=date)
             except ValueError:
                 pass
 
@@ -373,14 +373,14 @@ class BaseModelMixin:
         if "last_updated_after" in kwargs:
             try:
                 date = datetime.strptime(kwargs["last_updated_after"], "%m-%d-%Y")
-                filter_params &= Q(last_updated_at__date__gte=date)
+                filter_params &= Q(last_updated_at__date__lte=date)
             except ValueError:
                 pass
 
         if "last_updated_before" in kwargs:
             try:
                 date = datetime.strptime(kwargs["last_updated_before"], "%m-%d-%Y")
-                filter_params &= Q(last_updated_at__date__lte=date)
+                filter_params &= Q(last_updated_at__date__gte=date)
             except ValueError:
                 pass
 
@@ -394,14 +394,14 @@ class BaseModelMixin:
         if "deleted_after" in kwargs:
             try:
                 date = datetime.strptime(kwargs["deleted_after"], "%m-%d-%Y")
-                filter_params &= Q(deleted_at__date__gte=date)
+                filter_params &= Q(deleted_at__date__lte=date)
             except ValueError:
                 pass
 
         if "deleted_before" in kwargs:
             try:
                 date = datetime.strptime(kwargs["deleted_before"], "%m-%d-%Y")
-                filter_params &= Q(deleted_at__date__lte=date)
+                filter_params &= Q(deleted_at__date__gte=date)
             except ValueError:
                 pass
 

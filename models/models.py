@@ -142,11 +142,11 @@ class LogEntry(BaseLogEntryModel):
 
         if "created_after" in kwargs:
             date = datetime.strptime(kwargs["created_after"], "%m-%d-%Y")
-            filter_params &= Q(action_time__date__gte=date)
+            filter_params &= Q(action_time__date__lte=date)
 
         if "created_before" in kwargs:
             date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
-            filter_params &= Q(action_time__date__lte=date)
+            filter_params &= Q(action_time__date__gte=date)
 
         return filter_params
 
@@ -705,7 +705,7 @@ class User(BaseModel, AbstractUser):
             # Django calls User().set_password(rp) to increase request time span
             # for some reason?
             return super().set_password(raw_password)
-        
+
         result = self.update(
             user=user, update_fields=["password"], message="Password Change"
         )
