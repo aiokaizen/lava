@@ -27,7 +27,7 @@ class Account(BaseModel):
         abstract = True
 
     name = models.CharField(_("Name"), max_length=256, unique=True, null=True, blank=True)
-    balance = models.DecimalField(_("Balance"), max_digits=8, decimal_places=2, default=0, blank=True)
+    balance = models.DecimalField(_("Balance"), max_digits=14, decimal_places=2, default=0, blank=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -209,4 +209,3 @@ class Entity(BaseModel):
         base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
-

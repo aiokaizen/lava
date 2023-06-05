@@ -91,15 +91,24 @@ def strtobool(val: str):
         raise ValueError(_("invalid truth value %r") % (val,))
 
 
-def humanize_datetime(datetime):
+def humanize_datetime(datetime, verbose=True):
+    if not datetime:
+        return None
+
     now = timezone.now()
     if now.date() == datetime.date():
-        return datetime.strftime("%H:%M")
+        return datetime.strftime('%H:%M') if verbose else (
+            f"{_('Today')}, {datetime.strftime('%H:%M')}"
+        )
         # return f"{(now - datetime).seconds()}s ago"
     elif (now - datetime) < timedelta(days=360):
-        return datetime.strftime("%B, %d")
+        return datetime.strftime("%B, %d") if verbose else (
+            f"{datetime.strftime('%B')}, {datetime.strftime('%H:%M')}"
+        )
 
-    return datetime.strftime("%Y/%m/%d")
+    return datetime.strftime("%Y/%m/%d") if verbose else (
+        f"{datetime.strftime('%Y/%m/%d')}, {datetime.strftime('%H:%M')}"
+    )
 
 
 def guess_protocol():
