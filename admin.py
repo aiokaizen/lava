@@ -374,7 +374,34 @@ class PreferencesAdmin(admin.ModelAdmin):
 
 @admin.register(Conversation)
 class ConversationAdmin(BaseModelAdmin):
-    pass
+    fieldsets = (
+        (
+            _("General informations"),
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": (
+                    "name",
+                    "is_group_conversation",
+                    "logo",
+                    "members",
+                    "pinned_at",
+                ),
+            },
+        ),
+        (
+            _("Base attributes"),
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "last_updated_at",
+                    "deleted_at"
+                ),
+            },
+        ),
+    )
+
 
 
 @admin.register(ChatMessage)
