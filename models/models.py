@@ -1051,25 +1051,26 @@ class Backup(BaseModel):
                 tag="warning",
             )
 
-        # min_period_between_backups = timedelta(hours=1)
-        # daily_limit = 2
-        # now = timezone.now()
+        min_hours = 1
+        min_period_between_backups = timedelta(hours=min_hours)
+        daily_limit = 1
+        now = timezone.now()
 
-        # all_backups = Backup.get_all_items()
+        all_backups = Backup.get_all_items()
 
-        # latest_backup = all_backups.first()
+        latest_backup = all_backups.first()
 
-        # if not latest_backup:
-        #     return Result(True)
+        if not latest_backup:
+            return Result(True)
 
-        # today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
+        today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
 
-        # if today_backups.count() >= daily_limit:
-        #     return Result(False, _("You can not create more than %d backups per day." % daily_limit))
+        if today_backups.count() >= daily_limit:
+            return Result(False, _("You can not create more than %d backups per day." % daily_limit))
 
-        # latest_backup_time = latest_backup.created_at
-        # if now < latest_backup_time + min_period_between_backups:
-        #     return Result(False, _("You can only create one backup per hour"))
+        latest_backup_time = latest_backup.created_at
+        if now < latest_backup_time + min_period_between_backups:
+            return Result(False, _("You can only create one backup every %d hours." % min_hours))
 
         return Result(True)
 
