@@ -113,8 +113,8 @@ class LogEntry(BaseLogEntryModel):
         ordering = ["-action_time"]
         default_permissions = ()
         permissions = (
-            ("list_log_entry", _("Can view activity journal")),
-            ("export_log_entry", _("Can export activity journal")),
+            ("list_logentry", _("Can view activity journal")),
+            ("export_logentry", _("Can export activity journal")),
         )
 
     @classmethod
