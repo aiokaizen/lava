@@ -35,7 +35,9 @@ class Account(BaseModel):
         return f"{self.name}"
 
     def debit_account(self, user, amount):
-        amount = amount or 0
+        if not amount:
+            return Result.warning(_("Amount equals to 0. Account not debitted."))
+
         self.balance -= Decimal(amount)
         result = self.update(user, update_fields=["balance"], message="Debit Account")
         if result.is_error:
@@ -43,7 +45,9 @@ class Account(BaseModel):
         return Result.success(_("Account has been debitted successfully."))
 
     def credit_account(self, user, amount):
-        amount = amount or 0
+        if not amount:
+            return Result.warning(_("Amount equals to 0. Account not creditted."))
+
         self.balance += Decimal(amount)
         result = self.update(user, update_fields=["balance"], message="Credit Account")
         if result.is_error:
