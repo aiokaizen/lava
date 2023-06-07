@@ -56,6 +56,8 @@ if activate_api_urls:
     api_router.register(r"api/backup", views.BackupAPIViewSet)
     api_router.register(r"api/chat", views.ChatAPIViewSet)
     api_router.register(r'api/dashboard', views.DashboardAPIViewSet, basename='dashboard')
+    api_router.register(r'api/banks', views.BankAPIViewSet)
+    api_router.register(r'api/bank_accounts', views.BankAccountAPIViewSet)
 
 
     api_urlpatterns = [

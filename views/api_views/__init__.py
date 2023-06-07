@@ -8,3 +8,4 @@ from .log_entry_api_views import LogEntryAPIViewSet
 from .utility_apis import SettingsListAPI, ChoicesAPI, DashboardAPIViewSet
 from .backup_api_views import BackupAPIViewSet
 from .chat_api_views import ChatAPIViewSet
+from .organizations_api import BankAccountAPIViewSet, BankAPIViewSet
