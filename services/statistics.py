@@ -11,20 +11,20 @@ from lava.serializers.user_serializers import UserListSerializer
 from lava.serializers.log_entry_serializer import LogEntrySerializer
 
 
-def collect_statistics():
+def collect_statistics(user=None):
 
     # active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-    connected_users = User.filter(kwargs={"is_active": "True"})[:7]
-    users_count = User.filter().count()
+    connected_users = User.filter(user=user, kwargs={"is_active": "True"})[:7]
+    users_count = User.filter(user=user).count()
     connected_users_serializer = UserListSerializer(connected_users, many=True)
-    groups_count = Group.filter().count()
-    backup_list = Backup.filter()
+    groups_count = Group.filter(user=user).count()
+    backup_list = Backup.filter(user=user)
     backup_list_serializer = BackupSerializer(backup_list[:5], many=True)
     backups_count = backup_list.count()
     used_space = 34
     max_space = 128
     available_space_percent = round((used_space * 100) / max_space, 2)
-    latest_actions = LogEntry.objects.all()[:7]
+    latest_actions = LogEntry.filter(user=user)[:7]
     latest_actions_serializer = LogEntrySerializer(latest_actions, many=True)
 
     statistics = {
@@ -38,13 +38,13 @@ def collect_statistics():
         "active_users": connected_users_serializer.data,
         "latest_actions": latest_actions_serializer.data,
     }
-    
+
     return statistics
 
-def get_daily_actions():
+def get_daily_actions(user=None):
 
     daily_actions = (
-        LogEntry.objects.order_by("-action_time")
+        LogEntry.filter(user=user).order_by("-action_time")
         .annotate(action_day=TruncDate('action_time'))
         .values('action_day')
         .annotate(
@@ -54,32 +54,30 @@ def get_daily_actions():
 
     actions_data = {
         'actions': dict(),
-        
     }
 
 
     for action_data in daily_actions:
         action_day = action_data["action_day"].strftime("%Y-%m-%d")
-        
 
         if action_day not in list(actions_data['actions'].keys()):
             actions_data['actions'][action_day] = [action_day, 0]
-        
+
         actions_data["actions"][action_day][1] += action_data['count']
-        
+
     actions_data["actions"] = list(actions_data["actions"].values())
-            
-    
+
+
     return actions_data
 
-def get_indicators():
+def get_indicators(user=None):
 
-    users_count = User.filter().count()
-    groups_count = Group.filter().count()
-    backup_list = Backup.filter()
+    users_count = User.filter(user=user).count()
+    groups_count = Group.filter(user=user).count()
+    backup_list = Backup.filter(user=user)
     backups_count = backup_list.count()
 
-    
+
     statistics = [
         {
             "title": _('Utilisateurs'),
@@ -102,12 +100,12 @@ def get_indicators():
     ]
     return statistics
 
-def get_spaces():
+def get_spaces(user=None):
 
     used_space = 34
     max_space = 128
     available_space_percent = round((used_space * 100) / max_space, 2)
-    
+
     statistics = {
         "used_space": used_space,
         "max_space": max_space,
@@ -115,19 +113,18 @@ def get_spaces():
     }
     return statistics
 
-def get_active_users():
+def get_active_users(user=None):
 
-    connected_users = User.filter(kwargs={"is_active": "True"})[:7]
-    
-    connected_users_serializer = UserListSerializer(connected_users, many=True)    
+    connected_users = User.filter(user=user, kwargs={"is_active": "True"})[:7]
+
+    connected_users_serializer = UserListSerializer(connected_users, many=True)
 
     return connected_users_serializer.data
 
-def get_latest_actions():
+def get_latest_actions(user=None):
 
-    latest_actions = LogEntry.objects.all()[:7]
+    latest_actions = LogEntry.filter(user=user)[:7]
 
     latest_actions_serializer = LogEntrySerializer(latest_actions, many=True)
-    
+
     return latest_actions_serializer.data
-    

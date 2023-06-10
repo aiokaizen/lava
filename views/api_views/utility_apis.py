@@ -25,27 +25,27 @@ class ChoicesAPI(APIView):
 class DashboardAPIViewSet(ViewSet):
 
     permission_classes = [IsAuthenticated]
-    
+
     @action(methods=['GET'], detail=False)
     def daily_actions(self, request):
-        return Response(get_daily_actions())
-    
+        return Response(get_daily_actions(user=request.user))
+
     @action(methods=['GET'], detail=False)
     def indicators(self, request):
-        return Response(get_indicators())
-    
+        return Response(get_indicators(user=request.user))
+
     @action(methods=['GET'], detail=False)
     def spaces(self, request):
-        return Response(get_spaces())
-    
+        return Response(get_spaces(user=request.user))
+
     @action(methods=['GET'], detail=False)
     def active_users(self, request):
-        return Response(get_active_users())
+        return Response(get_active_users(user=request.user))
 
     @action(methods=['GET'], detail=False)
     def latest_actions(self, request):
-        return Response(get_latest_actions())
-    
+        return Response(get_latest_actions(user=request.user))
+
 
 class SettingsListAPI(APIView):
 
