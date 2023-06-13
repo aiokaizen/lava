@@ -13,7 +13,7 @@ from lava.forms.main_forms import (
 )
 from lava.models import (
     Notification, Preferences, User, Group, Backup,
-    Conversation, ChatMessage, NotificationGroup
+    Conversation, ChatMessage, NotificationGroup, LogEntry
 )
 from lava.utils.utils import pop_list_item
 from lava import settings as lava_settings
@@ -351,6 +351,10 @@ class GroupAdmin(auth_admin.GroupAdmin):
 class NotificationGroupAdmin(BaseModelAdmin):
     pass
 
+
+@admin.register(LogEntry)
+class LogEntryAdmin(BaseModelAdmin):
+    pass
 
 @admin.register(Backup)
 class BackupAdmin(BaseModelAdmin):
