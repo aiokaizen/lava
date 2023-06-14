@@ -353,8 +353,19 @@ class NotificationGroupAdmin(BaseModelAdmin):
 
 
 @admin.register(LogEntry)
-class LogEntryAdmin(BaseModelAdmin):
+class LogEntryAdmin(admin.ModelAdmin):
     pass
+    fields = [
+        "action_time",
+        "user",
+        "content_type",
+        "object_id",
+        "object_repr",
+        "action_flag",
+        "change_message",
+        "objects",
+    ]
+
 
 @admin.register(Backup)
 class BackupAdmin(BaseModelAdmin):
