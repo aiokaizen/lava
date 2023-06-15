@@ -31,7 +31,7 @@ from lava.exceptions import LavaBaseException
 from lava import settings as lava_settings
 
 
-def slugify(value, allow_unicode=False, separator="_"):
+def slugify(value, separator="_", allow_unicode=False):
     result = base_slugify(value, allow_unicode).replace("-", separator)
     return result
 
@@ -252,11 +252,19 @@ def mask_number(n):
     return n
 
 
-def try_parse(value, t):
+def try_parse(value, t, default=None):
     try:
-        return t(value)
+        if type(t) != list:
+            return t(value)
+
+        for item in t:
+            try:
+                return item(value)
+            except (ValueError, TypeError):
+                pass
+        return default
     except (ValueError, TypeError):
-        return None
+        return default
 
 
 def unmask_number(mask):
