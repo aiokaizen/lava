@@ -15,7 +15,7 @@ from lava.models import (
     Notification, Preferences, User, Group, Backup,
     Conversation, ChatMessage, NotificationGroup, LogEntry
 )
-from lava.utils.utils import pop_list_item
+from lava.utils import pop_list_item
 from lava import settings as lava_settings
 
 
@@ -258,6 +258,7 @@ class BaseModelAdmin(admin.ModelAdmin):
                 m2m_fields.append((attr, value))
             elif attr in file_field_names:
                 file_fields.append((attr, value))
+            else:
                 setattr(obj, attr, None)
 
         return obj.create(

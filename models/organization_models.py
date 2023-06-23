@@ -10,7 +10,7 @@ from lava import settings as lava_settings
 from lava.enums import DeletePolicy
 from lava.models.base_models import BaseModel
 from lava.models.utility_models import Address
-from lava.utils.utils import (
+from lava.utils import (
     get_entity_logo_filename, get_entity_logo_light_filename,
     Result, adjust_color
 )

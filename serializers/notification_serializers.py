@@ -5,7 +5,7 @@ from rest_framework.fields import empty
 
 from lava.models import Notification
 from lava.serializers.user_serializers import UserExerptSerializer
-from lava.utils.utils import humanize_datetime
+from lava.utils import humanize_datetime
 
 
 class BulkNotificationActionSerializer(serializers.ModelSerializer):

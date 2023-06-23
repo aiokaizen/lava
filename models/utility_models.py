@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from lava.enums import DeletePolicy
 from lava.models import BaseModel
 from lava.validators import validate_empty_field
+from lava.utils import get_document_filename
 
 
 class Address(BaseModel):
@@ -73,6 +74,19 @@ class Address(BaseModel):
         base_queryset = super().filter(user=user, kwargs=kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
+
+
+class FileDocument(BaseModel):
+
+    class Meta:
+        verbose_name = _("Document")
+        verbose_name_plural = _("Documents")
+
+    name = models.CharField(_("Name"), max_length=256, default="", blank=True)
+    document_file = models.FileField(_("File"), upload_to=get_document_filename)
+
+    def __str__(self):
+        return self.name
 
 
 # class SocialMediaAccount(BaseModel):

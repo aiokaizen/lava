@@ -277,52 +277,6 @@ def map_interval(value, min1, max1, min2, max2):
     return (value - min1) / (max1 - min1) * (max2 - min2) + min2
 
 
-# Handle Uploaded file names
-def get_user_cover_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    folder = "user/{}".format(mask_number(instance.id))
-    return "{}/cover_picture.{}".format(folder, ext)
-
-
-def get_user_photo_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    folder = "user/{}".format(mask_number(instance.id))
-    return "{}/profile_picture.{}".format(folder, ext)
-
-
-def get_group_photo_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    folder = "group/{}".format(instance.id)
-    return "{}/photo.{}".format(folder, ext)
-
-
-def get_entity_logo_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    return f"entity/{slugify(instance.name)}/logo.{ext}"
-
-
-def get_entity_logo_light_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    return f"entity/{slugify(instance.name)}/logo_light.{ext}"
-
-
-def get_person_image_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    name = f"{instance.last_name}{instance.first_name}"
-    return f"person/{slugify(name)}_picture.{ext}"
-
-
-def get_conversation_logo_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    return f"chat/conversations/{instance.id}/logo.{ext}"
-
-
-def get_chat_message_image_filename(instance, filename):
-    ext = filename.split(".")[-1]
-    now = timezone.now().strftime("%Y%m%d%H%M%S%z")
-    return f"chat/conversations/{instance.conversation.id}/messages/{instance.id}_{now}.{ext}"
-
-
 def get_model_file_from_io(filename, is_image=False):
     try:
         with open(filename, "rb") as f:
@@ -383,10 +337,6 @@ def get_model_file_from_url(url, is_image=False):
             return Result.error(str(e))
     else:
         return Result.error(f"Response error {response.status_code}")
-
-
-def get_backup_file_filename(instance, filename):
-    return "backup/{}".format(instance.get_filename())
 
 
 def get_or_create(

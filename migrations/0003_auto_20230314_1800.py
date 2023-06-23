@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='cover_picture',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, help_text='Preferred image dimentions: (1200 x 250)', null=True, upload_to=lava.utils.utils.get_user_cover_filename, verbose_name='Cover picture'),
+            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, help_text='Preferred image dimentions: (1200 x 250)', null=True, upload_to=lava.utils.get_user_cover_filename, verbose_name='Cover picture'),
         ),
         migrations.AlterField(
             model_name='user',
             name='photo',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.utils.get_user_photo_filename, verbose_name='Photo'),
+            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.get_user_photo_filename, verbose_name='Photo'),
         ),
     ]

@@ -337,7 +337,6 @@ def export_serializer_xlsx(
             content.append(data.get(field_name, '---'))
         data_content.append(content)
 
-    
     data = ExportDataType(
         col_titles=columns,
         data=data_content

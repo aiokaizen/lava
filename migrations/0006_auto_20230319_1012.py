@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
                 ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
                 ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('image', easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.utils.get_group_photo_filename, verbose_name='Image')),
+                ('image', easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.get_group_photo_filename, verbose_name='Image')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
                 ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='sub_groups', to='lava.group', verbose_name='Parent')),
             ],

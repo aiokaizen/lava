@@ -5,7 +5,7 @@ from django.db.models import Q
 
 from lava.models import Permission, Group
 from lava.models.models import LogEntry
-from lava.utils.utils import Result
+from lava.utils import Result
 from lava.utils.xlsx_utils import ExportDataType, export_xlsx
 
 

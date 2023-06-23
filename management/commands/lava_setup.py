@@ -75,9 +75,9 @@ class Command(BaseCommand):
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(name="ADMINS")
-        Group.objects.get_or_create(
-            name="STANDARD"
-        )  # Default group for signed up users
+        # Group.objects.get_or_create(
+        #     name="STANDARD"
+        # )  # Default group for signed up users
 
         # Add all available permissions to group ADMINS
         admins_group.permissions.add(
@@ -111,6 +111,7 @@ class Command(BaseCommand):
 
         try:
             ekadmin = User.objects.get(username="ekadmin")
+            ekadmin.groups.add(admins_group)
             logging.warning("admin user ekadmin already exists!")
         except User.DoesNotExist:
             ekadmin = User(

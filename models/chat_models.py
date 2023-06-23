@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from lava.error_codes import REQUIRED_ERROR_CODE
 from lava.models import User, BaseModel
-from lava.utils.utils import (
+from lava.utils import (
     Result, get_conversation_logo_filename, get_chat_message_image_filename
 )
 from lava import settings as lava_settings

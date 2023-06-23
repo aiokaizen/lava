@@ -1,7 +1,7 @@
 import os
 
 from django.core.files.storage import default_storage
-from django.db.models import FileField, signals
+from django.db.models import FileField, signals, ObjectDoesNotExist
 
 from lava.models import User
 
@@ -60,11 +60,14 @@ def pre_save_file_cleanup(sender, **kwargs):
         if field and isinstance(field, FileField):
             fieldname = field.name
 
-            if hasattr(sender, 'get_all_items'):
-                old_inst = sender.get_all_items().get(id=instance.id)
-            else:
-                manager = sender._default_manager
-                old_inst = manager.get(id=instance.id)
+            try:
+                if hasattr(sender, 'get_all_items'):
+                    old_inst = sender.get_all_items().get(id=instance.id)
+                else:
+                    manager = sender._default_manager
+                    old_inst = manager.get(id=instance.id)
+            except ObjectDoesNotExist:
+                continue
 
             old_field = getattr(old_inst, fieldname)
             new_field = getattr(instance, fieldname)
