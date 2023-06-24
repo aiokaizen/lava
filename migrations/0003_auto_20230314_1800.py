@@ -2,7 +2,7 @@
 
 from django.db import migrations
 import easy_thumbnails.fields
-import lava.utils.utils
+import lava.utils
 
 
 class Migration(migrations.Migration):

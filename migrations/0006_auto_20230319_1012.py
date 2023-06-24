@@ -6,7 +6,7 @@ import django.db.models.deletion
 import django.utils.timezone
 import easy_thumbnails.fields
 import lava.models.base_models
-import lava.utils.utils
+import lava.utils
 
 
 class Migration(migrations.Migration):
