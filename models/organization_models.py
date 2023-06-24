@@ -68,13 +68,17 @@ class Bank(BaseModel):
         ordering = ('name', )
         abstract = not lava_settings.ACTIVATE_PAYEMENTS
 
-    name = models.CharField(_("Name"), max_length=256, unique=True)
+    name = models.CharField(_("Name"), max_length=256)
     country = models.CharField(_("Country"), max_length=256, default='Morocco', blank=True)
+    city = models.CharField(_("City"), max_length=256, blank=True)
+    agency = models.CharField(_("Agency"), max_length=256, blank=True)
     routing_number = models.CharField(_("Routing number"), max_length=9, blank=True)
     swift_code = models.CharField(_("BIC / SWIFT"), max_length=256, blank=True)
 
     def __str__(self):
-        return f"{self.name}"
+        city = f" - {self.city}" if self.city else ""
+        agency = f" - {self.agency}" if self.agency else ""
+        return f"{self.name}{city}{agency}"
 
     @classmethod
     def create_default_bank(cls):

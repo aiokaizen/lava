@@ -1,0 +1,464 @@
+[
+  {
+    "name": "AL BARID BANK",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "ABBMMAMC"
+  },
+  {
+    "name": "ARAB BANK PLC",
+    "city": "MARRAKESH",
+    "agency": "MARRAKECH BRANCH",
+    "swift_code": "ARABMAMC250"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "AGADIR",
+    "agency": "",
+    "swift_code": "ARABMAMC260"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "ARABMAMC"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "CASABLANCA",
+    "agency": "MAIN BRANCH",
+    "swift_code": "ARABMAMC210"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "FES",
+    "agency": "",
+    "swift_code": "ARABMAMC240"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "ARABMAMC220"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "RABAT",
+    "agency": "AGDAL BRANCH",
+    "swift_code": "ARABMAMC221"
+  },
+  {
+    "name": "ARAB BANK PLC.",
+    "city": "TANGER",
+    "agency": "",
+    "swift_code": "ARABMAMC230"
+  },
+  {
+    "name": "ATTIJARI INTERNATIONAL BANK S.A. - BANQUE OFF SHORE",
+    "city": "TANGER",
+    "agency": "",
+    "swift_code": "AIBSMAMT"
+  },
+  {
+    "name": "ATTIJARIWAFA BANK",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BCMAMAMC"
+  },
+  {
+    "name": "ATTIJARIWAFA BANK",
+    "city": "CASABLANCA",
+    "agency": "ATTIJARI INTERMEDIATION",
+    "swift_code": "BCMAMAMCATI"
+  },
+  {
+    "name": "ATTIJARIWAFA BANK",
+    "city": "CASABLANCA",
+    "agency": "BCMAMAMCBAS",
+    "swift_code": "BCMAMAMCBAS"
+  },
+  {
+    "name": "ATTIJARIWAFA BANK",
+    "city": "CASABLANCA",
+    "agency": "BRANCH CTN DEVISE",
+    "swift_code": "BCMAMAMCDEV"
+  },
+  {
+    "name": "BANCO DE SABADELL, S.A.",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BSABMAMC"
+  },
+  {
+    "name": "BANK AL-MAGHRIB",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "BKAMMAMR"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BMCEMAMCBTI"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BMCEMAMC"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "AGENCE CORPORATE",
+    "swift_code": "BMCEMAMCCOR"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "BMCE CAPITAL",
+    "swift_code": "BMCEMAMCBCB"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "COMPTE SPECIAL MRE",
+    "swift_code": "BMCEMAMCMRE"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "CASABLANCA",
+    "agency": "SALLE DES MARCHES, CASABLANCA",
+    "swift_code": "BMCEMAMCSDM"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH TRADING ROOM, TANGIER",
+    "swift_code": "BMCEMAMCTCM"
+  },
+  {
+    "name": "BANK OF AFRICA",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH, TANGIER",
+    "swift_code": "BMCEMAMCTZF"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BCPOMAMC"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "DEPT. BACK OFFICE",
+    "swift_code": "BCPOMAMCBKO"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "DEPT. MONETIQUES",
+    "swift_code": "BCPOMAMCMON"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "DEPT. RECONCILIATION",
+    "swift_code": "BCPOMAMCREC"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "SCE. DOCUMENTAIRE",
+    "swift_code": "BCPOMAMCDOC"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "SCE. FINANCIER",
+    "swift_code": "BCPOMAMCFIN"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "TRANFERTS DES MAROCAINS RESIDANTS A L'ETRANGER",
+    "swift_code": "BCPOMAMCMRE"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "CASABLANCA",
+    "agency": "YSR",
+    "swift_code": "BCPOMAMCYSR"
+  },
+  {
+    "name": "BANQUE CENTRALE POPULAIRE",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH, TANGIER",
+    "swift_code": "BCPOMAMCCIB"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "BMCIMAMC"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "CASABLANCA",
+    "agency": "BUREAU DE CHANGE",
+    "swift_code": "BMCIMAMCBC"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "CASABLANCA",
+    "agency": "DEPT. RELATIONS INTERNATIONALES",
+    "swift_code": "BMCIMAMCDRI"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "CASABLANCA",
+    "agency": "SIEGE",
+    "swift_code": "BMCIMAMCXXX"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH, TANGIER",
+    "swift_code": "BMCIMAMCOBF"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH, TANGIER",
+    "swift_code": "BMCIMAMCOBF"
+  },
+  {
+    "name": "BANQUE MAROCAINE POUR LE COMMERCE ET L'INDUSTRIE",
+    "city": "TANGER",
+    "agency": "OFFSHORE BRANCH, TANGIER",
+    "swift_code": "BMCIMAMCOBF"
+  },
+  {
+    "name": "BANQUE POPULAIRE SAFI",
+    "city": "SAFI",
+    "agency": "",
+    "swift_code": "BCPOMAMCSAF"
+  },
+  {
+    "name": "BANQUE POPULAIRE TANGER",
+    "city": "TANGER",
+    "agency": "",
+    "swift_code": "BCPOMAMCTAT"
+  },
+  {
+    "name": "CAISSE DE DEPOT ET DE GESTION",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "CADGMAMR"
+  },
+  {
+    "name": "CAIXABANK, S.A. SUCCURSALE AU MAROC",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CAIXMAMC"
+  },
+  {
+    "name": "CDG CAPITAL",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "RDGCMAMR"
+  },
+  {
+    "name": "CFG BANK",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CAFGMAMC"
+  },
+  {
+    "name": "CITIBANK MAGHREB",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CITIMAMC"
+  },
+  {
+    "name": "CITIBANK MAGHREB",
+    "city": "CASABLANCA",
+    "agency": "TRADE SERVICES DEPARTMENT",
+    "swift_code": "CITIMAMCTRD"
+  },
+  {
+    "name": "COMPAGNIE NATIONALE ROYAL AIR MAROC",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "RAMSMAMC"
+  },
+  {
+    "name": "CREDIT AGRICOLE DU MAROC",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "CNCAMAMR"
+  },
+  {
+    "name": "CREDIT AGRICOLE DU MAROC",
+    "city": "RABAT",
+    "agency": "AL AKHDAR BRANCH",
+    "swift_code": "CNCAMAMRAAB"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "AGADIR",
+    "agency": "TRADE CENTER TALBORJT",
+    "swift_code": "CDMAMAMC706"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CDMAMAMC701"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CDMAMAMC702"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "ACTIVITES ET OPERATIONS PARTICIPATIVES",
+    "swift_code": "CDMAMAMCPAR"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "ALL MOROCCO BRANCHES",
+    "swift_code": "CDMAMAMC"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "OFFSHORE SERVICES",
+    "swift_code": "CDMAMAMCCOS"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "TRADE CENTER CENTRE-VILLE",
+    "swift_code": "CDMAMAMC703"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "CASABLANCA",
+    "agency": "TRADE CENTER EXPANSION",
+    "swift_code": "CDMAMAMC700"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "FES",
+    "agency": "TRADE CENTER QUARAOUYINE",
+    "swift_code": "CDMAMAMC707"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "MARRAKESH",
+    "agency": "TRADE CENTER MENARA",
+    "swift_code": "CDMAMAMC704"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "OUJDA",
+    "agency": "TRADE CENTER AL MOUSTAGBAL",
+    "swift_code": "CDMAMAMC708"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "RABAT",
+    "agency": "TRADE CENTER CHELLAH",
+    "swift_code": "CDMAMAMC709"
+  },
+  {
+    "name": "CREDIT DU MAROC",
+    "city": "TANGER",
+    "agency": "TRADE CENTER BOUGHAZ",
+    "swift_code": "CDMAMAMC705"
+  },
+  {
+    "name": "CREDIT IMMOBILIER ET HOTELIER",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "CIHMMAMC"
+  },
+  {
+    "name": "CREDIT IMMOBILIER ET HOTELIER",
+    "city": "CASABLANCA",
+    "agency": "DEPARTEMENT ETRANGER",
+    "swift_code": "CIHMMAMCDEP"
+  },
+  {
+    "name": "CREDIT IMMOBILIER ET HOTELIER",
+    "city": "CASABLANCA",
+    "agency": "SALLE DES MARCHES",
+    "swift_code": "CIHMMAMCSDM"
+  },
+  {
+    "name": "CREDIT IMMOBILIER ET HOTELIER",
+    "city": "CASABLANCA",
+    "agency": "UMNIA BANK",
+    "swift_code": "CIHMMAMCUBP"
+  },
+  {
+    "name": "GROUPE OCP",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "GOCPMAMC"
+  },
+  {
+    "name": "MEDIAFINANCE",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "MEDCMAMC"
+  },
+  {
+    "name": "OFFICE DES CHANGES",
+    "city": "RABAT",
+    "agency": "",
+    "swift_code": "OFCHMAMR"
+  },
+  {
+    "name": "SOCIETE GENERALE MAROCAINE DE BANQUES",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "SGMBMAMC"
+  },
+  {
+    "name": "SOCIETE GENERALE MAROCAINE DE BANQUES",
+    "city": "CASABLANCA",
+    "agency": "CASH MANAGEMENT INTERNATIONAL",
+    "swift_code": "SGMBMAMCCMI"
+  },
+  {
+    "name": "SOCIETE GENERALE MAROCAINE DE BANQUES",
+    "city": "CASABLANCA",
+    "agency": "FLUX CASH MANAGEMENT",
+    "swift_code": "SGMBMAMCFCM"
+  },
+  {
+    "name": "SOCIETE GENERALE MAROCAINE DE BANQUES",
+    "city": "CASABLANCA",
+    "agency": "SECURITIES AND FUNDS SERVICES",
+    "swift_code": "SGMBMAMCSFS"
+  },
+  {
+    "name": "SOCIETE GENERALE MAROCAINE DE BANQUES",
+    "city": "CASABLANCA",
+    "agency": "TRADE SERVICES",
+    "swift_code": "SGMBMAMCTS"
+  },
+  {
+    "name": "WAFASALAF",
+    "city": "CASABLANCA",
+    "agency": "",
+    "swift_code": "WAFAMAMC"
+  }
+]

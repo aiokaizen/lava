@@ -2,7 +2,7 @@ from .utils import (
     slugify, imdict, odict, strtobool, humanize_datetime, guess_protocol,
     pop_list_item, contains_arabic_chars, get_tmp_root, get_log_root,
     Result, camelcase_to_snakecase, mask_number, try_parse, unmask_number,
-    map_interval, get_model_file_from_io, get_model_file_from_url, get_or_create,
+    map_interval, get_model_file_from_io, get_model_file_from_url,
     send_html_email, send_mass_html_email, add_margin_to_image, get_image,
     generate_password, generate_username, _is_username_valid, hex_to_rgb, adjust_color,
     path_is_parent, path_includes_dir, zipdir, zipf, exec_command, dump_pgdb, load_pgdb,

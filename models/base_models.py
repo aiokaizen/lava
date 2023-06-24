@@ -284,7 +284,7 @@ class BaseModelMixin:
         }))
 
     @classmethod
-    def get_or_create(cls, current_user=None, defaults=None, **kwargs):
+    def get_or_create(cls, current_user=None, defaults=None, create_params=None, **kwargs):
         try:
             return cls.objects.get(**kwargs), False
         except cls.DoesNotExist:
@@ -292,7 +292,7 @@ class BaseModelMixin:
             for key, value in kwargs.items():
                 cleaned_kwargs[key.split("__")[0]] = value
             obj = cls(**cleaned_kwargs, **(defaults or {}))
-            result = obj.create(current_user)
+            result = obj.create(current_user, **(create_params or {}))
             if result.is_success:
                 return obj, True
             raise Exception(result.message)

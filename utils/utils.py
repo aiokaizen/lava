@@ -339,22 +339,6 @@ def get_model_file_from_url(url, is_image=False):
         return Result.error(f"Response error {response.status_code}")
 
 
-def get_or_create(
-    klass, action_user=None, default_value=None, create_parmas=None, *args, **kwargs
-):
-    try:
-        instance = klass.objects.get(*args, **kwargs)
-    except klass.DoesNotExist:
-        default_value = default_value or {}
-        create_parmas = create_parmas or {}
-        instance = klass(**default_value)
-        result = instance.create(user=action_user, **create_parmas)
-        if not result:
-            raise LavaBaseException(result)
-
-    return instance
-
-
 def send_html_email(
     request, template, recipients, sender=None, context=None, fail_silently=False
 ):

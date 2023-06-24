@@ -13,7 +13,8 @@ from lava.forms.main_forms import (
 )
 from lava.models import (
     Notification, Preferences, User, Group, Backup,
-    Conversation, ChatMessage, NotificationGroup, LogEntry
+    Conversation, ChatMessage, NotificationGroup, LogEntry,
+    Bank
 )
 from lava.utils import pop_list_item
 from lava import settings as lava_settings
@@ -423,3 +424,25 @@ class ConversationAdmin(BaseModelAdmin):
 @admin.register(ChatMessage)
 class ChatMessageAdmin(BaseModelAdmin):
     pass
+
+
+@admin.register(Bank)
+class BankAdmin(BaseModelAdmin):
+    search_fields = ["name", "city"]
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "country",
+                    "city",
+                    "agency",
+                    "routing_number",
+                    "swift_code",
+                ),
+            },
+        ),
+        # *super_base_model_admin.fieldsets
+    )
