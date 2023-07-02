@@ -249,7 +249,7 @@ class BaseModelMixin:
         return message
 
     @classmethod
-    def bulk_delete(cls, user, queryset, **kwargs):
+    def bulk_delete(cls, queryset, user=None, **kwargs):
         errors = {}
         soft_delete = not kwargs.get('trash', False)
         for obj in queryset:
@@ -267,7 +267,7 @@ class BaseModelMixin:
         }))
 
     @classmethod
-    def bulk_restore(cls, user, queryset, **kwargs):
+    def bulk_restore(cls, queryset, user=None, **kwargs):
         errors = {}
         for obj in queryset:
             result = obj.restore(user)
