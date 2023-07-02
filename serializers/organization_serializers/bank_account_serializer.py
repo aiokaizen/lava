@@ -26,4 +26,3 @@ class BankAccountSerializer(BaseModelSerializer):
         read_only_fields = [
             'id'
         ]
-

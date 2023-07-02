@@ -16,7 +16,8 @@ class BankSerializer(BaseModelSerializer):
         fields = [
             'id',
             'name',
-            'name',
+            'city',
+            'agency',
             'country',
             'routing_number',
             'swift_code',
@@ -24,4 +25,3 @@ class BankSerializer(BaseModelSerializer):
         read_only_fields = [
             'id'
         ]
-
