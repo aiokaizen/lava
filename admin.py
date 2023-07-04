@@ -260,7 +260,7 @@ class BaseModelAdmin(admin.ModelAdmin):
             elif attr in file_field_names:
                 file_fields.append((attr, value))
             else:
-                setattr(obj, attr, None)
+                setattr(obj, attr, value)
 
         return obj.create(
             user=user, m2m_fields=m2m_fields, file_fields=file_fields, **kwargs
