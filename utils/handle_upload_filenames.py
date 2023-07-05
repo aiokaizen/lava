@@ -1,6 +1,6 @@
 import os
 
-from lava.utils.utils import slugify
+from lava.utils.utils import slugify, mask_number
 
 
 def get_user_cover_filename(instance, filename):
