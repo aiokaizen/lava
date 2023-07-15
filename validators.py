@@ -57,8 +57,8 @@ class SchemelessURLValidator(URLValidator):
 @deconstructible
 class ExactLengthValidator(BaseValidator):
     message = ngettext_lazy(
-        'Ensure this value has exactly %(limit_value)d character (it only has %(show_value)d).',
-        'Ensure this value has exactly %(limit_value)d characters (it only has %(show_value)d).',
+        'Ensure this value has exactly %(limit_value)d character (it has %(show_value)d)',
+        'Ensure this value has exactly %(limit_value)d characters (it has %(show_value)d)',
         'limit_value')
     code = 'exact_length'
 
