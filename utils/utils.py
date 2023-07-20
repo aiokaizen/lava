@@ -111,6 +111,14 @@ def humanize_datetime(datetime, verbose=True):
     )
 
 
+def build_absolute_uri(serializer, f):
+    request = serializer.context.get('request', None)
+    url = f.url
+    if request is not None:
+        return request.build_absolute_uri(url)
+    return url
+
+
 def guess_protocol():
     # HOST containing `:` means that the project is running in a dev server
     return "http" if ":" in lava_settings.HOST else "https"
