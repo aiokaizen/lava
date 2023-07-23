@@ -1157,8 +1157,11 @@ class Backup(BaseModel):
                 notif = Notification(
                     title=gettext("Backup failed"),
                     content=gettext(
-                        "A %s that was started on %s has failed.\nError: %s"
-                        % (self.get_type_display(), self.created_at.strftime("%c"), e)
+                        "A %(type)s that was started on %(start_time)s has failed.\nError: %(e)s"
+                        % {
+                            "type": self.get_type_display(),
+                            "start_time": self.created_at.strftime("%c"), "e": e
+                        }
                     ),
                 )
                 m2m_fields = [("target_users", [user])]

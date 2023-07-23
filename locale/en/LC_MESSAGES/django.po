@@ -16,31 +16,32 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: admin.py:49
 msgid "Personal info"
-msgstr "Info personnelle"
+msgstr ""
 
 #: admin.py:68 models/models.py:82 models/models.py:83
 #: models/organization_models.py:164
 msgid "Preferences"
-msgstr "Préférences"
+msgstr ""
 
 #: admin.py:74 breadcrumbs.py:66 breadcrumbs.py:71 settings.py:175
 msgid "Permissions"
-msgstr "Permissions"
+msgstr ""
 
 #: admin.py:80
 msgid "Important dates"
-msgstr "Dates Importantes"
+msgstr ""
 
 #: admin.py:190 admin.py:409
 msgid "Base attributes"
-msgstr "Ensemble minimum d'attributs de base"
+msgstr ""
 
 #: admin.py:280
 msgid "Soft delete"
-msgstr "suppression réversible"
+msgstr ""
 
 #: admin.py:289
 #, python-format
@@ -48,17 +49,14 @@ msgid ""
 "The following error rose while trying to delete '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"L'erreur suivante s'est produite lors de la tentative de suppression de "
-"'%(obj)s' : \n"
-"        %(msg)s"
 
 #: admin.py:299 admin.py:340
 msgid "The selected objects were successfully deleted."
-msgstr "Les objets sélectionnés ont été supprimés avec succès."
+msgstr ""
 
 #: admin.py:302
 msgid "Restore"
-msgstr "Rétablir"
+msgstr ""
 
 #: admin.py:311
 #, python-format
@@ -66,13 +64,10 @@ msgid ""
 "The following error rose while trying to restore '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"L'erreur suivante s'est produite lors de la tentative de restauration de "
-"'%(obj)s' : \n"
-"        %(msg)s"
 
 #: admin.py:321
 msgid "The selected objects were successfully restored."
-msgstr "Les objets sélectionnés ont été restaurés avec succès."
+msgstr ""
 
 #: admin.py:332
 #, python-format
@@ -80,8 +75,6 @@ msgid ""
 "The following error rose while deleting '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"L'erreur suivante s'est produite lors de la suppression de '%(obj)s' : \n"
-"        %(msg)s"
 
 #: admin.py:396
 msgid "General informations"
@@ -93,296 +86,281 @@ msgstr ""
 
 #: breadcrumbs.py:52
 msgid "Home - Lava"
-msgstr "Accueil - Lava"
+msgstr ""
 
 #: breadcrumbs.py:52
 msgid "Home"
-msgstr "Accueil"
+msgstr ""
 
 #: breadcrumbs.py:53
 msgid "Login - Lava"
-msgstr "Connexion - Lava"
+msgstr ""
 
 #: breadcrumbs.py:53
 msgid "Login"
-msgstr "S’identifier"
+msgstr ""
 
 #: breadcrumbs.py:56 settings.py:173
 msgid "Users"
-msgstr "Utilisateurs·trices"
+msgstr ""
 
 #: breadcrumbs.py:57
 msgid "Create new user"
-msgstr "Créer un nouvel utilisateur"
+msgstr ""
 
 #: breadcrumbs.py:58
 msgid "User Profile"
-msgstr "Profil d'utilisateur"
+msgstr ""
 
 #: breadcrumbs.py:58
 msgid "User profile"
-msgstr "Profil Utilisateur"
+msgstr ""
 
 #: breadcrumbs.py:59
 msgid "Update Profile"
-msgstr "Mise à Jour Profil"
+msgstr ""
 
 #: breadcrumbs.py:59
 msgid "Update profile"
-msgstr "Mettre à jour le profil"
+msgstr ""
 
 #: breadcrumbs.py:61 models/models.py:228 serializers/user_serializers.py:267
 #: settings.py:174
 msgid "Groups"
-msgstr "Groupes"
+msgstr ""
 
 #: breadcrumbs.py:62
 msgid "Create new group"
-msgstr "Créer un nouveau groupe"
+msgstr ""
 
 #: breadcrumbs.py:63
 msgid "Group details"
-msgstr "Détails du groupe"
+msgstr ""
 
 #: breadcrumbs.py:64
 msgid "Update group"
-msgstr "Mettre à jour le groupe"
+msgstr ""
 
 #: breadcrumbs.py:67
 msgid "Create new permission"
-msgstr "Créer une nouvelle autorisation"
+msgstr ""
 
 #: breadcrumbs.py:68
 msgid "Permission details"
-msgstr "Détails de l'autorisation"
+msgstr ""
 
 #: breadcrumbs.py:69
 msgid "Update permission"
-msgstr "Autorisation de mise à jour"
+msgstr ""
 
 #: breadcrumbs.py:71
 msgid "Logs"
-msgstr "Journaux"
+msgstr ""
 
 #: constants.py:6
 msgid "Unable to log in with provided credentials."
-msgstr "Impossible de se connecter avec les identifiants fournis."
+msgstr ""
 
 #: constants.py:7
 msgid "User account is disabled."
-msgstr "Le compte d'utilisateur est désactivé"
+msgstr ""
 
 #: constants.py:8
 msgid "Invalid token for given user."
-msgstr "Jeton non valide pour un utilisateur donné."
+msgstr ""
 
 #: constants.py:9
 msgid "Invalid user id or user doesn't exist."
-msgstr "L'ID utilisateur ou l'utilisateur invalide n'existe pas."
+msgstr ""
 
 #: constants.py:10
 msgid "User is already activated."
-msgstr "L'utilisateur est déjà activé."
+msgstr ""
 
 #: constants.py:11
 msgid "The two password fields didn't match."
-msgstr "Les champs mot de passe sont différent."
+msgstr ""
 
 #: constants.py:12
 #, python-brace-format
 msgid "The two {0} fields didn't match."
-msgstr "Les deux {0} champs ne correspondaient pas."
+msgstr ""
 
 #: constants.py:13 models/models.py:783
 msgid "Invalid password."
-msgstr "Mot de passe invalide."
+msgstr ""
 
 #: constants.py:14
 msgid "User with given email does not exist."
-msgstr "L'utilisateur avec un email donné n'existe pas."
+msgstr ""
 
 #: constants.py:15
 msgid "Unable to create an account."
-msgstr "pour créer un compte. "
+msgstr ""
 
 #: forms/main_forms.py:15
 msgid "You can't change the group for this user."
-msgstr "Vous ne pouvez pas modifier le groupe pour cet utilisateur."
+msgstr ""
 
 #: messages.py:5
 msgid ""
 "An error has occurred in the application. Please try again later, we are "
 "working hard to fix it as soon as possible."
 msgstr ""
-"Une erreur s'est produite dans l'application. Veuillez réessayer plus tard, "
-"nous travaillons dur pour le réparer dès que possible."
 
 #: messages.py:9
 msgid "This operation is not yet implemented!"
-msgstr "Cette opÃ©ration n&apos;est pas encore disponible."
+msgstr ""
 
 #: messages.py:12
 msgid ""
 "Error establishing connection. Please check your connection and try again."
 msgstr ""
-"Erreur lors de l'établissement de la connexion. Veuillez vérifier votre "
-"connexion et réessayer."
 
 #: messages.py:16
 msgid "You don't have the necessary permessions to perform this action!"
 msgstr ""
-"Vous n'avez pas les permessions nécessaires pour effectuer cette action !"
 
 #: messages.py:21
 msgid "This action is not allowed!"
-msgstr "Cette action n'est pas autorisée"
+msgstr ""
 
 #: messages.py:24
 msgid "Authentication credentials were not provided."
-msgstr "Les identifiants d'authentification n'ont pas été fournis."
+msgstr ""
 
 #: messages.py:26
 msgid "Invalid format."
-msgstr "Format invalide. "
+msgstr ""
 
 #: messages.py:28
 msgid "Not found."
-msgstr "Non trouvé."
+msgstr ""
 
 #: models/base_models.py:30
 msgid "Object created successfully."
-msgstr "Objet créé avec succès."
+msgstr ""
 
 #: models/base_models.py:31
 msgid "Object updated successfully."
-msgstr "Objet mis à jour avec succès."
+msgstr ""
 
 #: models/base_models.py:32
 msgid "The object was deleted successfully."
-msgstr "L'objet a été supprimé avec succès."
+msgstr ""
 
 #: models/base_models.py:33
 msgid "Object duplicated successfully."
-msgstr "Objet dupliqué avec succès."
+msgstr ""
 
 #: models/base_models.py:34
 msgid "The object has been restored successfully."
-msgstr "Pièce restaurée."
+msgstr ""
 
 #: models/base_models.py:48
 msgid "This object is already created."
-msgstr "Cet objet est déjà créé."
+msgstr ""
 
 #: models/base_models.py:83
 msgid "This object is not yet created."
-msgstr "Cet objet n'est pas encore créé."
+msgstr ""
 
 #: models/base_models.py:104
-#, fuzzy
-#| msgid "This object is not yet created."
 msgid "This object is not yet created"
-msgstr "Cet objet n'est pas encore créé."
+msgstr ""
 
 #: models/base_models.py:110
-#, fuzzy
-#| msgid "This object is already created."
 msgid "This object is already deleted."
-msgstr "Cet objet est déjà créé."
+msgstr ""
 
 #: models/base_models.py:180
 msgid "Object is not deleted!"
-msgstr "L'objet n'est pas supprimé."
+msgstr ""
 
 #: models/base_models.py:264
-#, fuzzy
-#| msgid "Object is not deleted!"
 msgid "Some objects were not deleted."
-msgstr "L'objet n'est pas supprimé."
+msgstr ""
 
 #: models/base_models.py:267
-#, fuzzy, python-format
-#| msgid "The object has been restored successfully."
+#, python-format
 msgid "%(count)s objects have been deleted successfully."
-msgstr "Pièce restaurée."
+msgstr ""
 
 #: models/base_models.py:281
-#, fuzzy
-#| msgid "The selected objects were successfully restored."
 msgid "Some objects were not restored."
-msgstr "Les objets sélectionnés ont été restaurés avec succès."
+msgstr ""
 
 #: models/base_models.py:284
-#, fuzzy, python-format
-#| msgid "The object has been restored successfully."
+#, python-format
 msgid "%(count)s objects have been restored successfully."
-msgstr "Pièce restaurée."
+msgstr ""
 
 #: models/base_models.py:316
 #, python-format
 msgid "Can list %s"
-msgstr "Peut lister %s"
+msgstr ""
 
 #: models/base_models.py:317
 #, python-format
 msgid "Can add %s"
-msgstr "Peut ajouter %s"
+msgstr ""
 
 #: models/base_models.py:318
 #, python-format
 msgid "Can view %s"
-msgstr "Peut voir %s"
+msgstr ""
 
 #: models/base_models.py:319
 #, python-format
 msgid "Can update %s"
-msgstr "Peut modifier %s"
+msgstr ""
 
 #: models/base_models.py:320
-#, fuzzy, python-format
+#, python-format
 msgid "Can duplicate %s"
-msgstr "Peut dupliquer %s"
+msgstr ""
 
 #: models/base_models.py:321
 #, python-format
 msgid "Can soft delete %s"
-msgstr "Peut supprimer %s"
+msgstr ""
 
 #: models/base_models.py:322
-#, fuzzy, python-format
+#, python-format
 msgid "Can view deleted %s"
-msgstr "Peut voir les %s supprimé(e)s"
+msgstr ""
 
 #: models/base_models.py:323
 #, python-format
 msgid "Can restore %s"
-msgstr "Peut restaurer %s"
+msgstr ""
 
 #: models/base_models.py:324
 #, python-format
 msgid "Can delete %s"
-msgstr "Peut supprimer definitivement %s"
+msgstr ""
 
 #: models/base_models.py:325
-#, fuzzy, python-format
+#, python-format
 msgid "Can import %s list"
-msgstr "Peut importer la liste des %s"
+msgstr ""
 
 #: models/base_models.py:326
-#, fuzzy, python-format
+#, python-format
 msgid "Can export %s list"
-msgstr "Peut exporter la liste des %s"
+msgstr ""
 
 #: models/base_models.py:450
 msgid "Created at"
-msgstr "Créé à"
+msgstr ""
 
 #: models/base_models.py:452
 msgid "Last update"
-msgstr "Last update"
+msgstr ""
 
 #: models/base_models.py:453 models/models.py:400
 msgid "Deleted at"
-msgstr "Supprimé à"
+msgstr ""
 
 #: models/chat_models.py:19 models/chat_models.py:166
 msgid "Conversation"
@@ -396,7 +374,7 @@ msgstr ""
 #: models/organization_models.py:71 models/organization_models.py:145
 #: models/utility_models.py:85
 msgid "Name"
-msgstr "Nom"
+msgstr ""
 
 #: models/chat_models.py:27
 msgid "Group conversation"
@@ -415,10 +393,8 @@ msgid "Pinned at"
 msgstr ""
 
 #: models/chat_models.py:72
-#, fuzzy
-#| msgid "'device_id' field is mandatory."
 msgid "This field is mandatory"
-msgstr "Le champ 'device_id' est obligatoire."
+msgstr ""
 
 #: models/chat_models.py:85
 msgid "Conversation has been marked as read."
@@ -433,16 +409,12 @@ msgid "This user is not part of the conversation."
 msgstr ""
 
 #: models/chat_models.py:126
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The conversation has been muted for this user"
-msgstr "L'autorisation a été mise à jour avec succès."
+msgstr ""
 
 #: models/chat_models.py:135
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The conversation has been unmuted for this user"
-msgstr "L'autorisation a été mise à jour avec succès."
+msgstr ""
 
 #: models/chat_models.py:157 serializers/serializers.py:23
 msgid "Message"
@@ -453,10 +425,8 @@ msgid "Messages"
 msgstr ""
 
 #: models/chat_models.py:162
-#, fuzzy
-#| msgid "Gender"
 msgid "Sender"
-msgstr "Sexe"
+msgstr ""
 
 #: models/chat_models.py:169 settings.py:196
 msgid "Text"
@@ -479,10 +449,8 @@ msgid "You can't send an empty message."
 msgstr ""
 
 #: models/chat_models.py:188
-#, fuzzy
-#| msgid "You can not delete a permission."
 msgid "You can not send messages to this conversation!"
-msgstr "Vous ne pouvez pas supprimer une autorisation."
+msgstr ""
 
 #: models/chat_models.py:201
 msgid "Message has been marked as read."
@@ -490,107 +458,107 @@ msgstr ""
 
 #: models/models.py:68
 msgid "List"
-msgstr "Liste"
+msgstr ""
 
 #: models/models.py:69
 msgid "Cards"
-msgstr "Cartes"
+msgstr ""
 
 #: models/models.py:72
 msgid "Default"
-msgstr "Default"
+msgstr ""
 
 #: models/models.py:75 project_settings.py:209
 msgid "English"
-msgstr "Anglais"
+msgstr ""
 
 #: models/models.py:76
 msgid "Français"
-msgstr "Français"
+msgstr ""
 
 #: models/models.py:77
 msgid "Español"
-msgstr "Español"
+msgstr ""
 
 #: models/models.py:78
 msgid "العربية"
-msgstr "العربية"
+msgstr ""
 
 #: models/models.py:85
 msgid "Font style"
-msgstr "Style police"
+msgstr ""
 
 #: models/models.py:86
 msgid "Dark theme on?"
-msgstr "Thème sombre activé ?"
+msgstr ""
 
 #: models/models.py:88
 msgid "List layout"
-msgstr "Liste des mises en page"
+msgstr ""
 
 #: models/models.py:91
 msgid "Menu layout"
-msgstr "Disposition du menu"
+msgstr ""
 
 #: models/models.py:94
 msgid "Language"
-msgstr "Langue"
+msgstr ""
 
 #: models/models.py:97
 msgid "Notifications settings"
-msgstr "Préférences des notifications"
+msgstr ""
 
 #: models/models.py:111
 msgid "Log entry"
-msgstr "Entrée au journal"
+msgstr ""
 
 #: models/models.py:112
 msgid "Log entries"
-msgstr "Entrées de journal"
+msgstr ""
 
 #: models/models.py:116
 msgid "Can view activity journal"
-msgstr "Peut afficher le journal d'activité"
+msgstr ""
 
 #: models/models.py:117
 msgid "Can export activity journal"
-msgstr "Peut exporter le journal d'activité"
+msgstr ""
 
 #: models/models.py:174
 msgid "permission"
-msgstr "permission"
+msgstr ""
 
 #: models/models.py:175
 msgid "permissions"
-msgstr "autorisations"
+msgstr ""
 
 #: models/models.py:179
 msgid "Can set permissions"
-msgstr "Peut affecter les autorisations"
+msgstr ""
 
 #: models/models.py:182
 msgid "You can not create a new permission."
-msgstr "Vous ne pouvez pas créer une nouvelle autorisation."
+msgstr ""
 
 #: models/models.py:188
 msgid "The permission has been created successfully."
-msgstr "L'autorisation a été créée."
+msgstr ""
 
 #: models/models.py:198
 msgid "The permission has been updated successfully."
-msgstr "L'autorisation a été mise à jour avec succès."
+msgstr ""
 
 #: models/models.py:201
 msgid "You can not delete a permission."
-msgstr "Vous ne pouvez pas supprimer une autorisation."
+msgstr ""
 
 #: models/models.py:206
 msgid "The permission has been deleted successfully."
-msgstr "L'autorisation a été supprimée avec succès."
+msgstr ""
 
 #: models/models.py:227
 msgid "Group"
-msgstr "Groupe"
+msgstr ""
 
 #: models/models.py:231
 msgid "Description"
@@ -601,108 +569,98 @@ msgid "Parent"
 msgstr ""
 
 #: models/models.py:244
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notification group id"
-msgstr "Notifications"
+msgstr ""
 
 #: models/models.py:255
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "Group has been created successfully."
-msgstr "L’utilisateur a été créé avec succès"
+msgstr ""
 
 #: models/models.py:267
 msgid "Group updated successfully."
-msgstr "Groupe mis à jour avec succès."
+msgstr ""
 
 #: models/models.py:274
 msgid "The group has been deleted successfully."
-msgstr "Le groupe a été supprimé avec succès."
+msgstr ""
 
 #: models/models.py:317
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "All notification groups have been created successfully."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/models.py:334
 msgid "Can change user profile"
-msgstr "Changer le profil d'utilisateur…"
+msgstr ""
 
 #: models/models.py:335
 msgid "Can delete user profile"
-msgstr "Supprimer le profil de l’utilisateur"
+msgstr ""
 
 #: models/models.py:336
 msgid "Can soft delete user profile"
-msgstr "Peut supprimer le profil de l'utilisateur"
+msgstr ""
 
 #: models/models.py:341
 msgid "user permissions"
-msgstr "Les permissions de l’utilisateur"
+msgstr ""
 
 #: models/models.py:343
 msgid "Specific permissions for this user."
-msgstr "Autorisations spécifiques pour cet utilisateur."
+msgstr ""
 
 #: models/models.py:350
 msgid "groups"
-msgstr "groupes"
+msgstr ""
 
 #: models/models.py:353
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Les groupes auxquels cet utilisateur appartient. Un utilisateur obtiendra "
-"toutes les autorisations accordées à chacun de ses groupes."
 
 #: models/models.py:361
 msgid "Photo"
-msgstr "Photo"
+msgstr ""
 
 #: models/models.py:363
 msgid "Birth day"
-msgstr "Date de naissance"
+msgstr ""
 
 #: models/models.py:365
 msgid "Gender"
-msgstr "Sexe"
+msgstr ""
 
 #: models/models.py:371
-#, fuzzy
-#| msgid "Code name"
 msgid "Full name"
-msgstr "Nom du code"
+msgstr ""
 
 #: models/models.py:372 models/organization_models.py:72
 msgid "Country"
-msgstr "Pays"
+msgstr ""
 
 #: models/models.py:373 models/organization_models.py:73
 msgid "City"
-msgstr "Ville"
+msgstr ""
 
 #: models/models.py:374
 msgid "Street address"
-msgstr "N° et nom de rue"
+msgstr ""
 
 #: models/models.py:376 models/organization_models.py:149
 msgid "Phone number"
-msgstr "Numéro de téléphone"
+msgstr ""
 
 #: models/models.py:378
 msgid "Fax"
-msgstr "Fax"
+msgstr ""
 
 #: models/models.py:379
 msgid "Job title"
-msgstr "Intitulé du poste"
+msgstr ""
 
 #: models/models.py:381
 msgid "Cover picture"
-msgstr "Photo de couverture"
+msgstr ""
 
 #: models/models.py:385
 msgid "Preferred image dimentions: (1200 x 250)"
@@ -710,279 +668,245 @@ msgstr ""
 
 #: models/models.py:391
 msgid "Temporary password"
-msgstr "Mot de passe temporaire"
+msgstr ""
 
 #: models/models.py:394
 msgid "Device IDs"
-msgstr "Identifiants de l'appareil"
+msgstr ""
 
 #: models/models.py:397
 msgid "A list of devices the the user is connected from."
-msgstr "Liste des appareils à partir desquels l'utilisateur est connecté."
+msgstr ""
 
 #: models/models.py:431
 msgid "User is already created."
-msgstr "L'utilisateur est déjà créé."
+msgstr ""
 
 #: models/models.py:500
 msgid "User has been created successfully."
-msgstr "L’utilisateur a été créé avec succès"
+msgstr ""
 
 #: models/models.py:508 models/models.py:527 models/models.py:547
 msgid "Payments application is not installed"
-msgstr "L'application de paiement n'est pas installée"
+msgstr ""
 
 #: models/models.py:521
 msgid "Payments application was implemented successfully."
-msgstr "L'application de paiement a été mise en œuvre avec succès."
+msgstr ""
 
 #: models/models.py:532
 msgid "Account already created"
-msgstr "Compte déjà créé"
+msgstr ""
 
 #: models/models.py:541
 msgid "Associated account was created successfully."
-msgstr "Le compte associé a été créé avec succès."
+msgstr ""
 
 #: models/models.py:552
 msgid "Customer already created"
-msgstr "Client déjà créé"
+msgstr ""
 
 #: models/models.py:563
 msgid "Associated BrainTree customer was created successfully."
-msgstr "Le client BrainTree associé a été créé avec succès."
+msgstr ""
 
 #: models/models.py:570
 msgid ""
 "Unable to connect to one of our servers, please try again later. We "
 "apologize for the inconvenience."
 msgstr ""
-"Impossible de se connecter à l'un de nos serveurs, veuillez réessayer plus "
-"tard. Nous nous excusons pour la gêne occasionnée."
 
 #: models/models.py:583 models/models.py:647
 msgid "This functionality is not valid for a user with many or no groups."
 msgstr ""
-"Cette fonctionnalité n'est pas valable pour un utilisateur avec beaucoup ou "
-"pas de groupes."
 
 #: models/models.py:601
 msgid "Associated object was created successfully."
-msgstr "L'objet associé a été créé avec succès."
+msgstr ""
 
 #: models/models.py:636
 msgid "User has been updated successfully."
-msgstr "L'utilisateur a été mis à jour avec succès."
+msgstr ""
 
 #: models/models.py:658
 msgid "Invalid group type for this operation."
-msgstr "Type de groupe invalide pour cette opération."
+msgstr ""
 
 #: models/models.py:665
 msgid "Associated object was updated successfully."
-msgstr "L'objet associé a été mis à jour avec succès."
+msgstr ""
 
 #: models/models.py:670
 msgid "User is already deleted"
-msgstr "L'utilisateur est déjà supprimé"
+msgstr ""
 
 #: models/models.py:672
 msgid "User has been deleted successfully"
-msgstr "L'utilisateur a été supprimé avec succès."
+msgstr ""
 
 #: models/models.py:714
 msgid "Password has been changed successfully."
-msgstr "Le mot de passe a été mis à jour avec succès."
+msgstr ""
 
 #: models/models.py:721
 msgid "The user has been restored successfully."
-msgstr "L'utilisateur a été restauré avec succès."
+msgstr ""
 
 #: models/models.py:765
 msgid "The notification was sent successfully."
-msgstr "La notification a été envoyée avec succès."
+msgstr ""
 
 #: models/models.py:776
 msgid "`password` must be a string."
-msgstr "`mot de passe` doit être une chaîne."
+msgstr ""
 
 #: models/models.py:780
 msgid "User password is valid."
-msgstr "Le mot de passe utilisateur est valide."
+msgstr ""
 
 #: models/models.py:832
 msgid "Notification"
-msgstr "Notification"
+msgstr ""
 
 #: models/models.py:833
 msgid "Notifications"
-msgstr "Notifications"
+msgstr ""
 
 #: models/models.py:837
-#, fuzzy
-#| msgid "Notifications"
 msgid "Can list notifications"
-msgstr "Notifications"
+msgstr ""
 
 #: models/models.py:838
-#, fuzzy
-#| msgid "Notification"
 msgid "Can add notification"
-msgstr "Notification"
+msgstr ""
 
 #: models/models.py:839
-#, fuzzy
-#| msgid "Notification"
 msgid "Can view notification"
-msgstr "Notification"
+msgstr ""
 
 #: models/models.py:840
-#, fuzzy
-#| msgid "Can delete permissions"
 msgid "Can delete notification"
-msgstr "Peut supprimer des autorisations"
+msgstr ""
 
 #: models/models.py:847
 msgid "Date sent"
-msgstr "Date d'envoi"
+msgstr ""
 
 #: models/models.py:848
 msgid "Title"
-msgstr "Titre"
+msgstr ""
 
 #: models/models.py:849
 msgid "Content"
-msgstr "Contenu"
+msgstr ""
 
 #: models/models.py:851
 msgid "Category"
-msgstr "Catégories"
+msgstr ""
 
 #: models/models.py:857
 msgid "URL"
-msgstr "URL"
+msgstr ""
 
 #: models/models.py:858
 msgid "Action URL"
-msgstr "URL d'action"
+msgstr ""
 
 #: models/models.py:870
 msgid "Seen by"
-msgstr "Vu par"
+msgstr ""
 
 #: models/models.py:902
 msgid "You must specify either target users or target groups."
-msgstr "Vous devez spécifier les utilisateurs cibles ou les groupes cibles."
+msgstr ""
 
 #: models/models.py:916
 msgid "The notification has been created successfully."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/models.py:933
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The selected notifications have been marked as read."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/models.py:996
 msgid "Backup"
-msgstr "Backup"
+msgstr ""
 
 #: models/models.py:997
 msgid "Backups"
-msgstr "Les Sauvegardes"
+msgstr ""
 
 #: models/models.py:999
-#, fuzzy
-#| msgid "Backup failed"
 msgid "Backup name"
-msgstr "Détails sauvegarde"
+msgstr ""
 
 #: models/models.py:1001
 msgid "Backup type"
-msgstr "Type de sauvegarde :"
+msgstr ""
 
 #: models/models.py:1007
 msgid "Status"
-msgstr "Statut"
+msgstr ""
 
 #: models/models.py:1013
 msgid "Backup file"
-msgstr "Fichier de sauvegarde "
+msgstr ""
 
 #: models/models.py:1041
 msgid "Backup has been deleted successfully."
-msgstr "A été supprimé avec succès."
+msgstr ""
 
 #: models/models.py:1048
 msgid ""
 "A backup is already running, please wait until it's finished before starting "
 "a new one."
 msgstr ""
-"Une sauvegarde est déjà en cours d'exécution, veuillez attendre qu'elle soit "
-"terminée avant d'en démarrer une nouvelle."
 
 #: models/models.py:1069
-#, fuzzy, python-format
-#| msgid "You can not create a new permission."
+#, python-format
 msgid "You can not create more than %d backups per day."
-msgstr "Vous ne pouvez pas créer une nouvelle autorisation."
+msgstr ""
 
 #: models/models.py:1073
-#, fuzzy, python-format
-#| msgid "You can not create a new permission."
+#, python-format
 msgid "You can only create one backup every %d hours."
-msgstr "Vous ne pouvez pas créer une nouvelle autorisation."
+msgstr ""
 
 #: models/models.py:1094
 msgid "Backup has been started, you will get notified once it is finished."
 msgstr ""
-"La sauvegarde a été démarrée, vous serez averti une fois qu'elle sera "
-"terminée."
 
 #: models/models.py:1135
 msgid "Backup complete"
-msgstr "La sauvegarde est terminée"
+msgstr ""
 
 #: models/models.py:1137
-#, fuzzy, python-format
-#| msgid "A %s that was started on %s is finished successfully."
+#, python-format
 msgid "A %(name)s that was started on %(date)s is finished successfully."
-msgstr "Un %s qui a été démarré sur %s est terminé avec succès."
+msgstr ""
 
 #: models/models.py:1158
 msgid "Backup failed"
-msgstr "La sauvegarde a échoué"
+msgstr ""
 
 #: models/models.py:1160
-#, fuzzy, python-format
-#| msgid ""
-#| "A %s that was started on %s has failed.\n"
-#| "Error: %s"
+#, python-format
 msgid ""
 "A %(type)s that was started on %(start_time)s has failed.\n"
 "Error: %(e)s"
 msgstr ""
-"Un %s qui a été démarré sur %s a échoué.\n"
-"Erreur : %s"
 
 #: models/organization_models.py:21
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The account has been created successfully."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/organization_models.py:22
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The account has been updated successfully."
-msgstr "L'autorisation a été mise à jour avec succès."
+msgstr ""
 
 #: models/organization_models.py:23
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The account has been deleted successfully."
-msgstr "Le groupe a été supprimé avec succès."
+msgstr ""
 
 #: models/organization_models.py:27
 msgid "Account"
@@ -1001,38 +925,28 @@ msgid "Amount equals to 0. Account not debitted."
 msgstr ""
 
 #: models/organization_models.py:45
-#, fuzzy
-#| msgid "Backup has been deleted successfully."
 msgid "Account has been debitted successfully."
-msgstr "A été supprimé avec succès."
+msgstr ""
 
 #: models/organization_models.py:49
 msgid "Amount equals to 0. Account not creditted."
 msgstr ""
 
 #: models/organization_models.py:55
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "Account has been creditted successfully."
-msgstr "L’utilisateur a été créé avec succès"
+msgstr ""
 
 #: models/organization_models.py:60
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "The bank has been created successfully."
-msgstr "L’utilisateur a été créé avec succès"
+msgstr ""
 
 #: models/organization_models.py:61
-#, fuzzy
-#| msgid "User has been updated successfully."
 msgid "The bank has been updated successfully."
-msgstr "L'utilisateur a été mis à jour avec succès."
+msgstr ""
 
 #: models/organization_models.py:62
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The bank has been deleted successfully."
-msgstr "Le groupe a été supprimé avec succès."
+msgstr ""
 
 #: models/organization_models.py:66 models/organization_models.py:103
 msgid "Bank"
@@ -1047,32 +961,24 @@ msgid "Agency"
 msgstr ""
 
 #: models/organization_models.py:75
-#, fuzzy
-#| msgid "Phone number"
 msgid "Routing number"
-msgstr "Numéro de téléphone"
+msgstr ""
 
 #: models/organization_models.py:76
 msgid "BIC / SWIFT"
 msgstr ""
 
 #: models/organization_models.py:90
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The bank account has been created successfully."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/organization_models.py:91
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The bank account has been updated successfully."
-msgstr "L'autorisation a été mise à jour avec succès."
+msgstr ""
 
 #: models/organization_models.py:92
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The bank account has been deleted successfully."
-msgstr "Le groupe a été supprimé avec succès."
+msgstr ""
 
 #: models/organization_models.py:96 models/organization_models.py:156
 msgid "Bank account"
@@ -1087,10 +993,8 @@ msgid "Account holder"
 msgstr ""
 
 #: models/organization_models.py:101 models/utility_models.py:24
-#, fuzzy
-#| msgid "Code name"
 msgid "Code postal"
-msgstr "Nom du code"
+msgstr ""
 
 #: models/organization_models.py:102
 msgid "RIB"
@@ -1113,10 +1017,8 @@ msgid "Address"
 msgstr ""
 
 #: models/organization_models.py:150
-#, fuzzy
-#| msgid "Phone number"
 msgid "Phone numbser 2"
-msgstr "Numéro de téléphone"
+msgstr ""
 
 #: models/organization_models.py:151
 msgid "E-mail"
@@ -1155,10 +1057,9 @@ msgid "Entité local"
 msgstr ""
 
 #: models/organization_models.py:194
-#, fuzzy, python-format
-#| msgid "The notification has been created successfully."
+#, python-format
 msgid "The entity '%(name)s' has been successfully created."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: models/utility_models.py:13
 msgid "L'adresse a été créée avec succès."
@@ -1211,8 +1112,6 @@ msgstr ""
 #: serializers/base_serializers.py:64
 msgid "You can not create or update objects using a read-only serializer."
 msgstr ""
-"Vous ne pouvez pas créer ou mettre à jour des objets à l'aide d'un "
-"sérialiseur en lecture seule."
 
 #: serializers/chat_serializers.py:183
 msgid "Some member IDs are not valid."
@@ -1223,24 +1122,20 @@ msgid "Member IDs must be integers."
 msgstr ""
 
 #: serializers/notification_serializers.py:14
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notifications ids"
-msgstr "Notifications"
+msgstr ""
 
 #: serializers/notification_serializers.py:35
 msgid "Seen"
-msgstr "Vu"
+msgstr ""
 
 #: serializers/notification_serializers.py:81
 msgid "You must specify either target groups or target users."
-msgstr "Vous devez spécifier des groupes cibles ou des utilisateurs cibles."
+msgstr ""
 
 #: serializers/serializers.py:19
-#, fuzzy
-#| msgid "Code name"
 msgid "Class name"
-msgstr "Nom du code"
+msgstr ""
 
 #: serializers/serializers.py:21
 msgid "Result"
@@ -1267,10 +1162,8 @@ msgid "One or more ID is not valid."
 msgstr ""
 
 #: serializers/serializers.py:79
-#, fuzzy
-#| msgid "This action is not allowed!"
 msgid "The Selected action is not valid"
-msgstr "Cette action n'est pas autorisée"
+msgstr ""
 
 #: serializers/serializers.py:85
 #, python-format
@@ -1279,27 +1172,27 @@ msgstr ""
 
 #: serializers/serializers.py:117
 msgid "Current password"
-msgstr "Mot de passe actuel"
+msgstr ""
 
 #: serializers/serializers.py:120
 msgid "New password"
-msgstr "Nouveau mot de passe"
+msgstr ""
 
 #: serializers/serializers.py:123
 msgid "Confirm new password"
-msgstr "Confirmer le nouveau mot de passe"
+msgstr ""
 
 #: serializers/serializers.py:138
 msgid "The current password does not match!"
-msgstr "Le mot de passe actuel ne correspond pas !"
+msgstr ""
 
 #: serializers/serializers.py:150 serializers/user_serializers.py:122
 msgid "Password confirmation is not valid!"
-msgstr "La confirmation du mot de passe n'est pas valide !"
+msgstr ""
 
 #: serializers/serializers.py:168
 msgid "Code name"
-msgstr "Nom du code"
+msgstr ""
 
 #: serializers/serializers.py:205
 msgid "The query parametter must have a length of 2 or more."
@@ -1308,48 +1201,43 @@ msgstr ""
 #: serializers/user_serializers.py:26
 msgid "You can't create or update objects using a read-only serializer."
 msgstr ""
-"Vous ne pouvez pas créer ou mettre à jour des objets à l'aide d'un "
-"sérialiseur en lecture seule."
 
 #: serializers/user_serializers.py:94
 msgid "Password confirmation"
-msgstr "Confirmation du mot de passe"
+msgstr ""
 
 #: serializers/user_serializers.py:142
 msgid "You can not update a user using this serializer."
 msgstr ""
-"Vous ne pouvez pas mettre à jour un utilisateur à l'aide de ce sérialiseur."
 
 #: serializers/user_serializers.py:195 serializers/user_serializers.py:240
 msgid "You can not create a user using this serializer."
-msgstr "Vous ne pouvez pas créer d'utilisateur à l'aide de ce sérialiseur."
+msgstr ""
 
 #: serializers/user_serializers.py:257
 msgid "Incorrect password, please verify that 'All caps' is disabled."
 msgstr ""
-"Mot de passe incorrect, veuillez vérifier que « Tous les majuscules » est "
-"désactivé."
 
 #: serializers/user_serializers.py:269
 msgid "Extra attributes"
-msgstr "Attributs supplémentaires"
+msgstr ""
 
 #: serializers/user_serializers.py:272
 msgid "Attributes related to an object that is related to the current user."
-msgstr "Attributs liés à un objet lié à l'utilisateur actuel."
+msgstr ""
 
 #: serializers/user_serializers.py:342
 msgid "groups names must be a list of names."
-msgstr "les noms de groupes doivent être une liste de noms."
+msgstr ""
 
 #: serializers/user_serializers.py:348
 msgid "Invalid group choice."
-msgstr "Choix de groupe invalide."
+msgstr ""
 
 #: services/import_export.py:59 services/import_export.py:141
 #: utils/xlsx_utils.py:304
 msgid "File exported successfully"
-msgstr "Fichier exporté avec succès"
+msgstr ""
 
 #: services/statistics.py:83
 msgid "Utilisateurs"
@@ -1360,16 +1248,12 @@ msgid "Total des utilisateurs"
 msgstr ""
 
 #: services/statistics.py:89
-#, fuzzy
-#| msgid "Groups"
 msgid "Groupes"
-msgstr "Groupes"
+msgstr ""
 
 #: services/statistics.py:92
-#, fuzzy
-#| msgid "Can update group"
 msgid "Total des groupes"
-msgstr "Peut modifier groupe"
+msgstr ""
 
 #: services/statistics.py:95
 msgid "Sauvegardes"
@@ -1381,23 +1265,23 @@ msgstr ""
 
 #: settings.py:25
 msgid "Firebase is not installed"
-msgstr "Firebase n'est pas installé"
+msgstr ""
 
 #: settings.py:29
 msgid "Firebase credentials file does not exist."
-msgstr "Le fichier d'informations d'identification Firebase n'existe pas."
+msgstr ""
 
 #: settings.py:54
 msgid "Female"
-msgstr "Féminin"
+msgstr ""
 
 #: settings.py:54
 msgid "Male"
-msgstr "Homme"
+msgstr ""
 
 #: settings.py:56
 msgid "Alert"
-msgstr "Alerte"
+msgstr ""
 
 #: settings.py:96
 msgid "Success"
@@ -1413,71 +1297,59 @@ msgstr ""
 
 #: settings.py:104
 msgid "Full backup"
-msgstr "Sauvegarde totale"
+msgstr ""
 
 #: settings.py:105
 msgid "Database backup"
-msgstr "Sauvegarde de BdD"
+msgstr ""
 
 #: settings.py:109
 msgid "Running"
-msgstr "course à pied"
+msgstr ""
 
 #: settings.py:110
 msgid "Completed"
-msgstr "Complété"
+msgstr ""
 
 #: settings.py:111
 msgid "Failed"
-msgstr "Echoué"
+msgstr ""
 
 #: settings.py:140
 msgid "User creation alert"
 msgstr ""
 
 #: settings.py:141
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "This notification is sent when a new user is created."
-msgstr "La notification a été créée avec succès."
+msgstr ""
 
 #: settings.py:144
 msgid "User deletion alert"
 msgstr ""
 
 #: settings.py:145
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a user is deleted."
-msgstr "La notification a été envoyée avec succès."
+msgstr ""
 
 #: settings.py:148
-#, fuzzy
-#| msgid "Group details"
 msgid "Group creation alert"
-msgstr "Détails du groupe"
+msgstr ""
 
 #: settings.py:149
 msgid "This notification is sent when a new group is created."
 msgstr ""
 
 #: settings.py:152
-#, fuzzy
-#| msgid "Group details"
 msgid "Group deletion alert"
-msgstr "Détails du groupe"
+msgstr ""
 
 #: settings.py:153
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a group is deleted."
-msgstr "La notification a été envoyée avec succès."
+msgstr ""
 
 #: settings.py:156
-#, fuzzy
-#| msgid "Permission details"
 msgid "Permission update alert"
-msgstr "Détails de l'autorisation"
+msgstr ""
 
 #: settings.py:158
 msgid ""
@@ -1486,21 +1358,17 @@ msgid ""
 msgstr ""
 
 #: settings.py:162
-#, fuzzy
-#| msgid "Backup complete"
 msgid "Backup completed alert"
-msgstr "La sauvegarde est terminée"
+msgstr ""
 
 #: settings.py:163
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a backup is completed."
-msgstr "La notification a été envoyée avec succès."
+msgstr ""
 
 #: templates/lava/email/activation.html:4
 #, python-format
 msgid "Account activation on %(site_name)s"
-msgstr "Activation de compte sur %(site_name)s"
+msgstr ""
 
 #: templates/lava/email/activation.html:8
 #, python-format
@@ -1508,12 +1376,10 @@ msgid ""
 "You're receiving this email because you need to finish activation process on "
 "%(site_name)s."
 msgstr ""
-"Vous recevez cet e-mail car vous devez terminer le processus d'activation "
-"sur %(site_name)s."
 
 #: templates/lava/email/activation.html:10
 msgid "Please go to the following page to activate account:"
-msgstr "Veuillez vous rendre sur la page suivante pour activer le compte :"
+msgstr ""
 
 #: templates/lava/email/activation.html:13
 #: templates/lava/email/confirmation.html:10
@@ -1524,7 +1390,7 @@ msgstr "Veuillez vous rendre sur la page suivante pour activer le compte :"
 #: templates/lava/email/username_reset.html:14
 #: templates/lava/email/username_reset.html:26
 msgid "Thanks for using our site!"
-msgstr "Merci d’avoir utiliser notre site!"
+msgstr ""
 
 #: templates/lava/email/activation.html:15 templates/lava/email/base.html:12
 #: templates/lava/email/confirmation.html:12
@@ -1536,70 +1402,70 @@ msgstr "Merci d’avoir utiliser notre site!"
 #: templates/lava/email/username_reset.html:28
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "L'équipe %(site_name)s"
+msgstr ""
 
 #: templates/lava/email/activation.html:56
 msgid "Click the button below to activate your account."
-msgstr "Cliquez sur le bouton ci-dessous pour activer votre compte."
+msgstr ""
 
 #: templates/lava/email/activation.html:66
 msgid "Activate your account"
-msgstr "Activer votre compte"
+msgstr ""
 
 #: templates/lava/email/activation.html:70
 #: templates/lava/email/confirmation.html:56
 msgid "Thank you for signing up to our service."
-msgstr "Merci de vous être inscrit sur"
+msgstr ""
 
 #: templates/lava/email/activation.html:71
 #: templates/lava/email/confirmation.html:57
 msgid "Cheers"
-msgstr "Bravo"
+msgstr ""
 
 #: templates/lava/email/activation.html:83 templates/lava/email/base.html:65
 #: templates/lava/email/confirmation.html:69
 msgid "This email was sent to "
-msgstr "Cet e-mail a été envoyé à"
+msgstr ""
 
 #: templates/lava/email/activation.html:86 templates/lava/email/base.html:68
 #: templates/lava/email/confirmation.html:72
 msgid "Copyright © 2022"
-msgstr "Copyright © 2022. "
+msgstr ""
 
 #: templates/lava/email/activation.html:91 templates/lava/email/base.html:73
 #: templates/lava/email/confirmation.html:77
 msgid "All rights reserved."
-msgstr "Tous droits réservés."
+msgstr ""
 
 #: templates/lava/email/base.html:10
 msgid "Thank you for using our site!"
-msgstr "Merci d'utiliser notre site !"
+msgstr ""
 
 #: templates/lava/email/confirmation.html:4
 msgid "EKBlocks - Your account has been successfully activated!"
-msgstr "EKBlocks - Votre compte a été activé avec succès !"
+msgstr ""
 
 #: templates/lava/email/confirmation.html:8
 msgid "Your account has been created and is ready to use!"
-msgstr "Votre compte a été créé et est prêt à être utilisé !"
+msgstr ""
 
 #: templates/lava/email/confirmation.html:54
 msgid "Your account has been activated and is ready to use!"
-msgstr "Votre compte a été activé et est prêt à être utilisé !"
+msgstr ""
 
 #: templates/lava/email/password_changed_confirmation.html:4
 #, python-format
 msgid "%(site_name)s - Your password has been successfully changed!"
-msgstr "%(site_name)s - Votre mot de passe a été modifié avec succès !"
+msgstr ""
 
 #: templates/lava/email/password_changed_confirmation.html:8
 msgid "Your password has been changed!"
-msgstr "Votre mot de passe a bien été modifié !"
+msgstr ""
 
 #: templates/lava/email/password_reset.html:4
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "Réinitialisation de mot de passe sur %(site_name)s"
+msgstr ""
 
 #: templates/lava/email/password_reset.html:8
 #, python-format
@@ -1607,33 +1473,31 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de "
-"passe pour votre compte d'utilisateur de %(site_name)s."
 
 #: templates/lava/email/password_reset.html:10
 msgid "Please go to the following page and choose a new password:"
-msgstr "Veuillez accéder à cette page pour choisir un nouveau mot de passe :"
+msgstr ""
 
 #: templates/lava/email/password_reset.html:12
 #: templates/lava/email/username_reset.html:12
 #: templates/lava/email/username_reset.html:24
 msgid "Your username, in case you've forgotten:"
-msgstr "Votre nom d'utilisateur, au cas où vous l'auriez oublié :"
+msgstr ""
 
 #: templates/lava/email/username_changed_confirmation.html:4
 #, python-format
 msgid "%(site_name)s - Your username has been successfully changed!"
-msgstr "%(site_name)s - Votre nom d'utilisateur a été modifié avec succès !"
+msgstr ""
 
 #: templates/lava/email/username_changed_confirmation.html:8
 #: templates/lava/email/username_changed_confirmation.html:16
 msgid "Your username has been changed!"
-msgstr "Votre nom d'utilisateur a été modifié !"
+msgstr ""
 
 #: templates/lava/email/username_reset.html:4
 #, python-format
 msgid "Username reset on %(site_name)s"
-msgstr "Réinitialisation du nom d'utilisateur sur %(site_name)s"
+msgstr ""
 
 #: templates/lava/email/username_reset.html:8
 #: templates/lava/email/username_reset.html:20
@@ -1642,39 +1506,37 @@ msgid ""
 "You're receiving this email because you requested a username reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"Vous recevez cet e-mail car vous avez demandé une réinitialisation de mot de "
-"passe pour votre compte d'utilisateur de %(site_name)s."
 
 #: templates/lava/email/username_reset.html:10
 #: templates/lava/email/username_reset.html:22
 msgid "Please go to the following page and choose a new username:"
-msgstr "Veuillez accéder à cette page pour choisir un nouveau mot de passe :"
+msgstr ""
 
 #: utils/utils.py:91
 #, python-format
 msgid "invalid truth value %r"
-msgstr "valeur de vérité %r non valide"
+msgstr ""
 
 #: utils/xlsx_utils.py:115
 #, python-format
 msgid "The uploaded file does not contain a column named '%s'."
-msgstr "Le fichier téléchargé ne contient pas de colonne nommée '%s'."
+msgstr ""
 
 #: utils/xlsx_utils.py:302
 msgid "The tmp file could not be created!"
-msgstr "Impossible de créer le fichier."
+msgstr ""
 
 #: validators.py:15
 msgid "This field is required"
-msgstr "Cette donnée est requise"
+msgstr ""
 
 #: validators.py:34 validators.py:41
 msgid "A user with that email already exists."
-msgstr "Un utilisateur est déjà associé à cette adresse e-mail"
+msgstr ""
 
 #: validators.py:51
 msgid "A local url must start with a forward slash `/`"
-msgstr "Une URL locale doit commencer par une barre oblique «/»"
+msgstr ""
 
 #: validators.py:60
 #, python-format
@@ -1688,121 +1550,41 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: validators.py:78
-#, fuzzy
-#| msgid "Invalid group choice."
 msgid "Invalid QR code"
-msgstr "Choix de groupe invalide."
+msgstr ""
 
 #: validators.py:92
 msgid "The notifications settings must be a dictionary."
-msgstr "Les paramètres de notification doivent être un dictionnaire."
+msgstr ""
 
 #: validators.py:98
 #, python-format
 msgid "`%(key)s` is not a valid key for notifications settings."
 msgstr ""
-"`%(key)s`n' est pas une clé valide pour les paramètres de notifications."
 
 #: validators.py:104
 #, python-format
 msgid "The value of `%(key)s` is not a valid boolean value."
-msgstr "La valeur de `%(key)s`n' est pas une valeur booléenne valide."
+msgstr ""
 
 #: views/api_views/api_views.py:53
 msgid "'device_id' field is mandatory."
-msgstr "Le champ 'device_id' est obligatoire."
+msgstr ""
 
 #: views/api_views/api_views.py:179
 msgid ""
 "This site is under maintenance. Our team is working hard to resolve the "
 "issues as soon as possible. Please come back later."
 msgstr ""
-"Ce site est en maintenance. Notre équipe travaille d'arrache-pied pour "
-"résoudre les problèmes le plus rapidement possible. Veuillez revenir plus "
-"tard."
 
 #: views/api_views/user_api_views.py:60
 msgid "Password has been changed successfully!"
-msgstr "Mot de passe changé avec succès "
+msgstr ""
 
 #: ws/consumers.py:147
 msgid "Message ID is not valid!"
 msgstr ""
 
 #: ws/consumers.py:214
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notification ID is not valid!"
-msgstr "Notifications"
-
-#~ msgid "Group created successfully."
-#~ msgstr "Groupe créé avec succès."
-
-#~ msgid "Can add permissions"
-#~ msgstr "Peut ajouter des autorisations"
-
-#~ msgid "Can view permission details"
-#~ msgstr "Peut afficher les détails d'une autorisation"
-
-#~ msgid "Can update permissions"
-#~ msgstr "Mettre à jour les autorisations"
-
-#~ msgid "Can view permissions list"
-#~ msgstr "Peut afficher la liste des autorisations"
-
-#~ msgid "Can export permissions"
-#~ msgstr "Peut exporter les autorisations"
-
-#~ msgid "Can add group"
-#~ msgstr "Peut ajouter groupe"
-
-#~ msgid "Can delete group"
-#~ msgstr "Peut supprimer definitivement un groupe"
-
-#~ msgid "Can soft delete group"
-#~ msgstr "Peut supprimer un groupe"
-
-#~ msgid "Can view group"
-#~ msgstr "Peut voir groupe "
-
-#~ msgid "Can view group list"
-#~ msgstr "Peut afficher la liste des groupes"
-
-#~ msgid "Can view deleted groups"
-#~ msgstr "Voir les groupe supprimées"
-
-#~ msgid "Can restore group"
-#~ msgstr "Peut restaurer le groupe"
-
-#~ msgid "Can add user"
-#~ msgstr "Peut ajouter un utilisateur"
-
-#~ msgid "Can change user"
-#~ msgstr "Changer d'utilisateur"
-
-#~ msgid "Can delete user"
-#~ msgstr "Supprimer l'utilisateur"
-
-#~ msgid "Can soft delete user"
-#~ msgstr "Peut supprimer l'utilisateur en douceur"
-
-#~ msgid "Can view user"
-#~ msgstr "Peut voir l'utilisateur"
-
-#~ msgid "Can view users list"
-#~ msgstr "Peut afficher la liste des utilisateurs"
-
-#~ msgid "Can restore user"
-#~ msgstr "Peut restaurer l'utilisateur"
-
-#~ msgid "Can add backup"
-#~ msgstr "Ajouter une sauvegarde"
-
-#~ msgid "Can delete backup"
-#~ msgstr "Supprimer la sauvegarde"
-
-#~ msgid "Can soft delete backup"
-#~ msgstr "Peut supprimer definitivement une sauvegarde"
-
-#~ msgid "Can view backup"
-#~ msgstr "Peut afficher la sauvegarde"
+msgstr ""
