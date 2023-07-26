@@ -10,7 +10,7 @@ class PermissionsTest(BaseModelTest):
 
     def test_add_user_action_permission_exists(self):
         """
-        Ensure we can not create a new category object when the name and arabic name are not provided.
+        Ensure we can not create a new category object when the name is not provided.
         """
         ekadmin = self.users.ekadmin
         action = PermissionActionName.Add
@@ -20,7 +20,7 @@ class PermissionsTest(BaseModelTest):
 
     def test_add_user_action_permission_exists_denied(self):
         """
-        Ensure we can not create a new category object when the name and arabic name are not provided.
+        Ensure we can not create a new category object when the name is not provided.
         """
         user1 = self.users.testuser_1
         action = PermissionActionName.Add
@@ -30,7 +30,7 @@ class PermissionsTest(BaseModelTest):
 
     def test_duplicate_user_str_permission_exists(self):
         """
-        Ensure we can not create a new category object when the name and arabic name are not provided.
+        Ensure we can not create a new category object when the name is not provided.
         """
         ekadmin = self.users.ekadmin
         action = "duplicate_user"
@@ -40,7 +40,7 @@ class PermissionsTest(BaseModelTest):
 
     def test_publish_user_str_permission_does_not_exist(self):
         """
-        Ensure we can not create a new category object when the name and arabic name are not provided.
+        Ensure we can not create a new category object when the name is not provided.
         """
         ekadmin = self.users.ekadmin
         action = "publish_user"
