@@ -111,11 +111,18 @@ def humanize_datetime(datetime, verbose=True):
     )
 
 
-def build_absolute_uri(serializer, f):
+def build_absolute_uri(serializer, f): 
     request = serializer.context.get('request', None)
+   
+    if not f :
+        return ""
+    
     url = f.url
-    if request is not None:
-        return request.build_absolute_uri(url)
+
+    if request is not None and f:
+        url = f.url
+        return request.build_absolute_uri(url) 
+        
     return url
 
 
