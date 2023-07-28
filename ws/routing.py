@@ -7,6 +7,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'librarian.settings.settings_asg
 asgi_application = get_asgi_application()
 
 from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
 
 from lava.ws.consumers import ChatConsumer, NotificationConsumer, BackUpConsumer
 from lava.middleware import SocketTokenAuthMiddlewareStack
@@ -21,9 +22,11 @@ websocket_urlpatterns = [
 
 application = ProtocolTypeRouter({
     "http": asgi_application,
-    'websocket': SocketTokenAuthMiddlewareStack(
-            URLRouter(
-                websocket_urlpatterns
-            ),
+    'websocket': AllowedHostsOriginValidator(
+            SocketTokenAuthMiddlewareStack(
+                URLRouter(
+                    websocket_urlpatterns
+                ),
+            )
         )
 })
