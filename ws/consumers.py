@@ -17,6 +17,9 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def prepare_connection(self):
         self.user = self.scope['user']
 
+        if not self.channel_layer:
+            self.channel_layer = get_channel_layer(self.channel_layer_alias)
+
         headers = self.scope["headers"]
         media_protocol = 'https' if settings.DEBUG is False else 'http'
 
@@ -42,8 +45,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(group_name, self.channel_name)
 
     async def get_group_member_count(group_name):
-        channel_layer = get_channel_layer()
-        group_status = await channel_layer.group_status(group_name)
+        group_status = await self.channel_layer.group_status(group_name)
         return group_status.get("channel_layer", {}).get("groups", {}).get(group_name, {}).get("channel_count", 0)
 
 
@@ -163,8 +165,6 @@ class ChatConsumer(BaseConsumer):
 
 class NotificationConsumer(BaseConsumer):
 
-    channel_layer_alias = 'notification'
-
     async def connect(self):
         await super().prepare_connection()
         user_groups = await database_sync_to_async (
@@ -241,8 +241,6 @@ class NotificationConsumer(BaseConsumer):
 
 
 class BackUpConsumer(BaseConsumer):
-
-    channel_layer_alias = 'backup'
 
     async def connect(self):
         await super().prepare_connection()
