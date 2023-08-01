@@ -17,9 +17,6 @@ class BaseConsumer(AsyncWebsocketConsumer):
     async def prepare_connection(self):
         self.user = self.scope['user']
 
-        if not self.channel_layer:
-            self.channel_layer = get_channel_layer(self.channel_layer_alias)
-
         headers = self.scope["headers"]
         media_protocol = 'https' if settings.DEBUG is False else 'http'
 
@@ -28,11 +25,12 @@ class BaseConsumer(AsyncWebsocketConsumer):
             if key.decode() == 'host':
                 self.base_url = f"{media_protocol}://{value.decode()}"
 
-        self.user_group_name = f'user_{self.user.id}'
-        await self.channel_layer.group_add(
-            self.user_group_name,
-            self.channel_name
-        )
+        if self.channel_layer:
+            self.user_group_name = f'user_{self.user.id}'
+            await self.channel_layer.group_add(
+                self.user_group_name,
+                self.channel_name
+            )
 
     async def connect(self):
         await self.prepare_connection()
@@ -171,14 +169,15 @@ class NotificationConsumer(BaseConsumer):
             list
         )(self.user.groups.all())
 
-        self.user_groups_names = []
-        for group in user_groups:
-            user_group_name = f'user_group_{group.id}'
-            await self.channel_layer.group_add(
-                user_group_name,
-                self.channel_name
-            )
-            self.user_groups_names.append(user_group_name)
+        if self.channel_layer:
+            self.user_groups_names = []
+            for group in user_groups:
+                user_group_name = f'user_group_{group.id}'
+                await self.channel_layer.group_add(
+                    user_group_name,
+                    self.channel_name
+                )
+                self.user_groups_names.append(user_group_name)
         await self.accept()
 
     async def receive(self, text_data):
@@ -248,14 +247,15 @@ class BackUpConsumer(BaseConsumer):
             list
         )(self.user.groups.all())
 
-        self.user_groups_names = []
-        for group in user_groups:
-            user_group_name = f'user_group_{group.id}'
-            await self.channel_layer.group_add(
-                user_group_name,
-                self.channel_name
-            )
-            self.user_groups_names.append(user_group_name)
+        if self.channel_layer:
+            self.user_groups_names = []
+            for group in user_groups:
+                user_group_name = f'user_group_{group.id}'
+                await self.channel_layer.group_add(
+                    user_group_name,
+                    self.channel_name
+                )
+                self.user_groups_names.append(user_group_name)
         await self.accept()
 
     async def backup_status(self, event):
