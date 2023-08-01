@@ -248,17 +248,6 @@ FILE_PATTERNS = {
 
 # Channels settings
 ASGI_APPLICATION = "lava.ws.routing.application"
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': "channels.layers.InMemoryChannelLayer"
-    },
-    'notification': {
-        'BACKEND': "lava.ws.layers.NotificationInMemoryChannelLayer"
-    },
-    'backup': {
-        'BACKEND': "lava.ws.layers.BackUpInMemoryChannelLayer"
-    }
-}
 
 
 # Maintenance mode

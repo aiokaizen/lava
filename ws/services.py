@@ -8,7 +8,7 @@ from lava.settings import HOST
 
 async def send_message_to_clients(message, alias='default', target_users=None, target_groups=None):
     """ Send a message to a specific WebSocket clients. """
-    channel_layer = get_channel_layer(alias)
+    channel_layer = get_channel_layer()
     if target_groups:
         group_name_prefix = 'user_group_'
         for group in target_groups:
@@ -74,15 +74,15 @@ def send_ws_backup_status(instance):
     asyncio.set_event_loop(loop)
     loop.run_until_complete(
         send_message_to_clients(
-            target_users=[instance.created_by],
-            alias='backup',
             message={
                 "type": "backup_status",
                 "backup": {
                     "id": instance.id,
                     "status": instance.status,
                 },
-            }
+            },
+            alias='backup',
+            target_users=[instance.created_by],
         )
     )
     loop.close()
