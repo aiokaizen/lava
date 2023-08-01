@@ -21,3 +21,4 @@ easy-thumbnails==2.8.5
 channels==4.0.0
 daphne==4.0.0
 django-wkhtmltopdf==3.4.0
+channels-redis==4.1.0
