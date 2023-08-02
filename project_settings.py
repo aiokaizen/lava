@@ -249,6 +249,24 @@ FILE_PATTERNS = {
 # Channels settings
 ASGI_APPLICATION = "lava.ws.routing.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+            "expiry": 30,  # Message expiry in seconds (default 60)
+            "group_expiry": 86400,  # Default: 86400. Best practice to lower it down to a reasonable value.
+            "capacity": 100,  # The maximum number of messages supported by the system
+            # "channel_capacity": {
+            #     "channel_name": <capacity>,
+            #     "http.request": 200,
+            #     "http.response!*": 10,
+            #     re.compile(r"^websocket.send\!.+"): 20,
+            # },
+        },
+    },
+}
+
 
 # Maintenance mode
 MAINTENANCE_MODE = int(os.environ.get(f"{PROJECT_NAME.upper()}_MAINTENANCE_MODE", 0))
