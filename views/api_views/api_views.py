@@ -16,7 +16,7 @@ from lava.serializers import (
 )
 from lava.serializers.serializers import ListIDsSerializer
 from lava.utils import Result
-from lava.services import permissions as lava_permissions
+from lava.services.permissions import get_model_permission_class
 
 
 class UserListCreate(generics.ListCreateAPIView):
@@ -110,6 +110,10 @@ class NotificationViewSet(ReadOnlyModelViewSet):
 
     def get_permissions(self):
         permission_classes = [permissions.IsAuthenticated]
+        if self.action == "send_notification":
+            permission_classes = [
+                get_model_permission_class(Notification, 'add_notification')
+            ]
         return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
@@ -160,8 +164,6 @@ class NotificationViewSet(ReadOnlyModelViewSet):
     def send(self, request, *args, **kwargs):
         user = request.user
         self.user = user
-        if not lava_permissions.can_send_notifications(user):
-            return Response(HTTP_403_MESSAGE, status=status.HTTP_403_FORBIDDEN)
         serializer = NotificationSerializer(user=user, data=request.data)
         serializer.is_valid(raise_exception=True)
         result = serializer.create(serializer.validated_data)
