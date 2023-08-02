@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -28,7 +27,7 @@ msgstr "التفضيلات"
 
 #: admin.py:74 breadcrumbs.py:66 breadcrumbs.py:71 settings.py:175
 msgid "Permissions"
-msgstr "أذونات"
+msgstr "الصلاحيات"
 
 #: admin.py:80
 msgid "Important dates"
@@ -40,7 +39,7 @@ msgstr "السمات الأساسية"
 
 #: admin.py:280
 msgid "Soft delete"
-msgstr "حذف ناعم"
+msgstr "حذف بشكل مؤقت""
 
 #: admin.py:289
 #, python-format
@@ -48,7 +47,7 @@ msgid ""
 "The following error rose while trying to delete '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"ارتفع الخطأ التالي أثناء محاولة حذف '%(obj)s ': \n"
+"حدت الخطأ التالي أثناء محاولة حذف '%(obj)s ': \n"
 "\t%(msg)s"
 
 #: admin.py:299 admin.py:340
@@ -65,7 +64,7 @@ msgid ""
 "The following error rose while trying to restore '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"ارتفع الخطأ التالي أثناء محاولة استعادة '%(obj)s ': \n"
+"حدت الخطأ التالي أثناء محاولة استعادة '%(obj)s ': \n"
 "\t%(msg)s"
 
 #: admin.py:321
@@ -78,20 +77,20 @@ msgid ""
 "The following error rose while deleting '%(obj)s': \n"
 "\t%(msg)s"
 msgstr ""
-"ارتفع الخطأ التالي أثناء حذف '%(obj)s ': \n"
+"حدت الخطأ التالي أثناء حذف '%(obj)s ': \n"
 "\t%(msg)s"
 
 #: admin.py:396
 msgid "General informations"
-msgstr ""
+msgstr "معلومات عامة"
 
 #: apps.py:8
 msgid "Administration"
-msgstr ""
+msgstr "الإدارة"
 
 #: breadcrumbs.py:52
 msgid "Home - Lava"
-msgstr "الرئيسية - الحمم البركانية"
+msgstr "الرئيسية -  Lava"
 
 #: breadcrumbs.py:52
 msgid "Home"
@@ -148,15 +147,15 @@ msgstr "تحديث المجموعة"
 
 #: breadcrumbs.py:67
 msgid "Create new permission"
-msgstr "إنشاء إذن جديد"
+msgstr "إنشاء صلاحية جديدة"
 
 #: breadcrumbs.py:68
 msgid "Permission details"
-msgstr "تفاصيل التصريح"
+msgstr "تفاصيل الصلاحية"
 
 #: breadcrumbs.py:69
 msgid "Update permission"
-msgstr "تحديث الإذن"
+msgstr "تحديث  الصلاحية"
 
 #: breadcrumbs.py:71
 msgid "Logs"
@@ -180,7 +179,7 @@ msgstr "معرف مستخدم أو مستخدم غير صالح غير موجو�
 
 #: constants.py:10
 msgid "User is already activated."
-msgstr "تم تنشيط المستخدم بالفعل."
+msgstr "تم تفعّيل المستخدم بالفعل."
 
 #: constants.py:11
 msgid "The two password fields didn't match."
@@ -267,51 +266,39 @@ msgstr "تمت استعادة الكائن بنجاح."
 
 #: models/base_models.py:48
 msgid "This object is already created."
-msgstr "تم إنشاء هذا الكائن بالفعل."
+msgstr "تم إنشاء هذا الكائن من قبل."
 
 #: models/base_models.py:83
 msgid "This object is not yet created."
 msgstr "لم يتم إنشاء هذا الكائن بعد."
 
 #: models/base_models.py:104
-#, fuzzy
-#| msgid "This object is not yet created."
 msgid "This object is not yet created"
 msgstr "لم يتم إنشاء هذا الكائن بعد."
 
 #: models/base_models.py:110
-#, fuzzy
-#| msgid "This object is already created."
 msgid "This object is already deleted."
-msgstr "تم إنشاء هذا الكائن بالفعل."
+msgstr "تم إنشاء هذا الكائن من قبل."
 
 #: models/base_models.py:180
 msgid "Object is not deleted!"
 msgstr "لم يتم حذف الكائن!"
 
 #: models/base_models.py:264
-#, fuzzy
-#| msgid "Object is not deleted!"
 msgid "Some objects were not deleted."
-msgstr "لم يتم حذف الكائن!"
+msgstr "تم حذف بعض العناصر بنجاح."
 
 #: models/base_models.py:267
-#, fuzzy, python-format
-#| msgid "The object has been restored successfully."
 msgid "%(count)s objects have been deleted successfully."
-msgstr "تمت استعادة الكائن بنجاح."
+msgstr تم حذف %(count)s عنصر بنجاح.
 
 #: models/base_models.py:281
-#, fuzzy
-#| msgid "The selected objects were successfully restored."
 msgid "Some objects were not restored."
-msgstr "تمت استعادة الكائنات المحددة بنجاح."
+msgstr "لم يتم استعادة بعض العناصر."
 
 #: models/base_models.py:284
-#, fuzzy, python-format
-#| msgid "The object has been restored successfully."
 msgid "%(count)s objects have been restored successfully."
-msgstr "تمت استعادة الكائن بنجاح."
+msgstr تم استعادة %(count)s عناصر بنجاح.
 
 #: models/base_models.py:316
 #, python-format
@@ -334,19 +321,15 @@ msgid "Can update %s"
 msgstr "يمكن تحديث %s"
 
 #: models/base_models.py:320
-#, fuzzy, python-format
-#| msgid "Can update %s"
 msgid "Can duplicate %s"
 msgstr "يمكن تحديث %s"
 
 #: models/base_models.py:321
 #, python-format
 msgid "Can soft delete %s"
-msgstr "يمكن حذف لينة %s"
+msgstr "يمكن حذف %s بشكل مؤقت"
 
 #: models/base_models.py:322
-#, fuzzy, python-format
-#| msgid "Can view deleted groups"
 msgid "Can view deleted %s"
 msgstr "يمكن عرض المجموعات المحذوفة"
 
@@ -361,14 +344,10 @@ msgid "Can delete %s"
 msgstr "يمكن حذف %s"
 
 #: models/base_models.py:325
-#, fuzzy, python-format
-#| msgid "Can view users list"
 msgid "Can import %s list"
-msgstr "يمكن عرض قائمة المستخدمين"
+msgstr "يمكن استيراد قائمة %s"
 
 #: models/base_models.py:326
-#, fuzzy, python-format
-#| msgid "Can export permissions"
 msgid "Can export %s list"
 msgstr "يمكن تصدير الأذونات"
 
@@ -386,11 +365,11 @@ msgstr "تم الحذف في"
 
 #: models/chat_models.py:19 models/chat_models.py:166
 msgid "Conversation"
-msgstr ""
+msgstr "المحادثة"
 
 #: models/chat_models.py:20
 msgid "Conversations"
-msgstr ""
+msgstr "المحادثات"
 
 #: models/chat_models.py:26 models/organization_models.py:31
 #: models/organization_models.py:71 models/organization_models.py:145
@@ -400,93 +379,83 @@ msgstr "اسم"
 
 #: models/chat_models.py:27
 msgid "Group conversation"
-msgstr ""
+msgstr "محادثة جماعية"
 
 #: models/chat_models.py:30 models/organization_models.py:146
 msgid "Logo"
-msgstr ""
+msgstr "شعار"
 
 #: models/chat_models.py:39
 msgid "Members"
-msgstr ""
+msgstr "الأعضاء"
 
 #: models/chat_models.py:40
 msgid "Pinned at"
-msgstr ""
+msgstr "تم تثبيته في"
 
 #: models/chat_models.py:72
-#, fuzzy
-#| msgid "'device_id' field is mandatory."
 msgid "This field is mandatory"
-msgstr "حقل \"device_id\" إلزامي."
+msgstr "هذا الحقل إلزامي"
 
 #: models/chat_models.py:85
 msgid "Conversation has been marked as read."
-msgstr ""
+msgstr "تم وضع علامة على المحادثة كمقروءة."
 
 #: models/chat_models.py:89
 msgid "New members list is empty!"
-msgstr ""
+msgstr "قائمة الأعضاء الجدد فارغة!"
 
 #: models/chat_models.py:113 models/chat_models.py:130
 msgid "This user is not part of the conversation."
-msgstr ""
+msgstr "هذا المستخدم ليس جزءًا من المحادثة."
 
 #: models/chat_models.py:126
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The conversation has been muted for this user"
-msgstr "تم تحديث الإذن بنجاح."
+msgstr "تم كتم المحادثة لهذا المستخدم."
 
 #: models/chat_models.py:135
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The conversation has been unmuted for this user"
-msgstr "تم تحديث الإذن بنجاح."
+msgstr "تم إلغاء كتم المحادثة لهذا المستخدم."
 
 #: models/chat_models.py:157 serializers/serializers.py:23
 msgid "Message"
-msgstr ""
+msgstr "الرسالة"
 
 #: models/chat_models.py:158
 msgid "Messages"
-msgstr ""
+msgstr "الرسائل"
 
 #: models/chat_models.py:162
-#, fuzzy
-#| msgid "Gender"
 msgid "Sender"
-msgstr "الجنس"
+msgstr "المرسل"
 
 #: models/chat_models.py:169 settings.py:196
 msgid "Text"
-msgstr ""
+msgstr "نص"
 
 #: models/chat_models.py:172 models/models.py:233 settings.py:197
 msgid "Image"
-msgstr ""
+msgstr "صورة"
 
 #: models/chat_models.py:175
 msgid "Message type"
-msgstr ""
+msgstr "نوع الرسالة"
 
 #: models/chat_models.py:178
 msgid "Read by"
-msgstr ""
+msgstr "تمت قراءتها بواسطة"
 
 #: models/chat_models.py:185
 msgid "You can't send an empty message."
-msgstr ""
+msgstr "لا يمكنك إرسال رسالة فارغة."
 
 #: models/chat_models.py:188
-#, fuzzy
-#| msgid "You can not delete a permission."
 msgid "You can not send messages to this conversation!"
-msgstr "لا يمكنك حذف إذن."
+msgstr "لا يمكنك إرسال رسائل إلى هذه المحادثة!"
 
 #: models/chat_models.py:201
 msgid "Message has been marked as read."
-msgstr ""
+msgstr "تم وضع علامة على الرسالة كمقروءة."
 
 #: models/models.py:68
 msgid "List"
@@ -522,7 +491,7 @@ msgstr "نمط الخط"
 
 #: models/models.py:86
 msgid "Dark theme on?"
-msgstr "القالب المظلم يعمل ؟"
+msgstr "الوضع الداكن مفعّل؟"
 
 #: models/models.py:88
 msgid "List layout"
@@ -558,35 +527,35 @@ msgstr "يمكن تصدير دفتر يومية النشاط"
 
 #: models/models.py:174
 msgid "permission"
-msgstr "إذن"
+msgstr "صلاحية"
 
 #: models/models.py:175
 msgid "permissions"
-msgstr "أذونات"
+msgstr "صلاحيات"
 
 #: models/models.py:179
 msgid "Can set permissions"
-msgstr "يمكن تعيين الأذونات"
+msgstr "يمكن تعيين الصلاحيات"
 
 #: models/models.py:182
 msgid "You can not create a new permission."
-msgstr "لا يمكنك إنشاء إذن جديد."
+msgstr "لا يمكنك إنشاء صلاحية جديدة."
 
 #: models/models.py:188
 msgid "The permission has been created successfully."
-msgstr "تم إنشاء الإذن بنجاح."
+msgstr "تم إنشاء الصلاحية بنجاح."
 
 #: models/models.py:198
 msgid "The permission has been updated successfully."
-msgstr "تم تحديث الإذن بنجاح."
+msgstr "تم تحديث الصلاحية بنجاح."
 
 #: models/models.py:201
 msgid "You can not delete a permission."
-msgstr "لا يمكنك حذف إذن."
+msgstr "لا يمكنك حذف الصلاحية."
 
 #: models/models.py:206
 msgid "The permission has been deleted successfully."
-msgstr "تم حذف الإذن بنجاح."
+msgstr "تم حذف الصلاحية بنجاح."
 
 #: models/models.py:227
 msgid "Group"
@@ -594,23 +563,19 @@ msgstr "المجموعة"
 
 #: models/models.py:231
 msgid "Description"
-msgstr ""
+msgstr "الوصف"
 
 #: models/models.py:237
 msgid "Parent"
-msgstr ""
+msgstr "الأم"
 
 #: models/models.py:244
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notification group id"
-msgstr "الإشعارات"
+msgstr "معرف مجموعة الإشعارات"
 
 #: models/models.py:255
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "Group has been created successfully."
-msgstr "تم إنشاء المستخدم بنجاح."
+msgstr "تم إنشاء المجموعة بنجاح."
 
 #: models/models.py:267
 msgid "Group updated successfully."
@@ -621,10 +586,8 @@ msgid "The group has been deleted successfully."
 msgstr "تم حذف المجموعة بنجاح."
 
 #: models/models.py:317
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "All notification groups have been created successfully."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "تم إنشاء جميع مجموعات الإشعارات بنجاح."
 
 #: models/models.py:334
 msgid "Can change user profile"
@@ -636,15 +599,15 @@ msgstr "يمكن حذف ملف تعريف المستخدم"
 
 #: models/models.py:336
 msgid "Can soft delete user profile"
-msgstr "يمكن حذف ملف تعريف المستخدم بسهولة"
+msgstr "يمكن حذف ملف تعريف المستخدم بشكل مؤقت""
 
 #: models/models.py:341
 msgid "user permissions"
-msgstr "أذونات المستخدم"
+msgstr "صلاحيات المستخدم"
 
 #: models/models.py:343
 msgid "Specific permissions for this user."
-msgstr "أذونات محددة لهذا المستخدم."
+msgstr "صلاحيات محددة لهذا المستخدم."
 
 #: models/models.py:350
 msgid "groups"
@@ -655,7 +618,7 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"المجموعات التي ينتمي إليها هذا المستخدم. سيحصل المستخدم على جميع الأذونات "
+"المجموعات التي ينتمي إليها هذا المستخدم. سيحصل المستخدم على جميع الصلاحيات "
 "الممنوحة لكل مجموعة من مجموعاته."
 
 #: models/models.py:361
@@ -671,10 +634,8 @@ msgid "Gender"
 msgstr "الجنس"
 
 #: models/models.py:371
-#, fuzzy
-#| msgid "Code name"
 msgid "Full name"
-msgstr "الاسم الرمزي"
+msgstr "الاسم الكامل"
 
 #: models/models.py:372 models/organization_models.py:72
 msgid "Country"
@@ -706,7 +667,7 @@ msgstr "صورة الغلاف"
 
 #: models/models.py:385
 msgid "Preferred image dimentions: (1200 x 250)"
-msgstr ""
+msgstr "الأبعاد المفضلة للصورة: (1200 × 250)"
 
 #: models/models.py:391
 msgid "Temporary password"
@@ -816,28 +777,20 @@ msgid "Notifications"
 msgstr "الإشعارات"
 
 #: models/models.py:837
-#, fuzzy
-#| msgid "Notifications"
 msgid "Can list notifications"
 msgstr "الإشعارات"
 
 #: models/models.py:838
-#, fuzzy
-#| msgid "Notification"
 msgid "Can add notification"
 msgstr "إشعار"
 
 #: models/models.py:839
-#, fuzzy
-#| msgid "Notification"
 msgid "Can view notification"
 msgstr "إشعار"
 
 #: models/models.py:840
-#, fuzzy
-#| msgid "Can delete permissions"
 msgid "Can delete notification"
-msgstr "يمكن حذف الأذونات"
+msgstr "يمكن حذف الصلاحيات ."
 
 #: models/models.py:847
 msgid "Date sent"
@@ -857,11 +810,11 @@ msgstr "الفئة"
 
 #: models/models.py:857
 msgid "URL"
-msgstr "عنوان URL"
+msgstr "URL"
 
 #: models/models.py:858
 msgid "Action URL"
-msgstr "عنوان URL للإجراء"
+msgstr "URL للإجراء"
 
 #: models/models.py:870
 msgid "Seen by"
@@ -876,10 +829,8 @@ msgid "The notification has been created successfully."
 msgstr "تم إنشاء الإشعار بنجاح."
 
 #: models/models.py:933
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The selected notifications have been marked as read."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "تم وضع علامة على الإشعارات المحددة كمقروءة."
 
 #: models/models.py:996
 msgid "Backup"
@@ -890,8 +841,6 @@ msgid "Backups"
 msgstr "النسخ الاحتياطية"
 
 #: models/models.py:999
-#, fuzzy
-#| msgid "Backup failed"
 msgid "Backup name"
 msgstr "فشل النسخ الاحتياطي"
 
@@ -920,16 +869,12 @@ msgstr ""
 "بدء واحدة جديدة."
 
 #: models/models.py:1069
-#, fuzzy, python-format
-#| msgid "You can not create a new permission."
 msgid "You can not create more than %d backups per day."
-msgstr "لا يمكنك إنشاء إذن جديد."
+msgstr "لا يمكنك إنشاء أكثر من %d نسخة احتياطية في اليوم."
 
 #: models/models.py:1073
-#, fuzzy, python-format
-#| msgid "You can not create a new permission."
 msgid "You can only create one backup every %d hours."
-msgstr "لا يمكنك إنشاء إذن جديد."
+msgstr "يمكنك إنشاء نسخة احتياطية واحدة فقط كل %d ساعة."
 
 #: models/models.py:1094
 msgid "Backup has been started, you will get notified once it is finished."
@@ -940,18 +885,14 @@ msgid "Backup complete"
 msgstr "اكتمل النسخ الاحتياطي"
 
 #: models/models.py:1137
-#, fuzzy, python-format
-#| msgid "A %s that was started on %s is finished successfully."
 msgid "A %(name)s that was started on %(date)s is finished successfully."
-msgstr "تم الانتهاء من %s الذي بدأ في %s بنجاح."
+msgstr "تم الانتهاء من %(name)s الذي بدأ في %(date)s بنجاح."
 
 #: models/models.py:1158
 msgid "Backup failed"
 msgstr "فشل النسخ الاحتياطي"
 
 #: models/models.py:1160
-#, fuzzy, python-format
-#| msgid ""
 #| "A %s that was started on %s has failed.\n"
 #| "Error: %s"
 msgid ""
@@ -962,176 +903,148 @@ msgstr ""
 "خطأ: %s"
 
 #: models/organization_models.py:21
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The account has been created successfully."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "تم إنشاء الحساب بنجاح."
 
 #: models/organization_models.py:22
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The account has been updated successfully."
-msgstr "تم تحديث الإذن بنجاح."
+msgstr "تم تحديث الحساب بنجاح."
 
 #: models/organization_models.py:23
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The account has been deleted successfully."
-msgstr "تم حذف المجموعة بنجاح."
+msgstr "تم حذف الحساب بنجاح."
 
 #: models/organization_models.py:27
 msgid "Account"
-msgstr ""
+msgstr "الحساب"
 
 #: models/organization_models.py:28
 msgid "Accounts"
-msgstr ""
+msgstr "الحسابات"
 
 #: models/organization_models.py:32
 msgid "Balance"
-msgstr ""
+msgstr "الرصيد"
 
 #: models/organization_models.py:39
 msgid "Amount equals to 0. Account not debitted."
-msgstr ""
+msgstr "المبلغ يساوي 0. لم يتم خصمه من الحساب."
 
 #: models/organization_models.py:45
-#, fuzzy
-#| msgid "Backup has been deleted successfully."
 msgid "Account has been debitted successfully."
-msgstr "تم حذف النسخة الاحتياطية بنجاح."
+msgstr "تم خصم المبلغ بنجاح من الحساب."
 
 #: models/organization_models.py:49
 msgid "Amount equals to 0. Account not creditted."
-msgstr ""
+msgstr "المبلغ يساوي 0. لم يتم اعتماد المبلغ في الحساب."
 
 #: models/organization_models.py:55
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "Account has been creditted successfully."
-msgstr "تم إنشاء المستخدم بنجاح."
+msgstr "تم اعتماد المبلغ في الحساب بنجاح."
 
 #: models/organization_models.py:60
-#, fuzzy
-#| msgid "User has been created successfully."
 msgid "The bank has been created successfully."
-msgstr "تم إنشاء المستخدم بنجاح."
+msgstr "تم إنشاء البنك بنجاح."
 
 #: models/organization_models.py:61
-#, fuzzy
-#| msgid "User has been updated successfully."
 msgid "The bank has been updated successfully."
-msgstr "تم تحديث المستخدم بنجاح."
+msgstr "تم تحديث البنك بنجاح."
 
 #: models/organization_models.py:62
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The bank has been deleted successfully."
-msgstr "تم حذف المجموعة بنجاح."
+msgstr "تم حذف البنك بنجاح."
 
 #: models/organization_models.py:66 models/organization_models.py:103
 msgid "Bank"
-msgstr ""
+msgstr "البنك"
 
 #: models/organization_models.py:67
 msgid "Banks"
-msgstr ""
+msgstr "بنوك"
 
 #: models/organization_models.py:74
 msgid "Agency"
-msgstr ""
+msgstr "وكالة"
 
 #: models/organization_models.py:75
-#, fuzzy
-#| msgid "Phone number"
 msgid "Routing number"
 msgstr "رقم الهاتف"
 
 #: models/organization_models.py:76
 msgid "BIC / SWIFT"
-msgstr ""
+msgstr "BIC / SWIFT"
 
 #: models/organization_models.py:90
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "The bank account has been created successfully."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "تم إنشاء الحساب البنكي بنجاح."
 
 #: models/organization_models.py:91
-#, fuzzy
-#| msgid "The permission has been updated successfully."
 msgid "The bank account has been updated successfully."
-msgstr "تم تحديث الإذن بنجاح."
+msgstr "تم تحديث الحساب البنكي بنجاح."
 
 #: models/organization_models.py:92
-#, fuzzy
-#| msgid "The group has been deleted successfully."
 msgid "The bank account has been deleted successfully."
-msgstr "تم حذف المجموعة بنجاح."
+msgstr "تم حذف الحساب البنكي بنجاح."
 
 #: models/organization_models.py:96 models/organization_models.py:156
 msgid "Bank account"
-msgstr ""
+msgstr "الحساب البنكي"
 
 #: models/organization_models.py:97
 msgid "Bank accounts"
-msgstr ""
+msgstr "حسابات بنكية"
 
 #: models/organization_models.py:100
 msgid "Account holder"
-msgstr ""
+msgstr "صاحب الحساب"
 
 #: models/organization_models.py:101 models/utility_models.py:24
-#, fuzzy
-#| msgid "Code name"
 msgid "Code postal"
-msgstr "الاسم الرمزي"
+msgstr "الرمز البريدي"
 
 #: models/organization_models.py:102
 msgid "RIB"
-msgstr ""
+msgstr "RIB"
 
 #: models/organization_models.py:141
 msgid "Entity"
-msgstr ""
+msgstr "كيان شركائي"
 
 #: models/organization_models.py:142
 msgid "Entities"
-msgstr ""
+msgstr "يانات شركائية"
 
 #: models/organization_models.py:147
 msgid "Logo light"
-msgstr ""
+msgstr "شعار فاتح"
 
 #: models/organization_models.py:148
 msgid "Address"
-msgstr ""
+msgstr "العنوان"
 
 #: models/organization_models.py:150
-#, fuzzy
-#| msgid "Phone number"
 msgid "Phone numbser 2"
 msgstr "رقم الهاتف"
 
 #: models/organization_models.py:151
 msgid "E-mail"
-msgstr ""
+msgstr "البريد الإلكتروني"
 
 #: models/organization_models.py:152
 msgid "Website"
-msgstr ""
+msgstr "الموقع الإلكتروني
 
 #: models/organization_models.py:153
 msgid "Note"
-msgstr ""
+msgstr "ملاحظة"
 
 #: models/organization_models.py:154
 msgid "Accent color"
-msgstr ""
+msgstr "لون التمييز"
 
 #: models/organization_models.py:160
 msgid "ICE"
-msgstr ""
+msgstr "ICE"
 
 #: models/organization_models.py:161
 msgid "RC"
@@ -1139,69 +1052,67 @@ msgstr ""
 
 #: models/organization_models.py:162
 msgid "IF"
-msgstr ""
+msgstr "IF"
 
 #: models/organization_models.py:163
 msgid "TP"
-msgstr ""
+msgstr "TP"
 
 #: models/organization_models.py:165
 msgid "Entité local"
-msgstr ""
+msgstr "وحدة محلية"
 
 #: models/organization_models.py:194
-#, fuzzy, python-format
-#| msgid "The notification has been created successfully."
 msgid "The entity '%(name)s' has been successfully created."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "تم إنشاء الكيان '%(name)s' بنجاح."
 
 #: models/utility_models.py:13
 msgid "L'adresse a été créée avec succès."
-msgstr ""
+msgstr "تم إنشاء العنوان بنجاح."
 
 #: models/utility_models.py:14
 msgid "L'adresse a été modifiée avec succès"
-msgstr ""
+msgstr "تم تعديل العنوان بنجاح."
 
 #: models/utility_models.py:15
 msgid "L'addresse a été supprimée avec succès."
-msgstr ""
+msgstr "تم حذف العنوان بنجاح."
 
 #: models/utility_models.py:19 models/utility_models.py:23
 msgid "Adresse"
-msgstr ""
+msgstr "عنوان"
 
 #: models/utility_models.py:20
 msgid "Adresses"
-msgstr ""
+msgstr "عناوين"
 
 #: models/utility_models.py:25
 msgid "Ville"
-msgstr ""
+msgstr "مدينة"
 
 #: models/utility_models.py:26
 msgid "Pays"
-msgstr ""
+msgstr "بلد"
 
 #: models/utility_models.py:82
 msgid "Document"
-msgstr ""
+msgstr "مستند"
 
 #: models/utility_models.py:83
 msgid "Documents"
-msgstr ""
+msgstr "مستندات"
 
 #: models/utility_models.py:86
 msgid "File"
-msgstr ""
+msgstr "ملف"
 
 #: project_settings.py:210
 msgid "Arabic"
-msgstr ""
+msgstr "العربية"
 
 #: project_settings.py:211
 msgid "Frensh"
-msgstr ""
+msgstr "الفرنسية"
 
 #: serializers/base_serializers.py:64
 msgid "You can not create or update objects using a read-only serializer."
@@ -1209,17 +1120,15 @@ msgstr "لا يمكنك إنشاء كائنات أو تحديثها باستخد
 
 #: serializers/chat_serializers.py:183
 msgid "Some member IDs are not valid."
-msgstr ""
+msgstr "بعض معرفات الأعضاء غير صالحة."
 
 #: serializers/chat_serializers.py:187
 msgid "Member IDs must be integers."
-msgstr ""
+msgstr "معرفات الأعضاء يجب أن تكون أرقام صحيحة."
 
 #: serializers/notification_serializers.py:14
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notifications ids"
-msgstr "الإشعارات"
+msgstr "معرّفات الإشعارات"
 
 #: serializers/notification_serializers.py:35
 msgid "Seen"
@@ -1230,45 +1139,41 @@ msgid "You must specify either target groups or target users."
 msgstr "يجب عليك تحديد المجموعات المستهدفة أو المستخدمين المستهدفين."
 
 #: serializers/serializers.py:19
-#, fuzzy
-#| msgid "Code name"
 msgid "Class name"
-msgstr "الاسم الرمزي"
+msgstr "اسم الفئة"
 
 #: serializers/serializers.py:21
 msgid "Result"
-msgstr ""
+msgstr "النتيجة"
 
 #: serializers/serializers.py:24
 msgid "Errors"
-msgstr ""
+msgstr "الأخطاء"
 
 #: serializers/serializers.py:25
 msgid "Error code"
-msgstr ""
+msgstr "رمز الخطأ"
 
 #: serializers/serializers.py:26
 msgid "Object ID"
-msgstr ""
+msgstr "معرف الكائن"
 
 #: serializers/serializers.py:41
 msgid "IDs"
-msgstr ""
+msgstr "المعرّفات"
 
 #: serializers/serializers.py:60 serializers/serializers.py:64
 msgid "One or more ID is not valid."
-msgstr ""
+msgstr "معرّف واحد أو أكثر غير صالح."
 
 #: serializers/serializers.py:79
-#, fuzzy
-#| msgid "This action is not allowed!"
 msgid "The Selected action is not valid"
-msgstr "هذا الإجراء غير مسموح به!"
+msgstr "الإجراء المحدد غير صالح"
 
 #: serializers/serializers.py:85
 #, python-format
 msgid "`%(action_name)s` is not a callable for model `%(model)s`."
-msgstr ""
+msgstr "%(action_name)s ليس استدعاء صالح للنموذج %(model)s."
 
 #: serializers/serializers.py:117
 msgid "Current password"
@@ -1296,7 +1201,7 @@ msgstr "الاسم الرمزي"
 
 #: serializers/serializers.py:205
 msgid "The query parametter must have a length of 2 or more."
-msgstr ""
+msgstr "يجب أن يكون طول معامل الاستعلام 2 أو أكثر."
 
 #: serializers/user_serializers.py:26
 msgid "You can't create or update objects using a read-only serializer."
@@ -1341,31 +1246,27 @@ msgstr "تم تصدير الملف بنجاح"
 
 #: services/statistics.py:83
 msgid "Utilisateurs"
-msgstr ""
+msgstr "المستخدمون"
 
 #: services/statistics.py:86
 msgid "Total des utilisateurs"
-msgstr ""
+msgstr "إجمالي المستخدمين"
 
 #: services/statistics.py:89
-#, fuzzy
-#| msgid "Groups"
 msgid "Groupes"
 msgstr "المجموعات"
 
 #: services/statistics.py:92
-#, fuzzy
-#| msgid "Can update group"
 msgid "Total des groupes"
-msgstr "يمكن تحديث المجموعة"
+msgstr "إجمالي المجموعات"
 
 #: services/statistics.py:95
 msgid "Sauvegardes"
-msgstr ""
+msgstr "النسخ الاحتياطي"
 
 #: services/statistics.py:98
 msgid "Total des sauvegardes"
-msgstr ""
+msgstr "إجمالي النسخ الاحتياطي"
 
 #: settings.py:25
 msgid "Firebase is not installed"
@@ -1389,11 +1290,11 @@ msgstr "تنبيه"
 
 #: settings.py:96
 msgid "Success"
-msgstr ""
+msgstr "نجاح"
 
 #: settings.py:97
 msgid "Warning"
-msgstr ""
+msgstr "تحذير"
 
 #: settings.py:98
 msgid "Error"
@@ -1409,7 +1310,7 @@ msgstr "النسخ الاحتياطي لقاعدة البيانات"
 
 #: settings.py:109
 msgid "Running"
-msgstr "الجري"
+msgstr "خطأ"
 
 #: settings.py:110
 msgid "Completed"
@@ -1421,69 +1322,54 @@ msgstr "باءت بالفشل"
 
 #: settings.py:140
 msgid "User creation alert"
-msgstr ""
+msgstr "تنبيه إنشاء مستخدم"
 
 #: settings.py:141
-#, fuzzy
-#| msgid "The notification has been created successfully."
 msgid "This notification is sent when a new user is created."
-msgstr "تم إنشاء الإشعار بنجاح."
+msgstr "يتم إرسال هذا الإشعار عند إنشاء مستخدم جديد."
 
 #: settings.py:144
 msgid "User deletion alert"
-msgstr ""
+msgstr "تنبيه حذف المستخدم"
 
 #: settings.py:145
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a user is deleted."
-msgstr "تم إرسال الإشعار بنجاح."
+msgstr "يتم إرسال هذا الإشعار عند حذف مستخدم."
 
 #: settings.py:148
-#, fuzzy
-#| msgid "Group details"
 msgid "Group creation alert"
-msgstr "تفاصيل المجموعة"
+msgstr "تنبيه إنشاء مجموعة"
 
 #: settings.py:149
 msgid "This notification is sent when a new group is created."
-msgstr ""
+msgstr "هذا الإشعار يُرسل عند إنشاء مجموعة جديدة."
 
 #: settings.py:152
-#, fuzzy
-#| msgid "Group details"
 msgid "Group deletion alert"
-msgstr "تفاصيل المجموعة"
+msgstr "تنبيه حذف مجموعة"
 
 #: settings.py:153
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a group is deleted."
-msgstr "تم إرسال الإشعار بنجاح."
+msgstr "هذا الإشعار يُرسل عند حذف مجموعة."
+
 
 #: settings.py:156
-#, fuzzy
-#| msgid "Permission details"
 msgid "Permission update alert"
-msgstr "تفاصيل التصريح"
+msgstr "تنبيه تحديث الصلاحية"
 
 #: settings.py:158
 msgid ""
 "This notification is sent when a permission has been affected or revoked "
 "from a user or group."
-msgstr ""
+msgstr "هذا الإشعار يُرسل عندما يتم تأثير أو إلغاء الصلاحيات من مستخدم أو مجموعة."
 
 #: settings.py:162
-#, fuzzy
-#| msgid "Backup complete"
 msgid "Backup completed alert"
 msgstr "اكتمل النسخ الاحتياطي"
 
 #: settings.py:163
-#, fuzzy
-#| msgid "The notification was sent successfully."
 msgid "This notification is sent when a backup is completed."
-msgstr "تم إرسال الإشعار بنجاح."
+msgstr "يتم إرسال هذا الإشعار عند اكتمال عملية النسخ الاحتياطي."
 
 #: templates/lava/email/activation.html:4
 #, python-format
@@ -1662,7 +1548,7 @@ msgstr "يوجد مستخدم بهذا البريد الإلكتروني بال�
 
 #: validators.py:51
 msgid "A local url must start with a forward slash `/`"
-msgstr "يجب أن يبدأ عنوان url المحلي بشرطة مائلة للأمام '/'"
+msgstr "يجب أن يبدأ عنوان url  '/'"
 
 #: validators.py:60
 #, python-format
@@ -1672,14 +1558,12 @@ msgid ""
 msgid_plural ""
 "Ensure this value has exactly %(limit_value)d characters (it has "
 "%(show_value)d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "تأكد من أن هذه القيمة تحتوي على %(limit_value)d حرف (حالياً بها %(show_value)d حرف)."
+msgstr[1] "تأكد من أن هذه القيمة تحتوي بالضبط على %(limit_value)d حرف (لديها %(show_value)d حرف)."
 
 #: validators.py:78
-#, fuzzy
-#| msgid "Invalid group choice."
 msgid "Invalid QR code"
-msgstr "اختيار المجموعة غير صالح."
+msgstr "غير صالح QR code."
 
 #: validators.py:92
 msgid "The notifications settings must be a dictionary."
@@ -1688,7 +1572,7 @@ msgstr "يجب أن تكون إعدادات الإشعارات عبارة عن �
 #: validators.py:98
 #, python-format
 msgid "`%(key)s` is not a valid key for notifications settings."
-msgstr "'%(key)s `ليس مفتاحًا صالحًا لإعدادات الإشعارات."
+msgstr "%(key)s ليس مفتاح صالح لإعدادات الإشعارات."
 
 #: validators.py:104
 #, python-format
@@ -1713,31 +1597,29 @@ msgstr "تم تغيير كلمة المرور بنجاح!"
 
 #: ws/consumers.py:147
 msgid "Message ID is not valid!"
-msgstr ""
+msgstr "معرف الرسالة غير صالح!"
 
 #: ws/consumers.py:214
-#, fuzzy
-#| msgid "Notifications"
 msgid "Notification ID is not valid!"
-msgstr "الإشعارات"
+msgstr "معرف الإشعارات غير صالح"
 
 #~ msgid "Group created successfully."
 #~ msgstr "تم إنشاء المجموعة بنجاح."
 
 #~ msgid "Can add permissions"
-#~ msgstr "يمكنه إضافة أذونات"
+#~ msgstr "يمكن إضافة صلاحية"
 
 #~ msgid "Can view permission details"
-#~ msgstr "يمكن عرض تفاصيل الإذن"
+#~ msgstr "يمكن عرض تفاصيل الصلاحية"
 
 #~ msgid "Can update permissions"
-#~ msgstr "يمكنه تحديث الأذونات"
+#~ msgstr "يمكن تحديث الصلاحيات"
 
 #~ msgid "Can view permissions list"
-#~ msgstr "يمكن عرض قائمة الأذونات"
+#~ msgstr "يمكن عرض قائمة الصلاحيات"
 
 #~ msgid "Can export permissions"
-#~ msgstr "يمكن تصدير الأذونات"
+#~ msgstr "يمكن تصدير الصلاحيات"
 
 #~ msgid "Can add group"
 #~ msgstr "يمكن إضافة مجموعة"
@@ -1746,13 +1628,13 @@ msgstr "الإشعارات"
 #~ msgstr "يمكن حذف المجموعة"
 
 #~ msgid "Can soft delete group"
-#~ msgstr "يمكن حذف المجموعة بشكل ناعم"
+#~ msgstr "يمكن حذف المجموعة بشكل مؤقت"
 
 #~ msgid "Can view group"
 #~ msgstr "يمكن عرض المجموعة"
 
 #~ msgid "Can view group list"
-#~ msgstr "يمكن عرض قائمة المجموعة"
+#~ msgstr "يمكن عرض قائمة المجموعات"
 
 #~ msgid "Can view deleted groups"
 #~ msgstr "يمكن عرض المجموعات المحذوفة"
@@ -1770,7 +1652,7 @@ msgstr "الإشعارات"
 #~ msgstr "يمكن حذف المستخدم"
 
 #~ msgid "Can soft delete user"
-#~ msgstr "يمكن حذف المستخدم لينة"
+#~ msgstr "يمكن حذف المستخدم بشكل مؤقت"
 
 #~ msgid "Can view user"
 #~ msgstr "يمكن عرض المستخدم"
@@ -1787,8 +1669,8 @@ msgstr "الإشعارات"
 #~ msgid "Can delete backup"
 #~ msgstr "يمكن حذف النسخة الاحتياطية"
 
-#~ msgid "Can soft backup"
-#~ msgstr "يمكن النسخ الاحتياطي الناعم"
+#~ msgid "Can soft delete backup"
+#~ msgstr "يمكن حذف النسخ الاحتياطي بشكل مؤقت"
 
 #~ msgid "Can view backup"
 #~ msgstr "يمكن عرض النسخ الاحتياطي"
