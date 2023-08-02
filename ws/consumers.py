@@ -37,13 +37,11 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         # Clean up
-        client_groups = self.channel_layer.groups.get(self.channel_name, set())
+        client_groups = getattr(self, "user_groups_names", [])
         for group_name in client_groups:
             await self.channel_layer.group_discard(group_name, self.channel_name)
 
-    async def get_group_member_count(group_name):
-        group_status = await self.channel_layer.group_status(group_name)
-        return group_status.get("channel_layer", {}).get("groups", {}).get(group_name, {}).get("channel_count", 0)
+        await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
 
 
 class ChatConsumer(BaseConsumer):
@@ -188,14 +186,6 @@ class NotificationConsumer(BaseConsumer):
         if action == 'mark_notification_as_read':
             await self.mark_as_read(data)
 
-    # async def send_notification(self, data):
-    #     await self.channel_layer.group_send(
-    #         self.conversation_group_name, {
-    #             'type': 'notification_message',
-    #             'message': data
-    #         }
-    #     )
-
     async def mark_as_read(self, data):
         notification_id = data['notification_id']
         try:
@@ -211,7 +201,7 @@ class NotificationConsumer(BaseConsumer):
                 'error': Result.error(_("Notification ID is not valid!"))
             })
 
-    async def notification_message(self, event):
+    async def send_notification(self, event):
         data = event['message']
         if data.get('sender') is None:
             data['sender'] = {
@@ -228,6 +218,9 @@ class NotificationConsumer(BaseConsumer):
             'action': 'notification_message',
             'message': data
         }))
+
+    async def send_backup_status(self, event):
+        pass
 
     async def error_message(self, event):
         error = event['error']
@@ -255,7 +248,10 @@ class BackUpConsumer(BaseConsumer):
             self.user_groups_names.append(user_group_name)
         await self.accept()
 
-    async def backup_status(self, event):
+    async def send_notification(self, event):
+        pass
+
+    async def send_backup_status(self, event):
         await self.send(text_data=json.dumps({
             'action': 'backup_status',
             'message': event['backup']

@@ -42,7 +42,7 @@ def send_ws_notification(instance):
     loop.run_until_complete(
         send_message_to_clients(
             message={
-                "type": "notification_message",
+                "type": "send_notification",
                 "message": {
                     "title": str(instance.title),
                     "sender": {
@@ -75,7 +75,7 @@ def send_ws_backup_status(instance):
     loop.run_until_complete(
         send_message_to_clients(
             message={
-                "type": "backup_status",
+                "type": "send_backup_status",
                 "backup": {
                     "id": instance.id,
                     "status": instance.status,
