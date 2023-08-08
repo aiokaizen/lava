@@ -228,6 +228,7 @@ class Group(BaseModel, BaseGroupModel):
         verbose_name_plural = _("Groups")
         default_permissions = ()
 
+    slug = models.SlugField(_("Slug"), unique=True, max_length=256, null=True)
     description = models.TextField(_("Description"), blank=True)
     image = ThumbnailerImageField(
         _("Image"), upload_to=get_group_photo_filename, null=True, blank=True
@@ -399,6 +400,7 @@ class User(BaseModel, AbstractUser):
 
     deleted_at = models.DateTimeField(_("Deleted at"), null=True)
     # is_email_valid = models.BooleanField(_("Email is valid"), default=False)
+    extra_fields = models.JSONField(_("Extra fields"), default=dict)
 
     objects = LavaUserManager()
 
