@@ -44,7 +44,7 @@ class BaseAPITest(APITestCase, URLPatternsTestCase, BaseTestMixin):
 
     def setUp(self):
         super().setUp()
-        SetUpLava().handle(no_logs=True)
+        SetUpLava().handle(no_logs=True, reset_perms=None)
         LavaInstallDemo().handle(num_users=3, suffix="testuser", skip_avatars=True, no_logs=True)
 
         self.users = odict(
@@ -71,7 +71,7 @@ class BaseModelTest(TestCase, BaseTestMixin):
 
     def setUp(self):
         super().setUp()
-        SetUpLava().handle(no_logs=True)
+        SetUpLava().handle(no_logs=True, reset_perms=False)
         LavaInstallDemo().handle(num_users=2, suffix="testuser", skip_avatars=True, no_logs=True)
         self.users = odict(
             ekadmin=User.objects.get(username="ekadmin"),
