@@ -1,3 +1,5 @@
+from copy import deepcopy, copy
+
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 
@@ -14,6 +16,13 @@ class BaseModelSerializer(serializers.ModelSerializer):
         self.user = user
         super().__init__(instance, data, **kwargs)
 
+    def to_internal_value(self, data):
+        data = deepcopy(data)
+        for m2m_field_name in self.m2m_field_names:
+            if m2m_field_name in data and data[m2m_field_name] == "null":
+                data.setlist(m2m_field_name, [])
+        return super().to_internal_value(data)
+    
     def create(self, validated_data, **kwargs):
 
         m2m_field_names = getattr(self, 'm2m_field_names', [])

@@ -343,7 +343,7 @@ class User(BaseModel, AbstractUser):
         blank=True,
         help_text=_("Specific permissions for this user."),
         related_name="users",
-        related_query_name="user",
+        related_query_name="user"
     )
 
     groups = models.ManyToManyField(

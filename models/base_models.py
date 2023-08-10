@@ -90,7 +90,10 @@ class BaseModelMixin:
         if m2m_fields:
             for attr, value in m2m_fields:
                 field = getattr(self, attr)
-                field.set(value)
+                if not value:
+                    field.clear()
+                else:
+                    field.set(value)
 
         if user:
             self.log_action(user, CHANGE, message)
