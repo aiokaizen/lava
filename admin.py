@@ -356,7 +356,6 @@ class NotificationGroupAdmin(BaseModelAdmin):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    pass
     fields = [
         "action_time",
         "user",
@@ -371,7 +370,29 @@ class LogEntryAdmin(admin.ModelAdmin):
 
 @admin.register(Backup)
 class BackupAdmin(BaseModelAdmin):
-    pass
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                        "backup_file",
+                ),
+            },
+        ),
+        (
+            _("Base attributes"),
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "last_updated_at",
+                    "deleted_at"
+                ),
+            },
+        )
+    )
+
 
 
 @admin.register(Notification)

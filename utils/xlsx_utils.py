@@ -48,8 +48,13 @@ def get_col_width(content, font_size):
 def get_cell_str(col, row):
     return f"{get_column_letter(col)}{row}"
 
+def get_field_name(mapping, column_name):
+    if column_name in mapping.keys():
+        return mapping[column_name]
+    return slugify(column_name)
 
-def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None):
+
+def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None, column_name_mapping=None):
     """
     file_name | string: The path to open or a File like object
     start_row | int: the number of row where the header of the file is located.
@@ -66,18 +71,20 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
     >>> data = handle_excel_file("file.xlsx", start_row, column_names)
     """
 
+    if not column_name_mapping:
+        column_name_mapping = dict()
+
     if type(start_row) != int or start_row <= 0:
         raise Exception("'start_row' attribute is invalid!")
     start_row -= 1
 
     try:
-
         # Slugify extract_columns
         if not extract_columns:
             extract_columns = []
             slugified_extract_columns = []
         else:
-            slugified_extract_columns = [slugify(name) for name in extract_columns]
+            slugified_extract_columns = [get_field_name(column_name_mapping, name) for name in extract_columns]
 
         wb = openpyxl.load_workbook(file_name)
         worksheet = wb[target_sheet]
@@ -96,7 +103,7 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
             for col_index, cell in enumerate(row):
                 value = cell.value
                 if value:
-                    slugified_value = slugify(str(value))
+                    slugified_value = get_field_name(column_name_mapping, str(value))
                     if fill_extract_columns:
                         extract_columns.append(str(value))
                         slugified_extract_columns.append(slugified_value)
