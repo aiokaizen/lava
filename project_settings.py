@@ -9,13 +9,13 @@ from django.utils.text import slugify
 PROJECT_NAME = slugify(os.path.basename(os.path.normpath(settings.BASE_DIR))).replace('-', '_')
 
 
+DEBUG = os.getenv("DEBUG", True)
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9@xy8cgd$v6-zrbbsgk!krmp^9-syglu^z&4p-n^@2fs1_cj#^'
-try:
-    with open(f'/etc/secrets/{PROJECT_NAME}_secret.key') as f:
-        SECRET_KEY = f.read().strip()
-    logging.info("SECRET_KEY file loaded successfully.")
-except FileNotFoundError:
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    'django-insecure-9@xy8cgd$v6-zrbbsgk!krmp^9-syglu^z&4p-n^@2fs1_cj#^'
+)
+if SECRET_KEY.startswith("django-insecure"):
     logging.warning("SECRET_KEY file not found, using a default value.")
 
 
@@ -29,10 +29,27 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
+ENV_ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", [])
+if ENV_ALLOWED_HOSTS:
+    ENV_ALLOWED_HOSTS.split(",")
+
 ALLOWED_HOSTS = [
     "localhost",
-    "127.0.0.1"
+    "127.0.0.1",
+    *ENV_ALLOWED_HOSTS
 ]
+
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        'NAME': os.getenv("DB_NAME", "lava_db"),
+        "USER": os.getenv("DB_USER", "lava_user"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "user_pass"),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", 5432),
+    }
+}
 
 
 INSTALLED_APPS_PREFIX = [
