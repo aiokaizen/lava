@@ -83,7 +83,7 @@ class BaseModelMixin:
             return Result(False, _("This object is not yet created."))
 
         # Get changed message before saving the object
-        message = message or self.get_changed_message(m2m_fields)
+        message = message or self.get_changed_message(m2m_fields, update_fields=update_fields)
 
         self.save(update_fields=update_fields)
 
@@ -189,10 +189,9 @@ class BaseModelMixin:
 
         return Result.success(self.get_result_message('restore'))
 
-    def get_changed_message(self, m2m_fields=None):
+    def get_changed_message(self, m2m_fields=None, update_fields=None):
 
-        if not m2m_fields:
-            m2m_fields = []
+        m2m_fields = m2m_fields or []
 
         changed_message = {"fields": {}}
         klass = self.__class__
@@ -204,6 +203,9 @@ class BaseModelMixin:
         for field in klass._meta.get_fields(include_parents=True):
 
             field_name = field.name
+            if update_fields is not None and field_name not in update_fields:
+                continue
+
             old_value = getattr(old_self, field_name, None)
             new_value = getattr(self, field_name, None)
 
