@@ -265,12 +265,14 @@ FILE_PATTERNS = {
 
 # Channels settings
 ASGI_APPLICATION = "lava.ws.routing.application"
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.getenv("REDIS_PORT", 6379)
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
             "expiry": 30,  # Message expiry in seconds (default 60)
             "group_expiry": 86400,  # Default: 86400. Best practice to lower it down to a reasonable value.
             "capacity": 100,  # The maximum number of messages supported by the system
