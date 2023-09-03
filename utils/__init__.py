@@ -6,7 +6,7 @@ from .utils import (
     send_html_email, send_mass_html_email, add_margin_to_image, get_image,
     generate_password, generate_username, _is_username_valid, hex_to_rgb, adjust_color,
     path_is_parent, path_includes_dir, zipdir, zipf, exec_command, dump_pgdb, load_pgdb,
-    generate_requirements, generate_repo_backup, build_absolute_uri
+    generate_requirements, generate_repo_backup, build_absolute_uri, remove_html_tags
 )
 from .xlsx_utils import (
     ExportDataType, get_col_width, get_cell_str, handle_excel_file,
