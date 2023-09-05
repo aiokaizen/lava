@@ -93,7 +93,7 @@ class BulkActionSerializer(ListIDsSerializer):
     def perform_action(self, user):
         queryset = self.validated_data["list_ids"]
         action = self.validated_data["action"]
-        result = action(user, queryset, trash=self.trash)
+        result = action(queryset, user, trash=self.trash)
         return result
 
 
