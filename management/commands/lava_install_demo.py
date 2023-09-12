@@ -83,6 +83,10 @@ class Command(BaseCommand):
 
                 for group in groups:
                     Group.objects.get_or_create(name=group["name"])
+        else:
+            logging.info(
+                "Group creation has been skipped."
+            )
 
         # Creating users
         people = []
