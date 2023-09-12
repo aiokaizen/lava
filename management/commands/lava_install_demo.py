@@ -12,7 +12,7 @@ from django.conf import settings
 from django.core.files import File
 
 from lava.models import User, Group
-from lava.utils import get_user_photo_filename
+from lava.utils import get_user_photo_filename, slugify
 from lava import settings as lava_settings
 
 
@@ -103,6 +103,8 @@ class Command(BaseCommand):
         groups = Group.objects.all()
         user_avatar = "https://i.pravatar.cc/150"
 
+        groups_indexes = {}
+
         for i in range(number_of_users):
             person = random.choice(people)
             people.remove(person)
@@ -119,8 +121,15 @@ class Command(BaseCommand):
                     with open(filename, 'wb') as fp:
                         fp.write(response.content)
 
+            username = f"{username_suffix}_{i + 1}"
+            user_group = random.choice(groups)
+            groups_indexes[user_group.id] = groups_indexes.get(user_group.id, 0) + 1
+            if username_suffix == "user":
+                user_index = groups_indexes[user_group.id]
+                username = f"{slugify(user_group.name)}_{user_index}"
+
             user = User(
-                username=f"{username_suffix}_{i + 1}",
+                username=username,
                 first_name=person["first_name"],
                 last_name=person["last_name"],
                 email=person["email"],
@@ -132,7 +141,7 @@ class Command(BaseCommand):
                 job=person["job_title"],
             )
             user.create(
-                groups=[random.choice(groups)],
+                groups=[user_group],
                 password="admin_pass",
                 force_is_active=True,
                 link_payments_app=False
