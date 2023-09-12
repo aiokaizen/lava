@@ -245,6 +245,9 @@ class Group(BaseModel, BaseGroupModel):
     notification_id = models.CharField(
         _("Notification group id"), max_length=256, blank=True
     )
+    is_system = models.BooleanField(
+        _("Is system group"), default=False
+    )
 
     objects = GroupManager()
     all_objects = DefaultModelBaseManager()

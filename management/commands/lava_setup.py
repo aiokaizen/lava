@@ -74,9 +74,11 @@ class Command(BaseCommand):
                 )
 
         # Create the group 'ADMINS' if it does not exist
-        admins_group, _created = Group.objects.get_or_create(name="ADMINS")
+        admins_group, _created = Group.objects.get_or_create(
+            name="ADMINS", is_system=True
+        )
         # Group.objects.get_or_create(
-        #     name="STANDARD"
+        #     name="STANDARD", is_system=True
         # )  # Default group for signed up users
 
         # Add all available permissions to group ADMINS
