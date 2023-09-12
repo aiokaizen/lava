@@ -42,6 +42,13 @@ class Command(BaseCommand):
             help="The username suffix, defaults to user. eg: user1, user2, ..."
         )
         parser.add_argument(
+            '-s',
+            '--skip-groups',
+            action='store_true',
+            default=False,
+            help='If this argument is set, groups will not be created.',
+        )
+        parser.add_argument(
             '--no-logs',
             action='store_true',
             help='If this argument is set, the function will not print anything to the console.',
@@ -55,6 +62,7 @@ class Command(BaseCommand):
         skip_avatars = options["skip_avatars"]
         username_suffix = options["suffix"]
         no_logs = options["no_logs"]
+        skip_groups = options["skip_groups"]
 
         logging.info(
             "Start importing demo content with the following parameters:\n"
@@ -64,16 +72,17 @@ class Command(BaseCommand):
         )
 
         # Creating groups
-        groups = []
-        groups_filename = os.path.join(
-            settings.BASE_DIR, "lava", "demo_content", "groups.json"
-        )
-        with open(groups_filename, "r") as f:
-            data = f.read()
-            groups = json.loads(data)
+        if not skip_groups:
+            groups = []
+            groups_filename = os.path.join(
+                settings.BASE_DIR, "lava", "demo_content", "groups.json"
+            )
+            with open(groups_filename, "r") as f:
+                data = f.read()
+                groups = json.loads(data)
 
-            for group in groups:
-                Group.objects.get_or_create(name=group["name"])
+                for group in groups:
+                    Group.objects.get_or_create(name=group["name"])
 
         # Creating users
         people = []
@@ -83,14 +92,14 @@ class Command(BaseCommand):
         with open(people_filename, "r") as f:
             data = f.read()
             people = json.loads(data)
-        
+
         today_str = datetime.now().strftime("%Y%m%d")
         download_path = os.path.join(
             lava_settings.TMP_ROOT, f'tmp_user_avatars_{today_str}'
         )
         if not os.path.exists(download_path):
             os.makedirs(download_path)
-        
+
         groups = Group.objects.all()
         user_avatar = "https://i.pravatar.cc/150"
 
@@ -135,8 +144,8 @@ class Command(BaseCommand):
                         File(f)
                     )
                     user.update(update_fields=['photo'])
-            
+
             if not no_logs:
                 print(f'User {user.username} has been created.')
-        
+
         shutil.rmtree(download_path, )
