@@ -36,6 +36,7 @@ from lava.messages import FORBIDDEN_MESSAGE, UNKNOWN_ERROR_MESSAGE, ACTION_NOT_A
 from lava.models.base_models import BaseModel, BaseModelMixin
 from lava.utils import (
     Result,
+    slugify,
     get_user_cover_filename,
     get_user_photo_filename,
     generate_password,
@@ -249,6 +250,10 @@ class Group(BaseModel, BaseGroupModel):
     all_objects = DefaultModelBaseManager()
 
     def create(self, user=None, m2m_fields=None):
+
+        if not self.slug:
+            self.slug = slugify(self.name)
+
         result = super().create(user=user, m2m_fields=m2m_fields)
         if result.is_error:
             return result
@@ -256,6 +261,13 @@ class Group(BaseModel, BaseGroupModel):
         return Result.success(_("Group has been created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
+
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+            if update_fields is not None:
+                update_fields.append("slug")
+
         result = super().update(
             user=user,
             update_fields=update_fields,
