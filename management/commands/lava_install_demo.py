@@ -100,7 +100,8 @@ class Command(BaseCommand):
         if not os.path.exists(download_path):
             os.makedirs(download_path)
 
-        groups = Group.objects.all()
+        all_groups = Group.objects.all()
+        groups = [*all_groups]
         user_avatar = "https://i.pravatar.cc/150"
 
         groups_indexes = {}
@@ -123,6 +124,10 @@ class Command(BaseCommand):
 
             username = f"{username_suffix}_{i + 1}"
             user_group = random.choice(groups)
+            groups.remove(user_group)
+            if not groups:
+                groups = [*all_groups]
+
             groups_indexes[user_group.id] = groups_indexes.get(user_group.id, 0) + 1
             if username_suffix == "user":
                 user_index = groups_indexes[user_group.id]
