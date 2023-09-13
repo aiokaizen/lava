@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 
 from lava.models import User, Group, NotificationGroup
+from lava import settings as lava_settings
 
 
 class Command(BaseCommand):
@@ -42,9 +43,21 @@ class Command(BaseCommand):
         for model in apps.get_models():
             opts = model._meta
             content_type = ContentType.objects.get_for_model(model)
+
+            model_full_name = f"{content_type.app_label}.{model.__name__.lower()}"
+            if model_full_name in lava_settings.LOCKED_PERMISSIONS["models"]:
+                print("skipping model permissions for:", model_full_name)
+                continue
+
             if hasattr(model, "_create_default_permissions"):
                 default_permissions = model._create_default_permissions()
                 for code_name, verbose_name in default_permissions:
+
+                    permission_name = f"{content_type.app_label}.{code_name}"
+                    if permission_name in lava_settings.LOCKED_PERMISSIONS["permissions"]:
+                        print("Skipping permission:", permission_name)
+                        continue
+
                     Permission.objects.get_or_create(
                         codename=code_name,
                         content_type=content_type,
@@ -57,6 +70,12 @@ class Command(BaseCommand):
                 for perm in opts.default_permissions:
                     codename = f"{perm}_{opts.model_name}"
                     name = f"Can {perm} {opts.verbose_name}"
+
+                    permission_name = f"{content_type.app_label}.{codename}"
+                    if permission_name in lava_settings.LOCKED_PERMISSIONS["permissions"]:
+                        print("Skipping permission:", permission_name)
+                        continue
+
                     Permission.objects.get_or_create(
                         codename=codename,
                         content_type=content_type,
@@ -67,6 +86,12 @@ class Command(BaseCommand):
             for perm in opts.permissions:
                 codename = perm[0]
                 name = perm[1]
+
+                permission_name = f"{content_type.app_label}.{codename}"
+                if permission_name in lava_settings.LOCKED_PERMISSIONS["permissions"]:
+                    print("Skipping permission:", permission_name)
+                    continue
+
                 Permission.objects.get_or_create(
                     codename=codename,
                     content_type=content_type,
@@ -75,7 +100,7 @@ class Command(BaseCommand):
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(
-            name="ADMINS", is_system=True
+            name="ADMINS", defaults={"is_system": True}
         )
         # Group.objects.get_or_create(
         #     name="STANDARD", is_system=True

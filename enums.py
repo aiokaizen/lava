@@ -8,6 +8,8 @@ class DeletePolicy(enum.Enum):
 
 class PermissionActionName(enum.Enum):
     List = "list"
+    ListAll = "list_all"
+    Choices = "choices"
     Add = "add"
     View = "view"
     Change = "change"

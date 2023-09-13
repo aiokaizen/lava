@@ -36,6 +36,21 @@ def get_user_permissions_fields():
         permissions_fields.append("user_permissions")
     return tuple(permissions_fields)
 
+def get_group_general_fields():
+    general_fields = [
+        # 'id',
+        'name',
+        # 'parent',
+        'slug',
+        'description',
+        'image',
+        'notification_id',
+        'is_system',
+    ]
+    if not lava_settings.HIDE_PERMISSIONS_FIELDS_FROM_ADMIN:
+        general_fields.append("permissions")
+    return tuple(general_fields)
+
 
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
@@ -346,7 +361,35 @@ class BaseModelAdmin(admin.ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(auth_admin.GroupAdmin):
-    pass
+
+    fieldsets = (
+        (
+            "General Infos",
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": get_group_general_fields()
+            }
+        ),
+        (
+            "Important dates",
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "last_updated_at",
+                    "deleted_at"
+                ),
+            }
+        )
+    )
+    readonly_fields = [
+        "created_at",
+        "created_by",
+        "last_updated_at",
+        "deleted_at"
+    ]
+
 
 
 @admin.register(NotificationGroup)
@@ -394,7 +437,6 @@ class BackupAdmin(BaseModelAdmin):
     )
 
 
-
 @admin.register(Notification)
 class NotificationAdmin(BaseModelAdmin):
     m2m_field_names = ['target_users', 'target_groups']
@@ -439,7 +481,6 @@ class ConversationAdmin(BaseModelAdmin):
             },
         ),
     )
-
 
 
 @admin.register(ChatMessage)

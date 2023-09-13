@@ -27,6 +27,7 @@ class BaseModelViewSet(ModelViewSet):
 
     serializer_class = None
     list_serializer_class = None
+    choices_serializer_class = None
     retrieve_serializer_class = None
     create_serializer_class = None
     update_serializer_class = None
@@ -57,6 +58,8 @@ class BaseModelViewSet(ModelViewSet):
         self.serializer_class = self.list_serializer_class or self.serializer_class
         if self.action == "retrieve" and self.retrieve_serializer_class:
             self.serializer_class = self.retrieve_serializer_class
+        if self.action == "choices" and self.choices_serializer_class:
+            self.serializer_class = self.choices_serializer_class
         elif self.action == "create" and self.create_serializer_class:
             self.serializer_class = self.create_serializer_class
         elif (
@@ -120,6 +123,10 @@ class BaseModelViewSet(ModelViewSet):
             permission_classes.extend(
                 [get_model_permission_class(ActiveModel, PermissionActionName.List)]
             )
+        elif self.action == "choices":
+            permission_classes.extend(
+                [get_model_permission_class(ActiveModel, PermissionActionName.Choices)]
+            )
         elif self.action in ["view_trash", "view_trash_item"]:
             permission_classes.extend(
                 [
@@ -167,6 +174,25 @@ class BaseModelViewSet(ModelViewSet):
                 "results": serializer.data,
             })
         return super().list(request, *args, **kwargs)
+
+    @action(detail=False, methods=["GET"])
+    def choices(self, request, *args, **kwargs):
+        if "choices" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        self.user = request.user
+
+        qset = self.get_queryset()
+        serializer = self.get_serializer(qset, many=True)
+        return Response({
+            "count": len(serializer.data),
+            "next": None,
+            "previous": None,
+            "results": serializer.data,
+        })
 
     def retrieve(self, request, *args, **kwargs):
         if "retrieve" in self.denied_actions:

@@ -188,6 +188,23 @@ HIDE_PERMISSIONS_FIELDS_FROM_ADMIN = getattr(
     settings, "HIDE_PERMISSIONS_FIELDS_FROM_ADMIN", False
 )
 
+LOCKED_PERMISSIONS = getattr(settings, "LOCKED_PERMISSIONS", {
+    "models": [
+        # "app_name.model_name"
+
+        # e.g.
+        # "lava.user",
+        # "lava.notificationgroup"
+    ],
+    "permissions": [
+        # "app_name.permission_codename"
+
+        # e.g.
+        # "lava.add_user",
+        # "lava.soft_delete_user",
+    ],
+})
+
 
 # Chat models settings
 TIMEUNIT_CHOICES = ["days", "hours", "minutes"]

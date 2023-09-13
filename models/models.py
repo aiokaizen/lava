@@ -252,12 +252,12 @@ class Group(BaseModel, BaseGroupModel):
     objects = GroupManager()
     all_objects = DefaultModelBaseManager()
 
-    def create(self, user=None, m2m_fields=None):
+    def create(self, user=None, m2m_fields=None, *args, **kwargs):
 
         if not self.slug:
             self.slug = slugify(self.name)
 
-        result = super().create(user=user, m2m_fields=m2m_fields)
+        result = super().create(user=user, m2m_fields=m2m_fields, *args, **kwargs)
         if result.is_error:
             return result
 
@@ -1009,6 +1009,7 @@ class Notification(BaseModelMixin, models.Model):
 
 
 class Backup(BaseModel):
+
     class Meta(BaseModel.Meta):
         verbose_name = _("Backup")
         verbose_name_plural = _("Backups")
