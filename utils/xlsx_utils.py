@@ -186,7 +186,7 @@ def export_xlsx(
     start_file_header_col = 2
 
     start_row_index = start_file_header_row + 3
-    start_col_index = start_file_header_col
+    start_col_index = 1
 
     row_titles = data.row_titles
     data_rows_count = len(row_titles) if row_titles else 0
