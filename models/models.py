@@ -737,15 +737,18 @@ class User(BaseModel, AbstractUser):
 
         return Result(True, _("The user has been restored successfully."))
 
+    def get_notification_groups(self):
+        return NotificationGroup.objects.filter(user=self)
+
     def get_notifications(self):
         notifications = Notification.objects.filter(
-            Q(target_users=self.id) | Q(target_groups__in=self.groups.all())
+            Q(target_users=self.id) | Q(target_groups__in=self.get_notification_groups())
         )
         return notifications
 
     def get_unread_notifications(self):
         notifications = Notification.objects.filter(
-            Q(target_users=self.id) | Q(target_groups__in=self.groups.all())
+            Q(target_users=self.id) | Q(target_groups__in=self.get_notification_groups())
         ).exclude(seen_by__contains=self.id)
         return notifications
 

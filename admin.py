@@ -44,7 +44,6 @@ def get_group_general_fields():
         'slug',
         'description',
         'image',
-        'notification_id',
         'is_system',
     ]
     if not lava_settings.HIDE_PERMISSIONS_FIELDS_FROM_ADMIN:
@@ -192,7 +191,6 @@ class UserAdmin(auth_admin.UserAdmin):
 
     def get_queryset(self, request):
         return User.filter(user=request.user, kwargs=request.GET)
-
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -391,10 +389,42 @@ class GroupAdmin(auth_admin.GroupAdmin):
     ]
 
 
-
 @admin.register(NotificationGroup)
 class NotificationGroupAdmin(BaseModelAdmin):
-    pass
+    fieldsets = (
+        (
+            "General Infos",
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": [
+                    # 'id',
+                    'name',
+                    'slug',
+                    'notification_id',
+                    'description',
+                    'image',
+                ]
+            }
+        ),
+        (
+            "Important dates",
+            {
+                "classes": ("collapse", "expanded"),
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "last_updated_at",
+                    "deleted_at"
+                ),
+            }
+        )
+    )
+    readonly_fields = [
+        "created_at",
+        "created_by",
+        "last_updated_at",
+        "deleted_at"
+    ]
 
 
 @admin.register(LogEntry)
