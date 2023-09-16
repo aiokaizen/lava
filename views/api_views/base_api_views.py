@@ -96,60 +96,53 @@ class BaseModelViewSet(ModelViewSet):
         return serializer_class or self.serializer_class
 
     def get_permissions(self):
+        # Reset self.permission_classes to avoid permission denied error
+        # on pages with valid perms.
+        self.permission_classes = [permissions.IsAuthenticated]
+
         permission_classes = self.permission_classes or []
+
         ActiveModel = self.queryset.model
 
         if self.action == "create":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.Add)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Add)
             )
         elif self.action in ["update", "partial_update"]:
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.Change)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Change)
             )
         elif self.action == "destroy":
-            permission_classes.extend(
-                [
-                    get_model_permission_class(
-                        ActiveModel, PermissionActionName.SoftDelete
-                    )
-                ]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.SoftDelete)
             )
         elif self.action == "retrieve":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.View)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.View)
             )
         elif self.action == "list":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.List)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.List)
             )
         elif self.action == "choices":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.Choices)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Choices)
             )
         elif self.action in ["view_trash", "view_trash_item"]:
-            permission_classes.extend(
-                [
-                    get_model_permission_class(
-                        ActiveModel, PermissionActionName.ViewTrash
-                    )
-                ]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.ViewTrash)
             )
         elif self.action == "hard_delete":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.Delete)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Delete)
             )
         elif self.action == "restore":
-            permission_classes.extend(
-                [get_model_permission_class(ActiveModel, PermissionActionName.Restore)]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Restore)
             )
         elif self.action == "duplicate":
-            permission_classes.extend(
-                [
-                    get_model_permission_class(
-                        ActiveModel, PermissionActionName.Duplicate
-                    )
-                ]
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.Duplicate)
             )
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]
@@ -167,12 +160,14 @@ class BaseModelViewSet(ModelViewSet):
         if request.GET.get("page_size", None) == "all":
             qset = self.get_queryset()
             serializer = self.get_serializer(qset, many=True)
-            return Response({
-                "count": len(serializer.data),
-                "next": None,
-                "previous": None,
-                "results": serializer.data,
-            })
+            return Response(
+                {
+                    "count": len(serializer.data),
+                    "next": None,
+                    "previous": None,
+                    "results": serializer.data,
+                }
+            )
         return super().list(request, *args, **kwargs)
 
     @action(detail=False, methods=["GET"])
@@ -187,12 +182,14 @@ class BaseModelViewSet(ModelViewSet):
 
         qset = self.get_queryset()
         serializer = self.get_serializer(qset, many=True)
-        return Response({
-            "count": len(serializer.data),
-            "next": None,
-            "previous": None,
-            "results": serializer.data,
-        })
+        return Response(
+            {
+                "count": len(serializer.data),
+                "next": None,
+                "previous": None,
+                "results": serializer.data,
+            }
+        )
 
     def retrieve(self, request, *args, **kwargs):
         if "retrieve" in self.denied_actions:
