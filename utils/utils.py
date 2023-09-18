@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.http.request import QueryDict
 from django.utils.text import slugify as base_slugify
 from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
@@ -34,6 +35,15 @@ from lava import settings as lava_settings
 def slugify(value, separator="_", allow_unicode=False):
     result = base_slugify(value, allow_unicode).replace("-", separator)
     return result
+
+
+def build_query_dict(data):
+    if type(data) is not dict:
+        return None
+
+    return QueryDict("&".join(
+        [f"{key}={value}" for key, value in data.items()]
+    ))
 
 
 def remove_html_tags(html_string):
