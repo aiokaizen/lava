@@ -232,3 +232,30 @@ class ChoicesSerializer(serializers.Serializer):
                     *self.choices
                 ]
         return validated_data
+
+
+def build_choices_serializer_class(model):
+
+    class ChoicesSerializer(serializers.ModelSerializer):
+
+        label = serializers.SerializerMethodField(label="Label")
+
+        class Meta:
+            model = None
+            fields = [
+                "id", "label"
+            ]
+
+        def __init__(self, instance=None, data=empty, user=None, **kwargs):
+            # We keep the user because it is sent from the get_serializer() method
+            # of the BaseModelViewSet class.
+            self.Meta.model = model
+            super().__init__(instance, data, **kwargs)
+
+        def get_label(self, instance):
+            if hasattr(instance, "get_choices_display"):
+                return instance.get_choices_display()
+
+            return str(instance)
+
+    return ChoicesSerializer

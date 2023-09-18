@@ -15,6 +15,7 @@ from lava.enums import PermissionActionName
 from lava.messages import ACTION_NOT_ALLOWED
 from lava.pagination import LavaPageNumberPagination
 from lava.serializers.serializers import BulkActionSerializer, ResultSerializer
+from lava.serializers import build_choices_serializer_class
 from lava.services.permissions import get_model_permission_class
 from lava.services.class_permissions import ActionNotAllowed
 from lava.utils import Result
@@ -58,8 +59,11 @@ class BaseModelViewSet(ModelViewSet):
         self.serializer_class = self.list_serializer_class or self.serializer_class
         if self.action == "retrieve" and self.retrieve_serializer_class:
             self.serializer_class = self.retrieve_serializer_class
-        if self.action == "choices" and self.choices_serializer_class:
-            self.serializer_class = self.choices_serializer_class
+        if self.action == "choices":
+            self.serializer_class = (
+                self.choices_serializer_class
+                or build_choices_serializer_class(model=self.queryset.model)
+            )
         elif self.action == "create" and self.create_serializer_class:
             self.serializer_class = self.create_serializer_class
         elif (

@@ -7,6 +7,8 @@ import requests
 import logging
 from datetime import datetime
 
+from requests.exceptions import ConnectionError
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.core.files import File
@@ -116,15 +118,18 @@ class Command(BaseCommand):
 
             # Download avatar
             filename = None
-            if not skip_avatars:
-                response = requests.get(user_avatar)
-                if response.status_code == 200:
-                    content_type = response.headers['content-type']
-                    ext = mimetypes.guess_extension(content_type)
-                    now_str = datetime.now().strftime("%H%M%S%f")
-                    filename = os.path.join(download_path, f"{now_str}{ext}")
-                    with open(filename, 'wb') as fp:
-                        fp.write(response.content)
+            try:
+                if not skip_avatars:
+                    response = requests.get(user_avatar)
+                    if response.status_code == 200:
+                        content_type = response.headers['content-type']
+                        ext = mimetypes.guess_extension(content_type)
+                        now_str = datetime.now().strftime("%H%M%S%f")
+                        filename = os.path.join(download_path, f"{now_str}{ext}")
+                        with open(filename, 'wb') as fp:
+                            fp.write(response.content)
+            except ConnectionError:
+                logging.error("Connection ERROR: Could not retrieve user avatar.")
 
             username = f"{username_suffix}_{i + 1}"
             user_group = random.choice(groups)

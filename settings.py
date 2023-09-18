@@ -98,7 +98,7 @@ RESULT_TYPE_CHOICES = (
     ("error", _("Error")),
 )
 
-ACTIVATE_PAYEMENTS = getattr(settings, "ACTIVATE_PAYEMENTS", False)
+ACTIVATE_PAYEMENTS = getattr(settings, "ACTIVATE_PAYEMENTS", True)
 
 BACKUP_TYPE_CHOICES = (
     ("full_backup", _("Full backup")),

@@ -16,12 +16,12 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import (
     AbstractUser,
     Permission as BasePermissionModel,
-    Group as BaseGroupModel
+    Group as BaseGroupModel,
 )
 from django.contrib.admin.models import (
     LogEntry as BaseLogEntryModel,
     ADDITION,
-    DELETION
+    DELETION,
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _, gettext
@@ -245,15 +245,12 @@ class Group(BaseModel, BaseGroupModel):
     notification_id = models.CharField(
         _("Notification group id"), max_length=256, blank=True
     )
-    is_system = models.BooleanField(
-        _("Is system group"), default=False
-    )
+    is_system = models.BooleanField(_("Is system group"), default=False)
 
     objects = GroupManager()
     all_objects = DefaultModelBaseManager()
 
     def create(self, user=None, m2m_fields=None, *args, **kwargs):
-
         if not self.slug:
             self.slug = slugify(self.name)
 
@@ -264,7 +261,6 @@ class Group(BaseModel, BaseGroupModel):
         return Result.success(_("Group has been created successfully."), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
-
         if not self.slug:
             self.slug = slugify(self.name)
 
@@ -358,7 +354,7 @@ class User(BaseModel, AbstractUser):
         blank=True,
         help_text=_("Specific permissions for this user."),
         related_name="users",
-        related_query_name="user"
+        related_query_name="user",
     )
 
     groups = models.ManyToManyField(
@@ -742,13 +738,15 @@ class User(BaseModel, AbstractUser):
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
-            Q(target_users=self.id) | Q(target_groups__in=self.get_notification_groups())
+            Q(target_users=self.id)
+            | Q(target_groups__in=self.get_notification_groups())
         )
         return notifications
 
     def get_unread_notifications(self):
         notifications = Notification.objects.filter(
-            Q(target_users=self.id) | Q(target_groups__in=self.get_notification_groups())
+            Q(target_users=self.id)
+            | Q(target_groups__in=self.get_notification_groups())
         ).exclude(seen_by__contains=self.id)
         return notifications
 
@@ -1012,7 +1010,6 @@ class Notification(BaseModelMixin, models.Model):
 
 
 class Backup(BaseModel):
-
     class Meta(BaseModel.Meta):
         verbose_name = _("Backup")
         verbose_name_plural = _("Backups")
@@ -1181,7 +1178,8 @@ class Backup(BaseModel):
                         "A %(type)s that was started on %(start_time)s has failed.\nError: %(e)s"
                         % {
                             "type": self.get_type_display(),
-                            "start_time": self.created_at.strftime("%c"), "e": e
+                            "start_time": self.created_at.strftime("%c"),
+                            "e": e,
                         }
                     ),
                 )
