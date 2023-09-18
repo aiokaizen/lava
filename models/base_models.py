@@ -317,8 +317,8 @@ class BaseModelMixin:
         verbose_name_plural = verbose_name_plural or f"{verbose_name}s"
         return (
             (f'list_{sc_class_name}', _("Can list %s" % (verbose_name_plural, ))),
-            (f'list_all_{sc_class_name}', _("Can list %s" % (verbose_name_plural, ))),
-            (f'choices_{sc_class_name}', _("Can list %s" % (verbose_name_plural, ))),
+            (f'list_all_{sc_class_name}', _("Can list all %s" % (verbose_name_plural, ))),
+            (f'choices_{sc_class_name}', _("Can list choices %s" % (verbose_name_plural, ))),
             (f'add_{sc_class_name}', _("Can add %s" % (verbose_name, ))),
             (f'view_{sc_class_name}', _("Can view %s" % (verbose_name, ))),
             (f'change_{sc_class_name}', _("Can update %s" % (verbose_name, ))),
