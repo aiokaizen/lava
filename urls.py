@@ -59,6 +59,8 @@ if activate_api_urls:
     api_router.register(r'api/banks', views.BankAPIViewSet)
     api_router.register(r'api/bank_accounts', views.BankAccountAPIViewSet)
 
+    api_router.register(r'banks', views.BankAPIViewSet, basename='banks')
+    api_router.register(r'bank_accounts', views.BankAccountAPIViewSet, basename='bankaccount')
 
     api_urlpatterns = [
         # Swagger Documentation URLs
