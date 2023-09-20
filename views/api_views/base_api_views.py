@@ -33,6 +33,7 @@ class BaseModelViewSet(ModelViewSet):
     create_serializer_class = None
     update_serializer_class = None
     delete_serializer_class = None
+    view_excerpt_serializer_class = None
     page_size = None
 
     denied_actions = []
@@ -59,6 +60,8 @@ class BaseModelViewSet(ModelViewSet):
         self.serializer_class = self.list_serializer_class or self.serializer_class
         if self.action == "retrieve" and self.retrieve_serializer_class:
             self.serializer_class = self.retrieve_serializer_class
+        if self.action == "view_excerpt" and self.view_excerpt_serializer_class:
+            self.serializer_class = self.view_excerpt_serializer_class
         if self.action == "choices":
             self.serializer_class = (
                 self.choices_serializer_class
@@ -102,8 +105,6 @@ class BaseModelViewSet(ModelViewSet):
     def get_permissions(self):
         # Reset self.permission_classes to avoid permission denied error
         # on pages with valid perms.
-        self.permission_classes = [permissions.IsAuthenticated]
-
         permission_classes = self.permission_classes or []
 
         ActiveModel = self.queryset.model
@@ -123,6 +124,10 @@ class BaseModelViewSet(ModelViewSet):
         elif self.action == "retrieve":
             permission_classes.append(
                 get_model_permission_class(ActiveModel, PermissionActionName.View)
+            )
+        elif self.action == "view_excerpt":
+            permission_classes.append(
+                get_model_permission_class(ActiveModel, PermissionActionName.ViewExcerpt)
             )
         elif self.action == "list":
             permission_classes.append(
@@ -151,7 +156,12 @@ class BaseModelViewSet(ModelViewSet):
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]
 
-        return [permission() for permission in permission_classes]
+        user_permissions =  [permission() for permission in permission_classes]
+
+        self.permission_classes = [permissions.IsAuthenticated]
+
+        return user_permissions
+
 
     def list(self, request, *args, **kwargs):
         if "list" in self.denied_actions:
@@ -197,6 +207,16 @@ class BaseModelViewSet(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         if "retrieve" in self.denied_actions:
+            return Response(
+                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+            )
+
+        self.user = request.user
+        return super().retrieve(request, *args, **kwargs)
+
+    def view_excerpt(self, request, *args, **kwargs):
+        if "view_excerpt" in self.denied_actions:
             return Response(
                 Result(False, ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,

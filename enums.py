@@ -12,6 +12,7 @@ class PermissionActionName(enum.Enum):
     Choices = "choices"
     Add = "add"
     View = "view"
+    ViewExcerpt = "view_excerpt"
     Change = "change"
     Duplicate = "duplicate"
     SoftDelete = "soft_delete"

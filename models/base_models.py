@@ -289,6 +289,13 @@ class BaseModelMixin:
         }))
 
     @classmethod
+    def get_object_or_none(cls, **kwargs):
+        try:
+            return cls.objects.get(**kwargs)
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
     def get_or_create(cls, current_user=None, defaults=None, create_params=None, **kwargs):
         try:
             return cls.objects.get(**kwargs), False
@@ -321,10 +328,11 @@ class BaseModelMixin:
             (f'choices_{sc_class_name}', _("Can list choices %s" % (verbose_name_plural, ))),
             (f'add_{sc_class_name}', _("Can add %s" % (verbose_name, ))),
             (f'view_{sc_class_name}', _("Can view %s" % (verbose_name, ))),
+            (f'view_excerpt_{sc_class_name}', _("Can view excerpt %s" % (verbose_name_plural, ))),
             (f'change_{sc_class_name}', _("Can update %s" % (verbose_name, ))),
             (f'duplicate_{sc_class_name}', _("Can duplicate %s" % (verbose_name, ))),
-            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name_plural, ))),
-            (f'view_trash_{sc_class_name}', _("Can view deleted %s" % (verbose_name, ))),
+            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name, ))),
+            (f'view_trash_{sc_class_name}', _("Can view deleted %s" % (verbose_name_plural, ))),
             (f'restore_{sc_class_name}', _("Can restore %s" % (verbose_name, ))),
             (f'delete_{sc_class_name}', _("Can delete %s" % (verbose_name, ))),
             (f'import_{sc_class_name}', _("Can import %s list" % (verbose_name_plural, ))),
