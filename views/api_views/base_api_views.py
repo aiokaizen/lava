@@ -38,6 +38,12 @@ class BaseModelViewSet(ModelViewSet):
 
     denied_actions = []
 
+    def __init__(self, *args, **kwargs):
+
+        self.permission_classes = [permissions.IsAuthenticated]
+
+        return super().__init__(*args, **kwargs)
+
     @property
     def paginator(self):
         if self.page_size:
@@ -156,11 +162,7 @@ class BaseModelViewSet(ModelViewSet):
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]
 
-        user_permissions =  [permission() for permission in permission_classes]
-
-        self.permission_classes = [permissions.IsAuthenticated]
-
-        return user_permissions
+        return  [permission() for permission in permission_classes]
 
 
     def list(self, request, *args, **kwargs):
