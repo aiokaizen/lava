@@ -9,6 +9,7 @@ from lava.settings import HOST
 async def send_message_to_clients(message, alias='default', target_users=None, target_groups=None):
     """ Send a message to a specific WebSocket clients. """
     channel_layer = get_channel_layer()
+
     if target_groups:
         group_name_prefix = 'user_group_'
         for group in target_groups:
@@ -18,6 +19,7 @@ async def send_message_to_clients(message, alias='default', target_users=None, t
                 )
             except Exception:
                 pass
+
     if target_users:
         group_name_prefix = 'user_'
         for user in target_users:

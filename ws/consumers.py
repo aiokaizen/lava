@@ -56,7 +56,7 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
 
-        for notification_id in user_notification_group_names:
+        for notification_id in self.user_notification_group_names:
             await self.channel_layer.group_discard(notification_id, self.channel_name)
 
 

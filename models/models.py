@@ -1172,7 +1172,6 @@ class Backup(BaseModel):
                     )
                 ]
                 m2m_fields = [
-                    ("target_users", [user]),
                     ("target_groups", target_groups),
                 ]
                 notif.create(m2m_fields=m2m_fields)
