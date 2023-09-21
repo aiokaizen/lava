@@ -29,7 +29,7 @@ async def send_message_to_clients(message, alias='default', target_users=None, t
                 pass
 
 
-def send_ws_notification(instance):
+def send_ws_notification(instance, target_groups, target_users):
     """
     Send a notification via WebSocket to the target users and groups
     """
@@ -58,8 +58,8 @@ def send_ws_notification(instance):
                 }
             },
             alias='notification',
-            target_users=list(instance.target_users.all()),
-            target_groups=list(instance.target_groups.all()),
+            target_users=target_users,
+            target_groups=target_groups,
         )
     )
     loop.close()

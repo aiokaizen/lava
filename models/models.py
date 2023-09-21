@@ -926,8 +926,15 @@ class Notification(BaseModelMixin, models.Model):
         if not result.is_success:
             return result
 
+        target_groups = list(NotificationGroup.objects.filter(notifications=self))
+        target_users = list(self.target_users.all())
+
         if send_notification:
-            send_ws_notification(self)
+            send_ws_notification(
+                self,
+                target_groups=target_groups,
+                target_users=target_users
+            )
             self.send_firebase_notification()
 
         return Result(

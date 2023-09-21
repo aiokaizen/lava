@@ -7,7 +7,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 from lava.models.chat_models import ChatMessage, Conversation
-from lava.models.models import Notification
+from lava.models.models import Notification, Group, NotificationGroup
 from lava.utils import Result
 from channels.layers import get_channel_layer
 
@@ -25,11 +25,24 @@ class BaseConsumer(AsyncWebsocketConsumer):
             if key.decode() == 'host':
                 self.base_url = f"{media_protocol}://{value.decode()}"
 
+        user_groups = await database_sync_to_async(list)(
+            NotificationGroup.objects.filter(user=self.user)
+        )
+
         self.user_group_name = f'user_{self.user.id}'
         await self.channel_layer.group_add(
             self.user_group_name,
             self.channel_name
         )
+
+        setattr(self, f"user_notification_group_names", [
+            f"user_group_{group.id}" for group in user_groups
+        ])
+        for user_group in user_groups:
+            await self.channel_layer.group_add(
+                f"user_group_{user_group.id}",
+                self.channel_name
+            )
 
     async def connect(self):
         await self.prepare_connection()
@@ -42,6 +55,9 @@ class BaseConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_discard(group_name, self.channel_name)
 
         await self.channel_layer.group_discard(self.user_group_name, self.channel_name)
+
+        for notification_id in user_notification_group_names:
+            await self.channel_layer.group_discard(notification_id, self.channel_name)
 
 
 class ChatConsumer(BaseConsumer):
