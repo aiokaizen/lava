@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 
+from lava.views.api_views.base_api_views import ReadOnlyBaseModelViewSet
 from lava.messages import HTTP_403_MESSAGE
-from lava.models import Notification, Preferences, User
+from lava.models import Notification, Preferences, User, NotificationGroup, Group
 from lava.serializers import (
     PermissionSerializer,
     UserSerializer,
@@ -15,6 +16,7 @@ from lava.serializers import (
     PreferencesSerializer,
 )
 from lava.serializers.serializers import ListIDsSerializer
+from lava.serializers.group_serializers import GroupListSerializer
 from lava.utils import Result
 from lava.services.permissions import get_model_permission_class
 
@@ -95,6 +97,14 @@ class PreferencesViewSet(mixins.ListModelMixin, GenericViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class NotificationGroupViewSet(ReadOnlyBaseModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = GroupListSerializer
+    permissions_model = Group
+    queryset = NotificationGroup.objects.all()
 
 
 class NotificationViewSet(ReadOnlyModelViewSet):

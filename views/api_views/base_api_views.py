@@ -25,6 +25,7 @@ from lava.pagination import get_pagination_class
 class BaseModelViewSet(ModelViewSet):
     pagination_class = LavaPageNumberPagination
     permission_classes = [permissions.IsAuthenticated]
+    permissions_model = None
 
     serializer_class = None
     list_serializer_class = None
@@ -113,7 +114,7 @@ class BaseModelViewSet(ModelViewSet):
         # on pages with valid perms.
         permission_classes = self.permission_classes or []
 
-        ActiveModel = self.queryset.model
+        ActiveModel = self.permissions_model or self.queryset.model
 
         if self.action == "create":
             permission_classes.append(
@@ -427,9 +428,10 @@ class BaseModelViewSet(ModelViewSet):
 
 
 class ReadOnlyBaseModelViewSet(BaseModelViewSet):
+
     def get_permissions(self):
         permission_classes = [ActionNotAllowed]
-        ActiveModel = self.queryset.model
+        ActiveModel = self.permissions_model or self.queryset.model
 
         if self.action == "retrieve":
             permission_classes = [
@@ -438,6 +440,10 @@ class ReadOnlyBaseModelViewSet(BaseModelViewSet):
         elif self.action == "list":
             permission_classes = [
                 get_model_permission_class(ActiveModel, PermissionActionName.List)
+            ]
+        elif self.action == "choices":
+            permission_classes = [
+                get_model_permission_class(ActiveModel, PermissionActionName.Choices)
             ]
 
         return [permission() for permission in permission_classes]

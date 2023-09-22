@@ -48,6 +48,7 @@ base_urlpatterns = [
 
 if activate_api_urls:
     api_router.register(r"api/notifications", views.NotificationViewSet)
+    api_router.register(r"api/notifications_groups", views.NotificationGroupViewSet)
     api_router.register(r"api/preferences", views.PreferencesViewSet)
     api_router.register(r"api/groups", views.GroupAPIViewSet)
     api_router.register(r"api/users", views.UserAPIViewSet)
