@@ -433,8 +433,6 @@ class User(BaseModel, AbstractUser):
         cover=None,
         groups=None,
         password=None,
-        extra_attributes=None,
-        create_associated_objects=True,
         force_is_active=False,
         generate_tmp_password=False,
         link_payments_app=True,
@@ -491,19 +489,6 @@ class User(BaseModel, AbstractUser):
             # elif res.error_code == UNIMPLEMENTED:
             #     self.delete(soft_delete=False)
             #     raise Exception(res.to_dict())
-
-        if groups and len(groups) == 1 and create_associated_objects:
-            try:
-                result = self.create_associated_objects(extra_attributes)
-                if not result.success:
-                    self.delete(soft_delete=False)
-                    return result
-            except Exception as e:
-                self.delete(soft_delete=False)
-                logging.error(e)
-                return Result(
-                    success=False, message=UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN
-                )
 
         if user:
             self.log_action(user, ADDITION)
@@ -585,53 +570,14 @@ class User(BaseModel, AbstractUser):
                 ),
             )
 
-    def create_associated_objects(self, associated_object_attributes=None):
-        model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
-        groups = self.groups.all()
-        associated_object_attributes = associated_object_attributes or {}
-        if groups.count() != 1:
-            return Result(
-                success=False,
-                message=_(
-                    "This functionality is not valid for a user with many or no groups."
-                ),
-                tag="warning",
-                error_code=UNIMPLEMENTED,
-            )
-        group = groups.first()
-        if group.name in model_mapping.keys():
-            class_name = model_mapping[group.name]
-            klass = apps.get_model(class_name)
-            if "create" in dir(klass):
-                obj = klass(user=self)
-                result = obj.create(**associated_object_attributes)
-                if not result.success:
-                    return result
-            else:
-                obj = klass(user=self, **associated_object_attributes)
-                obj.save()
-        return Result(
-            success=True, message=_("Associated object was created successfully.")
-        )
-
     def update(
         self,
         user=None,
         update_fields=None,
-        extra_attributes=None,
         message="",
         *args,
         **kwargs,
     ):
-        groups = self.groups.all()
-        if extra_attributes and groups.count() == 1:
-            try:
-                result = self.update_associated_objects(extra_attributes)
-                if not result.success:
-                    return result
-            except Exception as e:
-                return Result(success=False, message=str(e))
-
         if update_fields and (
             "first_name" in update_fields or "last_name" in update_fields
         ):
@@ -647,36 +593,6 @@ class User(BaseModel, AbstractUser):
             return result
 
         return Result(success=True, message=_("User has been updated successfully."))
-
-    def update_associated_objects(self, associated_object_attributes=None):
-        model_mapping = lava_settings.GROUPS_ASSOCIATED_MODELS
-        groups = self.groups.all()
-        associated_object_attributes = associated_object_attributes or {}
-        if groups.count() != 1:
-            return Result(
-                success=False,
-                tag="warning",
-                message=_(
-                    "This functionality is not valid for a user with many or no groups."
-                ),
-                error_code=UNIMPLEMENTED,
-            )
-
-        group = groups.first()
-        if group.name in model_mapping.keys():
-            # Get class name (eg: `manager`) from class path (eg: myapp.Manager)
-            class_name = model_mapping[group.name].split(".")[1].lower()
-            obj = getattr(self, class_name, None)
-            if obj is None:
-                return Result(False, _("Invalid group type for this operation."))
-
-            for key, value in associated_object_attributes.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
-            obj.save()
-        return Result(
-            success=True, message=_("Associated object was updated successfully.")
-        )
 
     def delete(self, user=None, soft_delete=True):
         if not self.id:

@@ -65,19 +65,6 @@ ALLOWED_SIGNUP_GROUPS = getattr(
     ),
 )
 
-# This setting is used to map groups to other models.
-# When creating a user in a certain group, an object
-# from the group's mapped model is created and associated to the user.
-GROUPS_ASSOCIATED_MODELS = getattr(
-    settings,
-    "GROUPS_ASSOCIATED_MODELS",
-    {
-        #   "ADMINS": "ecom.models.Admin",
-        #   "CONTENT_MANAGERS": "myapp.ContentManager",
-        #   "CONTENT_CREATERS": "myapp.ContentCreater",
-    },
-)
-
 HOST = getattr(settings, "HOST", "localhost:8000")
 
 EKBLOCKS_COLOR = "#1cab98"

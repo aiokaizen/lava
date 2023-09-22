@@ -265,13 +265,6 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     groups_names = serializers.ListField(label=_("Groups"), required=True)
-    extra_attributes = serializers.JSONField(
-        label=_("Extra attributes"),
-        required=False,
-        help_text=_(
-            "Attributes related to an object that is related to the current user."
-        ),
-    )
 
     class Meta:
         model = User
@@ -294,12 +287,10 @@ class UserSerializer(serializers.ModelSerializer):
             "groups_names",
             "last_login",
             "date_joined",
-            "extra_attributes",
             "password",
         ]
         read_only_fields = ["id", "is_active", "last_login", "date_joined"]
         extra_kwargs = {
-            "extra_attributes": {"write_only": True},
             "password": {"write_only": True},
             "birth_day": {
                 "format": "%m/%d/%Y",
@@ -353,23 +344,21 @@ class UserSerializer(serializers.ModelSerializer):
         cover = validated_data.pop("cover_picture", None)
         groups = validated_data.pop("groups_names", None)
         password = validated_data.pop("password", None)
-        extra_attributes = validated_data.pop("extra_attributes", None)
         instance = User(**validated_data)
         user = getattr(self, 'user', None)
         result = instance.create(
-            user=user, photo=photo, cover=cover, groups=groups, password=password, extra_attributes=extra_attributes
+            user=user, photo=photo, cover=cover, groups=groups, password=password
         )
         if not result.success:
             raise serializers.ValidationError(result.to_dict())
         return instance
 
     def update(self, instance, validated_data):
-        extra_attributes = validated_data.pop("extra_attributes", None)
         update_fields = validated_data.keys()
         for key, value in validated_data.items():
             setattr(instance, key, value)
         result = instance.update(
-            update_fields=update_fields, extra_attributes=extra_attributes
+            update_fields=update_fields
         )
         if not result.success:
             raise serializers.ValidationError(result.as_dict())
