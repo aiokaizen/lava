@@ -6,8 +6,8 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
 from lava import settings as lava_settings
-from lava.models import User, Group
-from lava.serializer_fields import ThumbnailImageField
+from lava.models import User, Group, NotificationGroup
+from lava.serializer_fields import ThumbnailImageField, NotificationGroupsDefault
 from lava.serializers.serializers import PermissionSerializer
 from lava.serializers.base_serializers import (
     BaseModelSerializer, ReadOnlyBaseModelSerializer
@@ -54,6 +54,7 @@ class UserGetSerializer(ReadOnlyBaseModelSerializer):
     permissions = PermissionSerializer(many=True, source="get_all_permissions")
     photo = ThumbnailImageField(alias='avatar')
     cover_picture = ThumbnailImageField(alias='cover')
+    notification_groups = GroupListSerializer(source="get_notification_groups", many=True)
 
     class Meta:
         model = User
@@ -76,6 +77,7 @@ class UserGetSerializer(ReadOnlyBaseModelSerializer):
             "is_staff",
             "is_superuser",
             "groups",
+            "notification_groups",
             "user_permissions",
             "permissions",
             "last_login",
@@ -147,6 +149,10 @@ class UserUpdateSerializer(BaseModelSerializer):
 
     m2m_field_names = ['groups', 'user_permissions']
 
+    notification_groups = serializers.ListField(
+        default=NotificationGroupsDefault()
+    )
+
     class Meta :
         model = User
         fields = [
@@ -166,6 +172,7 @@ class UserUpdateSerializer(BaseModelSerializer):
             "is_active",
             "is_staff",
             "groups",
+            "notification_groups",
             "user_permissions",
         ]
         extra_kwargs = {
@@ -189,6 +196,29 @@ class UserUpdateSerializer(BaseModelSerializer):
                 raise serializers.ValidationError({"email": e.message})
 
         return validated_data
+
+    def validate_notification_groups(self, value):
+        groups = None
+        for id in value:
+            groups = NotificationGroup.objects.filter(id__in=value)
+            groups_count = groups.count()
+            if groups_count != len(value):
+                raise serializers.ValidationError("Notification id is not valid")
+        return groups
+
+    def update(self, instance, validated_data, **kwargs):
+
+        notification_groups = validated_data.pop("notification_groups", None)
+        groups = validated_data.pop("groups", None)
+
+        if notification_groups is not None:
+            if groups is None:
+                groups = []
+            groups = [*groups, *notification_groups]
+
+        validated_data["groups"] = groups
+
+        return super().update(instance, validated_data, **kwargs)
 
     def create(self, validated_data):
         raise serializers.ValidationError(

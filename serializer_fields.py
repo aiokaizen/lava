@@ -21,7 +21,7 @@ def humanize_file_size(file_size):  # File size in bytes
         return f"{(file_size / MEGA):.2f} MB"
     elif file_size < TERA:
         return f"{(file_size / GIGA):.2f} GB"
-    
+
     return f"{file_size / TERA} TB"
 
 
@@ -49,7 +49,7 @@ class ControlledFileField(FileField):
     def __init__(self, max_size=MEGA, **kwargs):
         self.max_size = max_size  # max_size in Mb
         super().__init__(**kwargs)
-    
+
     def run_validation(self, data=empty):
         # Validation
         file = data
@@ -59,3 +59,18 @@ class ControlledFileField(FileField):
                     "max_size": humanize_file_size(self.max_size)
                 }))
         return super().run_validation(data)
+
+
+# Default callabels for serializer fields
+
+class NotificationGroupsDefault:
+    """
+    Returns a list of the user's notification groups.
+    """
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        instance = serializer_field.context.get('instance')
+        if not instance:
+            return []
+        return instance.get_notification_groups_ids()

@@ -586,11 +586,32 @@ class User(BaseModel, AbstractUser):
             )
             update_fields.append("full_name")
 
+        m2m_fields = kwargs.pop("m2m_fields", ())
+        current_notification_groups = self.get_notification_groups()
+
         result = super().update(
             user=user, update_fields=update_fields, message=message, *args, **kwargs
         )
         if result.is_error:
             return result
+
+        for attr, value in m2m_fields:
+            field = getattr(self, attr)
+            if attr == "groups":
+                """
+                Since groups.objects does not include notification groups, so does
+                the m2m relations. there fore, user.groups.clear() and user.groups.set()
+                do not affect notification groups. To solve this problem, we remove all
+                the user's notification groups from the other end manually before assigning
+                them back.
+                """
+                # (ng.users.remove(self) for ng in current_notification_groups)
+                for ng in current_notification_groups:
+                    ng.users.remove(self)
+            if not value:
+                field.clear()
+            else:
+                field.set(value)
 
         return Result(success=True, message=_("User has been updated successfully."))
 
@@ -651,6 +672,9 @@ class User(BaseModel, AbstractUser):
 
     def get_notification_groups(self):
         return NotificationGroup.objects.filter(user=self)
+
+    def get_notification_groups_ids(self):
+        return self.get_notification_groups().values_list('id', flat=True)
 
     def get_notifications(self):
         notifications = Notification.objects.filter(

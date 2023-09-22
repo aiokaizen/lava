@@ -14,6 +14,9 @@ class BaseModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, instance=None, data=empty, user=None, **kwargs):
         self.user = user
+        context = kwargs.pop('context', {})
+        context["instance"] = instance
+        kwargs["context"] = context
         super().__init__(instance, data, **kwargs)
 
     def to_internal_value(self, data):
@@ -22,7 +25,7 @@ class BaseModelSerializer(serializers.ModelSerializer):
             if m2m_field_name in data and data[m2m_field_name] == "null":
                 data.setlist(m2m_field_name, [])
         return super().to_internal_value(data)
-    
+
     def create(self, validated_data, **kwargs):
 
         m2m_field_names = getattr(self, 'm2m_field_names', [])
