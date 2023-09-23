@@ -4,6 +4,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
+from rest_framework.serializers import empty
 
 from lava import settings as lava_settings
 from lava.models import User, Group, NotificationGroup
@@ -198,7 +199,9 @@ class UserUpdateSerializer(BaseModelSerializer):
         return validated_data
 
     def validate_notification_groups(self, value):
-        groups = None
+        if value is None:
+            return None
+
         for id in value:
             groups = NotificationGroup.objects.filter(id__in=value)
             groups_count = groups.count()
@@ -208,15 +211,16 @@ class UserUpdateSerializer(BaseModelSerializer):
 
     def update(self, instance, validated_data, **kwargs):
 
-        notification_groups = validated_data.pop("notification_groups", None)
-        groups = validated_data.pop("groups", None)
+        notification_groups = validated_data.pop("notification_groups", empty)
+        groups = validated_data.pop("groups", empty)
 
-        if notification_groups is not None:
-            if groups is None:
-                groups = []
+        if notification_groups is not empty:
+            if groups is empty:
+                groups = instance.groups.all()
             groups = [*groups, *notification_groups]
 
-        validated_data["groups"] = groups
+        if groups != empty:
+            validated_data["groups"] = groups
 
         return super().update(instance, validated_data, **kwargs)
 

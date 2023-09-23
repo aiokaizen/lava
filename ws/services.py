@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 
 from channels.layers import get_channel_layer
 
@@ -41,11 +42,13 @@ def send_ws_notification(instance, target_groups, target_users):
     photo = ''
     if instance.sender and instance.sender.photo:
         photo = f"{guess_protocol()}://{HOST}{instance.sender.photo.url}"
+
     loop.run_until_complete(
         send_message_to_clients(
             message={
                 "type": "send_notification",
                 "message": {
+                    "timestamp": datetime.now().timestamp().as_integer_ratio()[0],
                     "title": str(instance.title),
                     "sender": {
                         "id": instance.sender.id,
