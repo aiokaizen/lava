@@ -680,6 +680,7 @@ class User(BaseModel, AbstractUser):
         notifications = Notification.objects.filter(
             Q(target_users=self.id)
             | Q(target_groups__in=self.get_notification_groups())
+            | Q(target_groups__in=self.groups.all())
         )
         return notifications
 
@@ -770,6 +771,9 @@ class User(BaseModel, AbstractUser):
         if "is_superuser" in kwargs:
             filter_params &= Q(is_superuser=strtobool(kwargs["is_superuser"]))
 
+        if "groups_in" in kwargs:
+            filter_params &= Q(groups__in=kwargs.get("groups_in").split(","))
+
         return filter_params
 
     @classmethod
@@ -780,7 +784,7 @@ class User(BaseModel, AbstractUser):
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
 
         if user and user not in admin_users:
-            return base_queryset.exclude(pk__in=admin_users)
+            return base_queryset.filter(filter_params).exclude(pk__in=admin_users)
 
         return base_queryset.filter(filter_params)
 
@@ -866,13 +870,14 @@ class Notification(BaseModelMixin, models.Model):
         if not result.is_success:
             return result
 
-        target_groups = list(NotificationGroup.objects.filter(notifications=self))
+        target_notification_groups = list(NotificationGroup.objects.filter(notifications=self))
+        target_groups = list(Group.objects.filter(notifications=self))
         target_users = list(self.target_users.all())
 
         if send_notification:
             send_ws_notification(
                 self,
-                target_groups=target_groups,
+                target_groups=[*target_groups, *target_notification_groups],
                 target_users=target_users
             )
             self.send_firebase_notification()

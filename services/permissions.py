@@ -1,6 +1,7 @@
+import rest_framework.decorators
 from typing import Union
 
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from lava.enums import PermissionActionName
 
@@ -37,6 +38,24 @@ def get_model_permission_class(model, action: Union[PermissionActionName, str]):
             return is_authenticated and has_permission(user, model, action)
 
     return PermissionClass
+
+
+def get_or_permission_class(permission_classes):
+    """
+    The method returns a PermissionClass that returns True if any
+    of the provided permission_classes returns True, otherwise
+    it returns False.
+    """
+
+    class OrPermissionClass(AllowAny):
+
+        def has_permission(self, request, view):
+            return any(
+                permission_class().has_permission(request, view)
+                for permission_class in permission_classes
+            )
+
+    return OrPermissionClass
 
 
 # Notification permissions

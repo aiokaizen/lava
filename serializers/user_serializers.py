@@ -18,9 +18,14 @@ from lava.validators import validate_email
 
 
 class UserExerptSerializer(ReadOnlyBaseModelSerializer):
+
+    label = serializers.CharField(source="full_name", read_only=True)
     class Meta:
         model = User
-        fields = ["id", "photo", "username", "first_name", "last_name"]
+        fields = [
+            "id", "photo", "username", "first_name", "last_name",
+            "label"
+        ]
 
     def save(self, **kwargs):
         raise serializers.ValidationError(

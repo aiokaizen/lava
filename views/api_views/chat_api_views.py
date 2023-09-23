@@ -32,7 +32,9 @@ class ChatAPIViewSet(BaseModelViewSet):
 
     def get_permissions(self):
         if self.action == 'mark_as_read':
-            self.permission_classes = [permissions.AllowAny]
+            self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == "unread_messages":
+            self.permission_classes = [permissions.IsAuthenticated]
         return super().get_permissions()
 
     @action(detail=True, methods=['POST'])
