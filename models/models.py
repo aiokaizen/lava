@@ -322,8 +322,10 @@ class NotificationGroup(Group):
         ) in lava_settings.NOTIFICATION_GROUPS_NAMES.items():
             group, _created = NotificationGroup.objects.get_or_create(
                 notification_id=notification_id,
-                name=group_data.get("name"),
-                description=group_data.get("description", ""),
+                defaults={
+                    "name": group_data.get("name"),
+                    "description": group_data.get("description", ""),
+                }
             )
         return Result.success(
             _("All notification groups have been created successfully.")
