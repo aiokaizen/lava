@@ -442,12 +442,16 @@ class BaseModelMixin:
 
     @classmethod
     def filter(cls, user=None, trash=False, kwargs=None):
+        exclude = (kwargs or {}).get("exclude", False)
+        filter_action = "filter" if not exclude else "exclude"
+
         filter_params = BaseModelMixin.get_filter_params(kwargs)
         ordering = cls.get_ordering_params(kwargs)
         if not trash:
-            queryset = cls.objects.filter(filter_params)
+            queryset = getattr(cls.objects, filter_action)(filter_params)
         else:
-            queryset = cls.trash.filter(filter_params)
+            queryset = getattr(cls.trash, filter_action)(filter_params)
+
         if ordering:
             queryset = queryset.order_by(*ordering)
         return queryset
