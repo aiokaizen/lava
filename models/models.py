@@ -882,6 +882,10 @@ class Notification(BaseModelMixin, models.Model):
                 target_groups=[*target_groups, *target_notification_groups],
                 target_users=target_users
             )
+
+        # Disable FireBase notifications until it's implemented
+        send_firebase_notification = False
+        if send_firebase_notification:
             self.send_firebase_notification()
 
         return Result(
