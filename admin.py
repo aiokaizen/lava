@@ -12,7 +12,7 @@ from lava.forms.main_forms import (
     LavaUserChangeForm, LavaUserCreationForm
 )
 from lava.models import (
-    Notification, Preferences, User, Group, Backup,
+    Notification, Preferences, User, Group, Backup, BackupConfig,
     Conversation, ChatMessage, NotificationGroup, LogEntry,
     Bank
 )
@@ -448,7 +448,7 @@ class BackupAdmin(BaseModelAdmin):
             None,
             {
                 "fields": (
-                        "backup_file",
+                    "backup_file",
                 ),
             },
         ),
@@ -464,6 +464,20 @@ class BackupAdmin(BaseModelAdmin):
                 ),
             },
         )
+    )
+
+
+@admin.register(BackupConfig)
+class BackupConfigAdmin(BaseModelAdmin):
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "automatic_backup_hour_interval",
+                ),
+            },
+        ),
     )
 
 

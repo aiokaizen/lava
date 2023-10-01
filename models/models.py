@@ -4,6 +4,8 @@ import threading
 import itertools
 from datetime import datetime, timedelta
 from time import sleep
+
+import schedule
 import zipfile
 
 from django.apps import apps
@@ -967,6 +969,66 @@ class Notification(BaseModelMixin, models.Model):
         return Notification.objects.all()
 
 
+class BackupConfig(BaseModel):
+
+    class Meta:
+        verbose_name = _("Backup Configuration")
+        verbose_name_plural = _("Backup Configuration")
+
+    automatic_backup_hour_interval = models.PositiveIntegerField(
+        _("Automatic backup interval"), default=(24 * 7),  # Defaults to 7 days.
+        help_text=_("The number of hours between automatic backups.")
+    )
+
+    def __str__(self):
+        return "Automatic Backup Configuration"
+
+    def create(self, user=None, *args, **kwargs):
+        if BackupConfig.objects.exists():
+            # Singlton model
+            return Result.error(_(
+                "A Backup Configuration instance has already been created. "
+                "Try updating it instead."
+            ))
+
+        lava_settings.backup_scheduler = schedule.every(self.automatic_backup_hour_interval).hours.do(
+            Backup.start_automatic_backup
+        )
+
+        return super().create(user=user, *args, **kwargs)
+
+    def update(self, user=None, *args, **kwargs):
+
+        # Cancel old job
+        schedule.cancel_job(lava_settings.backup_scheduler)
+
+        # Run new job
+        lava_settings.backup_scheduler = schedule.every(self.automatic_backup_hour_interval).hours.do(
+            Backup.start_automatic_backup
+        )
+
+        return super().update(user=user, *args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return Result.error(_(
+            "You can not delete a singleton object. Please try to update it instead."
+        ))
+
+    @classmethod
+    def get_backup_config(cls):
+        """
+        Gets the backup config singleton object.
+        This method creates it if it does not exist.
+        """
+        config = BackupConfig.objects.first()
+        if not config:
+            result = BackupConfig().create()
+            if result.is_error:
+                return result
+            return result.instance
+        return config
+
+
 class Backup(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("Backup")
@@ -1027,9 +1089,9 @@ class Backup(BaseModel):
                 tag="warning",
             )
 
-        min_hours = 1
+        min_hours = lava_settings.MIN_HOURS_BETWEEN_BACKUPS
         min_period_between_backups = timedelta(hours=min_hours)
-        daily_limit = 1
+        daily_limit = lava_settings.MAX_BACKUPS_PER_DAY
         now = timezone.now()
 
         all_backups = Backup.get_all_items()
@@ -1046,7 +1108,12 @@ class Backup(BaseModel):
 
         latest_backup_time = latest_backup.created_at
         if now < latest_backup_time + min_period_between_backups:
-            return Result(False, _("You can only create one backup every %d hours." % min_hours))
+            if min_hours > 1:
+                return Result(False, _("You can only create one backup every %d hours." % min_hours))
+            elif min_hours * 60 > 1:
+                return Result(False, _("You can only create one backup every %d minutes." % (min_hours * 60)))
+            else:
+                return Result(False, _("You can only create one backup every %d seconds." % (min_hours * 60 * 60)))
 
         return Result(True)
 
@@ -1055,7 +1122,7 @@ class Backup(BaseModel):
         if not result.success:
             return result
 
-        self.name = f"{self.created_at.strftime('%c')} {self.get_type_display()}"
+        self.name = self.name or f"{self.created_at.strftime('%c')} {self.get_type_display()}"
         result = super().create(user, *args, **kwargs)
         if result.is_error:
             return result
@@ -1169,6 +1236,32 @@ class Backup(BaseModel):
         return Result.error(
             "You can not restore a backup, this functionality is not implemented yet."
         )
+
+    @classmethod
+    def start_automatic_backup(cls):
+        name = f"{self.created_at.strftime('%c')} (Automatic)"
+        backup = Backup(name=name)
+        result = backup.start_backup()
+        if result.is_error:
+            logging.error(result.message)
+            notif = Notification(
+                title=gettext("Automatic backup failed"),
+                content=gettext(
+                    "An automatic %(type)s that was started on %(start_time)s has failed.\nError: %(e)s"
+                    % {
+                        "type": backup.get_type_display(),
+                        "start_time": backup.created_at.strftime("%c"),
+                        "e": e,
+                    }
+                ),
+            )
+            target_groups = [
+                NotificationGroup.objects.get(
+                    notification_id=lava_settings.BACKUP_COMPLETED_NOTIFICATION_ID
+                )
+            ]
+            m2m_fields = [("target_groups", [target_groups])]
+            notif.create(m2m_fields=m2m_fields)
 
     @classmethod
     def is_locked(cls):

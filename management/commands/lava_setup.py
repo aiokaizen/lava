@@ -100,7 +100,7 @@ class Command(BaseCommand):
 
         # Create the group 'ADMINS' if it does not exist
         admins_group, _created = Group.objects.get_or_create(
-            name="ADMINS", defaults={"is_system": True}
+            name="ADMINS", defaults={"is_system": True, "slug": "admins"}
         )
         # Group.objects.get_or_create(
         #     name="STANDARD", is_system=True

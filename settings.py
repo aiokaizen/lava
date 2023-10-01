@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import os
 
+
 try:
     import firebase_admin
     from firebase_admin import credentials
@@ -200,3 +201,12 @@ CHAT_MESSAGE_CHOICES = (
     ("text", _("Text")),
     ("image", _("Image")),
 )
+
+
+# Backup settings
+MIN_HOURS_BETWEEN_BACKUPS = getattr(
+    settings, "MIN_HOURS_BETWEEN_BACKUPS", 4
+)  # This setting can be float (eg: 0.5 for 30 minutes).
+MAX_BACKUPS_PER_DAY = getattr(settings, "MAX_BACKUPS_PER_DAY", 1)
+AUTOMATIC_BACKUP_ACTIVE = getattr(settings, "AUTOMATIC_BACKUP_ACTIVE", None)
+backup_scheduler = None
