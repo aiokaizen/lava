@@ -25,7 +25,7 @@ def init_firebase():
         return (False, _("Firebase is not installed"))
 
     if not os.path.exists(creds_file_path):
-        logging.error("Firebase credentials file does not exist.")
+        logging.info("Firebase credentials file does not exist.")
         return (False, _("Firebase credentials file does not exist."))
 
     try:
