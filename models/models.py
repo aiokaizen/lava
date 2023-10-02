@@ -343,6 +343,14 @@ class NotificationGroup(Group):
 
 
 class User(BaseModel, AbstractUser):
+
+    excerpt_field_names = [
+        "username",
+        "first_name",
+        "last_name",
+        "photo",
+    ]
+
     class Meta(AbstractUser.Meta):
         ordering = ("-date_joined", "last_name", "first_name")
         default_permissions = ()
@@ -617,7 +625,11 @@ class User(BaseModel, AbstractUser):
             else:
                 field.set(value)
 
-        return Result(success=True, message=_("User has been updated successfully."))
+        return Result(
+            success=True,
+            message=_("User has been updated successfully."),
+            instance=self
+        )
 
     def delete(self, user=None, soft_delete=True):
         if not self.id:

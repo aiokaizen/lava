@@ -252,6 +252,9 @@ class Result(imdict):
         )
 
     def to_dict(self):
+
+        from lava.serializers import build_excerpt_serializer_class
+
         type = "success" if self.is_success else "error"
         if self.is_warning:
             type = "warning"
@@ -267,6 +270,13 @@ class Result(imdict):
             res_dict["error_code"] = self.error_code
         if self.instance:
             res_dict["object_id"] = self.instance.id
+            try:
+                res_dict["object"] = (
+                    self.instance if isinstance(self.instance, dict)
+                    else build_excerpt_serializer_class(self.instance.__class__)(self.instance).data
+                )
+            except:
+                res_dict["object"] = None
         return res_dict
 
 

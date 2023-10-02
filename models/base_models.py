@@ -33,6 +33,7 @@ class BaseModelMixin:
     duplicate_success_message = _("Object duplicated successfully.")
     restore_success_message = _("The object has been restored successfully.")
     default_delete_policy = DeletePolicy.SOFT_DELETE
+    excerpt_field_names = []
 
     def get_url(self):
         try:

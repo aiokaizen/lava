@@ -259,3 +259,26 @@ def build_choices_serializer_class(model):
             return str(instance)
 
     return ChoicesSerializer
+
+def build_excerpt_serializer_class(model):
+    # self.instance.excerpt_field_names
+
+    class ExcerptSerializer(serializers.ModelSerializer):
+
+        str = serializers.CharField(source="__str__")
+
+        class Meta:
+            model = None
+            fields = [
+                "id",
+                "str"
+            ]
+
+        def __init__(self, instance=None, data=empty, user=None, **kwargs):
+            # We keep the user because it is sent from the get_serializer() method
+            # of the BaseModelViewSet class.
+            self.Meta.model = model
+            self.Meta.fields.extend(model.excerpt_field_names)
+            super().__init__(instance, data, **kwargs)
+
+    return ExcerptSerializer
