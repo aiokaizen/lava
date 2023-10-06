@@ -466,7 +466,10 @@ class BaseModel(BaseModelMixin, models.Model):
         default_permissions = ()
 
     created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
-    created_by = models.ForeignKey('lava.User', on_delete=models.PROTECT, null=True, blank=True)
+    created_by = models.ForeignKey(
+        'lava.User', on_delete=models.PROTECT, null=True, blank=True,
+        related_name="+"
+    )
     last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
