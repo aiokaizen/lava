@@ -293,8 +293,12 @@ def mask_number(n):
 
 
 def try_parse(value, t, default=None):
+    """
+    if t is a list of types, try to parse the value for each type in that list.
+    The first type that does not raise an exception is returned.
+    """
     try:
-        if type(t) != list:
+        if type(t) not in (list, tuple, set):
             return t(value)
 
         for item in t:
