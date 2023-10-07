@@ -29,18 +29,18 @@ def lava_drf_exception_handler(exc, context):
 
     if isinstance(exc, NotAuthenticated):
         return Response(
-            Result(False, NOT_AUTHENTICATED_MESSAGE, error_code=NOT_AUTHENTICATED_ERROR_CODE).to_dict(),
+            Result.error(NOT_AUTHENTICATED_MESSAGE, error_code=NOT_AUTHENTICATED_ERROR_CODE).to_dict(),
             status=status.HTTP_401_UNAUTHORIZED
         )
     elif isinstance(exc, PermissionDenied):
         return Response(
-            Result(False, FORBIDDEN_MESSAGE, error_code=PERMISSION_DENIED_ERROR_CODE).to_dict(),
+            Result.error(FORBIDDEN_MESSAGE, error_code=PERMISSION_DENIED_ERROR_CODE).to_dict(),
             status=status.HTTP_403_FORBIDDEN
         )
 
     # if settings.DEBUG == False and isinstance(exc, Exception):
     #     return Response(
-    #         Result(False, UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN).to_dict(),
+    #         Result.error(UNKNOWN_ERROR_MESSAGE, error_code=UNKNOWN).to_dict(),
     #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
     #     )
 

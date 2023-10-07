@@ -89,8 +89,8 @@ class TestAPIViews(TestCase):
         token = response_body.get("auth_token", None)
         if token is not None:
             self.client.credentials(HTTP_AUTHORIZATION="Token " + token)
-            return Result(True, "Authenticated!")
-        return Result(False, response_body)
+            return Result.success("Authenticated!")
+        return Result.error(response_body)
 
     def test_user_list_superuser(self):
         response = self.client.get(self.user_list_url)

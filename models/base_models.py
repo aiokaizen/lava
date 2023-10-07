@@ -46,13 +46,13 @@ class BaseModelMixin:
 
     def create(self, user=None, m2m_fields=None, file_fields=None, clean=False):
         if self.pk:
-            return Result(False, _("This object is already created."))
+            return Result.error(_("This object is already created."))
 
         # if clean:
         #     try:
         #         self.clean_fields()
         #     except ValidationError as e:
-        #         return Result(False, _("Validation error."), errors=e.error_dict)
+        #         return Result.error(_("Validation error."), errors=e.error_dict)
 
         self.created_by = user
 
@@ -77,11 +77,11 @@ class BaseModelMixin:
         if user:
             self.log_action(user, ADDITION)
 
-        return Result(True, self.get_result_message('create'), instance=self)
+        return Result.success(self.get_result_message('create'), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.pk:
-            return Result(False, _("This object is not yet created."))
+            return Result.error(_("This object is not yet created."))
 
         # Get changed message before saving the object
         message = message or self.get_changed_message(m2m_fields, update_fields=update_fields)
@@ -181,7 +181,7 @@ class BaseModelMixin:
 
     def restore(self, user=None):
         if not self.deleted_at:
-            return Result(False, _("Object is not deleted!"))
+            return Result.error(_("Object is not deleted!"))
 
         self.deleted_at = None
         result = self.update(user=user, update_fields=['deleted_at'], message="Restoration")

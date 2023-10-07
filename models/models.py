@@ -182,13 +182,12 @@ class Permission(BaseModelMixin, BasePermissionModel):
         permissions = (("set_permission", _("Can set permissions")),)
 
     def create(self, user=None, *args, **kwargs):
-        return Result(False, _("You can not create a new permission."))
+        return Result.error(_("You can not create a new permission."))
 
         result = super().create(user=user, *args, **kwargs)
         if result.is_error:
             return result
-        return Result(
-            True, _("The permission has been created successfully."), instance=self
+        return Result.success(_("The permission has been created successfully."), instance=self
         )
 
     def update(self, user=None, update_fields=None, *args, **kwargs):
@@ -198,15 +197,15 @@ class Permission(BaseModelMixin, BasePermissionModel):
         result = super().update(user=user, update_fields=update_fields, *args, **kwargs)
         if result.is_error:
             return result
-        return Result(True, _("The permission has been updated successfully."))
+        return Result.success(_("The permission has been updated successfully."))
 
     def delete(self, user=None, *args, **kwargs):
-        return Result(False, _("You can not delete a permission."))
+        return Result.error(_("You can not delete a permission."))
 
         result = super().delete(user=user, soft_delete=False)
         if result.is_error:
             return result
-        return Result(True, _("The permission has been deleted successfully."))
+        return Result.success(_("The permission has been deleted successfully."))
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
@@ -288,7 +287,7 @@ class Group(BaseModel, BaseGroupModel):
         return Result.success(_("The group has been deleted successfully."))
 
     def restore(self, user=None):
-        return Result(False, "")
+        return Result.error("")
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
@@ -450,9 +449,7 @@ class User(BaseModel, AbstractUser):
         link_payments_app=True,
     ):
         if self.id:
-            return Result(
-                success=False, message=_("User is already created."), tag="warning"
-            )
+            return Result.warning(message=_("User is already created."))
 
         if not hasattr(self, "preferences"):
             self.preferences = Preferences.objects.create()
@@ -505,18 +502,15 @@ class User(BaseModel, AbstractUser):
         if user:
             self.log_action(user, ADDITION)
 
-        return Result(
-            success=True,
+        return Result.success(
             message=_("User has been created successfully."),
             instance=self,
         )
 
     def link_payments_app(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(
-                False,
+            return Result.warning(
                 _("Payments application is not installed"),
-                tag="warning",
                 error_code=UNIMPLEMENTED,
             )
 
@@ -528,18 +522,16 @@ class User(BaseModel, AbstractUser):
         if res.is_error:
             return res
 
-        return Result(True, _("Payments application was implemented successfully."))
+        return Result.success(_("Payments application was implemented successfully."))
 
     def create_account(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(
-                False,
+            return Result.warning(
                 _("Payments application is not installed"),
-                tag="warning",
                 error_code=UNIMPLEMENTED,
             )
         if hasattr(self, "account"):
-            return Result(False, _("Account already created"), tag="warning")
+            return Result.warning(_("Account already created"))
 
         from payments.models import Account
 
@@ -548,18 +540,16 @@ class User(BaseModel, AbstractUser):
         if result.is_error:
             return result
         self.account = account
-        return Result(True, _("Associated account was created successfully."))
+        return Result.success(_("Associated account was created successfully."))
 
     def create_braintree_customer(self):
         if "payments" not in settings.INSTALLED_APPS:
-            return Result(
-                False,
+            return Result.warning(
                 _("Payments application is not installed"),
-                tag="warning",
                 error_code=UNIMPLEMENTED,
             )
         if hasattr(self, "customer"):
-            return Result(False, _("Customer already created"), tag="warning")
+            return Result.warning(_("Customer already created"))
 
         from payments.models import Customer
 
@@ -569,13 +559,11 @@ class User(BaseModel, AbstractUser):
             if result.is_error:
                 return result
             self.customer = bt_customer
-            return Result(
-                True, _("Associated BrainTree customer was created successfully.")
+            return Result.success(_("Associated BrainTree customer was created successfully.")
             )
         except Exception as e:
             logging.error(e)
-            return Result(
-                False,
+            return Result.error(
                 _(
                     "Unable to connect to one of our servers, "
                     "please try again later. We apologize for the inconvenience."
@@ -625,15 +613,14 @@ class User(BaseModel, AbstractUser):
             else:
                 field.set(value)
 
-        return Result(
-            success=True,
+        return Result.success(
             message=_("User has been updated successfully."),
             instance=self
         )
 
     def delete(self, user=None, soft_delete=True):
         if not self.id:
-            return Result(False, _("User is already deleted"), tag="warning")
+            return Result.warning(_("User is already deleted"))
 
         success_message = _("User has been deleted successfully")
 
@@ -641,7 +628,7 @@ class User(BaseModel, AbstractUser):
             # self.is_active = False
             self.deleted_at = timezone.now()
             self.update(user=user, update_fields=["deleted_at"], message="Soft Delete")
-            return Result(success=True, message=success_message)
+            return Result.success(message=success_message)
 
         # Unlink from payments app
         if hasattr(self, "customer"):
@@ -660,7 +647,7 @@ class User(BaseModel, AbstractUser):
         if user:
             self.log_action(user, DELETION)
 
-        return Result(success=True, message=success_message)
+        return Result.success(message=success_message)
 
     def set_password(self, raw_password, user=None):
         self.password = make_password(raw_password)
@@ -677,14 +664,14 @@ class User(BaseModel, AbstractUser):
         )
         if result.is_error:
             return result
-        return Result(True, _("Password has been changed successfully."))
+        return Result.success(_("Password has been changed successfully."))
 
     def restore(self, user=None):
         result = super().restore(user=user)
         if result.is_error:
             return result
 
-        return Result(True, _("The user has been restored successfully."))
+        return Result.success(_("The user has been restored successfully."))
 
     def get_notification_groups(self):
         return NotificationGroup.objects.filter(user=self)
@@ -737,25 +724,24 @@ class User(BaseModel, AbstractUser):
         # Send the notification via firebase api
         notification.send_firebase_notification()
 
-        return Result(True, _("The notification was sent successfully."))
+        return Result.success(_("The notification was sent successfully."))
 
     def update_devices(self, device_id):
         if device_id not in self.device_id_list:
             self.device_id_list.append(device_id)
             self.save(update_fields=["device_id_list"])
-        return Result(True)
+        return Result.success()
 
     @classmethod
     def validate_password(cls, password):
         if not isinstance(password, str):
-            return Result(success=False, message=_("`password` must be a string."))
+            return Result.error(message=_("`password` must be a string."))
 
         try:
             validate_password(password, User)
-            return Result(success=True, message=_("User password is valid."))
+            return Result.success(message=_("User password is valid."))
         except ValidationError as e:
-            return Result(
-                success=False, message=_("Invalid password."), errors=e.messages
+            return Result.error(message=_("Invalid password."), errors=e.messages
             )
 
     @classmethod
@@ -902,8 +888,7 @@ class Notification(BaseModelMixin, models.Model):
         if send_firebase_notification:
             self.send_firebase_notification()
 
-        return Result(
-            True, _("The notification has been created successfully."), instance=self
+        return Result.success(_("The notification has been created successfully."), instance=self
         )
 
     def mark_as_read(self, user):
@@ -961,9 +946,9 @@ class Notification(BaseModelMixin, models.Model):
             messaging.send_multicast(message)
         except Exception as e:
             logging.error(e)
-            return Result(False, str(e))
+            return Result.error(str(e))
 
-        return Result(True)
+        return Result.success()
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
@@ -1075,7 +1060,7 @@ class Backup(BaseModel):
     def update(self, *args, **kwargs):
         if "message" not in kwargs:
             """Allow modification for inner actions only (eg: soft_delete())."""
-            return Result(False, ACTION_NOT_ALLOWED)
+            return Result.error(ACTION_NOT_ALLOWED)
         return super().update(*args, **kwargs)
 
     def delete(self, user=None, soft_delete=True):
@@ -1088,17 +1073,15 @@ class Backup(BaseModel):
         if backup_file:
             backup_file.delete()
 
-        return Result(True, _("Backup has been deleted successfully."))
+        return Result.success(_("Backup has been deleted successfully."))
 
     def can_start_backup(self):
         if Backup.is_locked():
-            return Result(
-                False,
+            return Result.warning(
                 _(
                     "A backup is already running, please wait "
                     "until it's finished before starting a new one."
                 ),
-                tag="warning",
             )
 
         min_hours = lava_settings.MIN_HOURS_BETWEEN_BACKUPS
@@ -1111,23 +1094,23 @@ class Backup(BaseModel):
         latest_backup = all_backups.first()
 
         if not latest_backup:
-            return Result(True)
+            return Result.success()
 
         today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
 
         if today_backups.count() >= daily_limit:
-            return Result(False, _("You can not create more than %d backups per day." % daily_limit))
+            return Result.error(_("You can not create more than %d backups per day." % daily_limit))
 
         latest_backup_time = latest_backup.created_at
         if now < latest_backup_time + min_period_between_backups:
             if min_hours > 1:
-                return Result(False, _("You can only create one backup every %d hours." % min_hours))
+                return Result.error(_("You can only create one backup every %d hours." % min_hours))
             elif min_hours * 60 > 1:
-                return Result(False, _("You can only create one backup every %d minutes." % (min_hours * 60)))
+                return Result.error(_("You can only create one backup every %d minutes." % (min_hours * 60)))
             else:
-                return Result(False, _("You can only create one backup every %d seconds." % (min_hours * 60 * 60)))
+                return Result.error(_("You can only create one backup every %d seconds." % (min_hours * 60 * 60)))
 
-        return Result(True)
+        return Result.success()
 
     def start_backup(self, user=None, *args, **kwargs):
         result = self.can_start_backup()
@@ -1144,8 +1127,7 @@ class Backup(BaseModel):
         backup = self
         threading.Thread(target=backup.run_backup, args=(user,)).start()
 
-        return Result(
-            True,
+        return Result.success(
             _("Backup has been started, you will get notified once it is finished."),
         )
 

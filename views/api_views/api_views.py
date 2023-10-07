@@ -52,7 +52,7 @@ def update_device_id(request):
     device_id = request.data.get("device_id")
     if not device_id:
         return Response(
-            Result(False, _("'device_id' field is mandatory.")).to_dict(),
+            Result.error(_("'device_id' field is mandatory.")).to_dict(),
             status=status.HTTP_400_BAD_REQUEST,
         )
 

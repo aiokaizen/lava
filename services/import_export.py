@@ -56,7 +56,7 @@ def export_permissions():
     if result.is_error:
         return result
 
-    return Result(True, _("File exported successfully"), instance=result.instance)
+    return Result.success(_("File exported successfully"), instance=result.instance)
 
 
 def export_activity_journal(
@@ -138,4 +138,4 @@ def export_activity_journal(
     if result.is_error:
         return result
 
-    return Result(True, _("File exported successfully"), instance=result.instance)
+    return Result.success(_("File exported successfully"), instance=result.instance)

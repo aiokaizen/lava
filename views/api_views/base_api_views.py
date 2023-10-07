@@ -169,7 +169,7 @@ class BaseModelViewSet(ModelViewSet):
     def list(self, request, *args, **kwargs):
         if "list" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -191,7 +191,7 @@ class BaseModelViewSet(ModelViewSet):
     def choices(self, request, *args, **kwargs):
         if "choices" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -211,7 +211,7 @@ class BaseModelViewSet(ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         if "retrieve" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -221,7 +221,7 @@ class BaseModelViewSet(ModelViewSet):
     def view_excerpt(self, request, *args, **kwargs):
         if "view_excerpt" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -232,7 +232,7 @@ class BaseModelViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         if "create" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -268,7 +268,7 @@ class BaseModelViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         if "update" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -308,7 +308,7 @@ class BaseModelViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         if "destroy" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -322,7 +322,7 @@ class BaseModelViewSet(ModelViewSet):
     def options(self, request, *args, **kwargs):
         if "metadata" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -334,7 +334,7 @@ class BaseModelViewSet(ModelViewSet):
     def duplicate(self, request, pk):
         if "duplicate" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -366,7 +366,7 @@ class BaseModelViewSet(ModelViewSet):
     def view_trash(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -384,7 +384,7 @@ class BaseModelViewSet(ModelViewSet):
     def view_trash_item(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -397,7 +397,7 @@ class BaseModelViewSet(ModelViewSet):
     def hard_delete(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 
@@ -414,7 +414,7 @@ class BaseModelViewSet(ModelViewSet):
     def restore(self, request, *args, **kwargs):
         if "trash" in self.denied_actions:
             return Response(
-                Result(False, ACTION_NOT_ALLOWED).to_dict(),
+                Result.error(ACTION_NOT_ALLOWED).to_dict(),
                 status=status.HTTP_405_METHOD_NOT_ALLOWED,
             )
 

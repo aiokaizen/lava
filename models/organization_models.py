@@ -98,7 +98,7 @@ class BankAccount(Account):
         abstract = not lava_settings.ACTIVATE_PAYEMENTS
 
     account_holder = models.CharField(_("Account holder"), max_length=256, blank=True)
-    iban = models.CharField(_("Code postal"), max_length=34, blank=True)
+    iban = models.CharField(_("IBAN"), max_length=34, blank=True)
     rib = models.CharField(_("RIB"), max_length=24, blank=True)
     bank = models.ForeignKey(Bank, verbose_name=_("Bank"), on_delete=models.PROTECT, null=True, blank=True)
 
@@ -191,7 +191,7 @@ class Entity(BaseModel):
         if result.is_error:
             return result
 
-        return Result(True, _("The entity '%(name)s' has been successfully created." % {'name': self.name}), instance=self)
+        return Result.success(_("The entity '%(name)s' has been successfully created." % {'name': self.name}), instance=self)
 
     @classmethod
     def get_filter_params(cls, kwargs=None):

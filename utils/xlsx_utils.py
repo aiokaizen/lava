@@ -306,9 +306,9 @@ def export_xlsx(
             logo.close()
 
     if not saved:
-        return Result(False, _("The tmp file could not be created!"))
+        return Result.error(_("The tmp file could not be created!"))
 
-    return Result(True, _("File exported successfully"), instance=tmp_file_path)
+    return Result.success(_("File exported successfully"), instance=tmp_file_path)
 
 
 def export_serializer_xlsx(
