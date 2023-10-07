@@ -44,9 +44,9 @@ class ListIDsSerializer(serializers.Serializer):
         fields = ["list_ids"]
 
     def __init__(self, instance=None, data=empty, model=None, trash=False, **kwargs):
-        assert model is not None, (
-            "Make sure that `model` parameter is different that None."
-        )
+        assert (
+            model is not None
+        ), "Make sure that `model` parameter is different that None."
         self.model = model
         self.trash = trash
         super().__init__(instance, data, **kwargs)
@@ -56,12 +56,10 @@ class ListIDsSerializer(serializers.Serializer):
         try:
             qset = manager.filter(pk__in=value)
         except ValueError:
-            raise serializers.ValidationError(
-                _("One or more ID is not valid."))
+            raise serializers.ValidationError(_("One or more ID is not valid."))
 
         if len(value) != qset.count():
-            raise serializers.ValidationError(
-                _("One or more ID is not valid."))
+            raise serializers.ValidationError(_("One or more ID is not valid."))
         return qset
 
 
@@ -75,17 +73,15 @@ class BulkActionSerializer(ListIDsSerializer):
     def validate_action(self, value):
         action = value
         if not value.startswith("bulk_") or not hasattr(self.model, action):
-            raise serializers.ValidationError(
-                _("The Selected action is not valid")
-            )
+            raise serializers.ValidationError(_("The Selected action is not valid"))
 
         action = getattr(self.model, action)
         if not callable(action):
             raise serializers.ValidationError(
-                _("`%(action_name)s` is not a callable for model `%(model)s`." % {
-                    'model': self.model.__name__,
-                    'action_name': value
-                })
+                _(
+                    "`%(action_name)s` is not a callable for model `%(model)s`."
+                    % {"model": self.model.__name__, "action_name": value}
+                )
             )
 
         return action
@@ -98,7 +94,6 @@ class BulkActionSerializer(ListIDsSerializer):
 
 
 class PreferencesSerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = Preferences
         fields = [
@@ -134,8 +129,7 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
 
     def validate_old_password(self, value):
         if not self.instance.check_password(value):
-            raise serializers.ValidationError(
-                _("The current password does not match!"))
+            raise serializers.ValidationError(_("The current password does not match!"))
 
     def validate_new_password(self, value):
         validate_password(value, self.instance)
@@ -156,28 +150,18 @@ class ChangePasswordFormSerializer(serializers.ModelSerializer):
             user=self.user, raw_password=validated_data["new_password"]
         )
         if result.is_error:
-            raise serializers.ValidationError(
-                result.errors or result.to_dict()
-            )
+            raise serializers.ValidationError(result.errors or result.to_dict())
         return instance
 
 
 class PermissionSerializer(BaseModelSerializer):
 
-    codename = serializers.SerializerMethodField(
-        label=_("Code name")
-    )
+    codename = serializers.SerializerMethodField(label=_("Code name"))
 
     class Meta:
         model = Permission
-        fields = [
-            "id",
-            "name",
-            "codename"
-        ]
-        read_only_fields = [
-            "id", "codename"
-        ]
+        fields = ["id", "name", "codename"]
+        read_only_fields = ["id", "codename"]
 
     @extend_schema_field(str)
     def get_codename(self, obj):
@@ -187,38 +171,43 @@ class PermissionSerializer(BaseModelSerializer):
 class ChoicesSerializer(serializers.Serializer):
 
     class_name = serializers.ChoiceField(
-        label="Class name", choices=lava_settings.CLASS_NAME_CHOICES)
+        label="Class name", choices=lava_settings.CLASS_NAME_CHOICES
+    )
     query = serializers.CharField(label="Query", required=False)
     id = serializers.IntegerField(required=False)
 
     class Meta:
-        fields = [
-            'class_name',
-            'query',
-            'id'
-        ]
+        fields = ["class_name", "query", "id"]
 
     def validate_query(self, value):
-        init_value = self.initial_data.get('query', '')
+        init_value = self.initial_data.get("query", "")
         if len(init_value) < 2:
             raise serializers.ValidationError(
-                _("The query parametter must have a length of 2 or more."))
+                _("The query parametter must have a length of 2 or more.")
+            )
         return value
 
     def validate(self, data):
         validated_data = super().validate(data)
-        class_name = lava_settings.CLASS_NAME_CHOICES_MAPPING[validated_data['class_name']]
-        model = apps.get_model(*class_name.split('.'))
-        query = validated_data.get('query')
-        id = validated_data.get('id')
+        class_name = lava_settings.CLASS_NAME_CHOICES_MAPPING[
+            validated_data["class_name"]
+        ]
+        model = apps.get_model(*class_name.split("."))
+        query = validated_data.get("query")
+        id = validated_data.get("id")
 
         if query == "":
             return []
 
-        self.choices = [{
-            "id": obj.pk,
-            "label": getattr(obj, 'get_choices_display', lambda: None)() or str(obj),
-        } for obj in model.filter(kwargs=QueryDict(f'query={query}')) if obj.id != id]
+        self.choices = [
+            {
+                "id": obj.pk,
+                "label": getattr(obj, "get_choices_display", lambda: None)()
+                or str(obj),
+            }
+            for obj in model.filter(kwargs=QueryDict(f"query={query}"))
+            if obj.id != id
+        ]
 
         if id:
             # Remove this code later
@@ -227,24 +216,24 @@ class ChoicesSerializer(serializers.Serializer):
                 self.choices = [
                     {
                         "id": single_obj.id,
-                        "label": getattr(single_obj, 'get_choices_display', lambda: None)() or str(single_obj),
+                        "label": getattr(
+                            single_obj, "get_choices_display", lambda: None
+                        )()
+                        or str(single_obj),
                     },
-                    *self.choices
+                    *self.choices,
                 ]
         return validated_data
 
 
 def build_choices_serializer_class(model):
-
     class ChoicesSerializer(serializers.ModelSerializer):
 
         label = serializers.SerializerMethodField(label="Label")
 
         class Meta:
             model = None
-            fields = [
-                "id", "label"
-            ]
+            fields = ["id", "label"]
 
         def __init__(self, instance=None, data=empty, user=None, **kwargs):
             # We keep the user because it is sent from the get_serializer() method
@@ -260,6 +249,7 @@ def build_choices_serializer_class(model):
 
     return ChoicesSerializer
 
+
 def build_excerpt_serializer_class(model):
     # self.instance.excerpt_field_names
 
@@ -269,10 +259,7 @@ def build_excerpt_serializer_class(model):
 
         class Meta:
             model = None
-            fields = [
-                "id",
-                "str"
-            ]
+            fields = ["id", "str"]
 
         def __init__(self, instance=None, data=empty, user=None, **kwargs):
             # We keep the user because it is sent from the get_serializer() method

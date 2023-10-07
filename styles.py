@@ -12,7 +12,6 @@ from lava.utils import odict
 
 
 class XLSXStyles:
-
     def __init__(self):
 
         # Fonts
@@ -33,16 +32,25 @@ class XLSXStyles:
         white_side = Side(color="ffffff", style="thin")
 
         default_border = Border(
-            left=default_side, right=default_side,
-            top=default_side, bottom=default_side, diagonal=default_side
+            left=default_side,
+            right=default_side,
+            top=default_side,
+            bottom=default_side,
+            diagonal=default_side,
         )
         header_border = Border(
-            left=header_side, right=header_side, top=header_side,
-            bottom=header_side, diagonal=header_side
+            left=header_side,
+            right=header_side,
+            top=header_side,
+            bottom=header_side,
+            diagonal=header_side,
         )
         white_border = Border(
-            left=white_side, right=white_side, top=white_side,
-            bottom=white_side, diagonal=white_side
+            left=white_side,
+            right=white_side,
+            top=white_side,
+            bottom=white_side,
+            diagonal=white_side,
         )
         self.borders = odict(
             default=default_border,
@@ -55,9 +63,15 @@ class XLSXStyles:
             topleft=Alignment(vertical="top", horizontal="left", wrap_text=True),
             topcenter=Alignment(vertical="top", horizontal="center", wrap_text=True),
             topright=Alignment(vertical="top", horizontal="right", wrap_text=True),
-            centerright=Alignment(vertical="center", horizontal="right", wrap_text=True),
-            bottomright=Alignment(vertical="bottom", horizontal="right", wrap_text=True),
-            bottomcenter=Alignment(vertical="bottom", horizontal="center", wrap_text=True),
+            centerright=Alignment(
+                vertical="center", horizontal="right", wrap_text=True
+            ),
+            bottomright=Alignment(
+                vertical="bottom", horizontal="right", wrap_text=True
+            ),
+            bottomcenter=Alignment(
+                vertical="bottom", horizontal="center", wrap_text=True
+            ),
             bottomleft=Alignment(vertical="bottom", horizontal="left", wrap_text=True),
             centerleft=Alignment(vertical="center", horizontal="left", wrap_text=True),
             center=Alignment(vertical="center", horizontal="center", wrap_text=True),

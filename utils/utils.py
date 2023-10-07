@@ -41,13 +41,11 @@ def build_query_dict(data):
     if type(data) is not dict:
         return None
 
-    return QueryDict("&".join(
-        [f"{key}={value}" for key, value in data.items()]
-    ))
+    return QueryDict("&".join([f"{key}={value}" for key, value in data.items()]))
 
 
 def remove_html_tags(html_string):
-    cleaned_text = re.sub(r'<.*?>', '', html_string)
+    cleaned_text = re.sub(r"<.*?>", "", html_string)
     return cleaned_text
 
 
@@ -112,24 +110,30 @@ def humanize_datetime(datetime, verbose=True):
 
     now = timezone.now()
     if now.date() == datetime.date():
-        return datetime.strftime('%H:%M') if verbose else (
-            f"{_('Today')}, {datetime.strftime('%H:%M')}"
+        return (
+            datetime.strftime("%H:%M")
+            if verbose
+            else (f"{_('Today')}, {datetime.strftime('%H:%M')}")
         )
         # return f"{(now - datetime).seconds()}s ago"
     elif (now - datetime) < timedelta(days=360):
-        return datetime.strftime("%B, %d") if verbose else (
-            f"{datetime.strftime('%B')}, {datetime.strftime('%H:%M')}"
+        return (
+            datetime.strftime("%B, %d")
+            if verbose
+            else (f"{datetime.strftime('%B')}, {datetime.strftime('%H:%M')}")
         )
 
-    return datetime.strftime("%Y/%m/%d") if verbose else (
-        f"{datetime.strftime('%Y/%m/%d')}, {datetime.strftime('%H:%M')}"
+    return (
+        datetime.strftime("%Y/%m/%d")
+        if verbose
+        else (f"{datetime.strftime('%Y/%m/%d')}, {datetime.strftime('%H:%M')}")
     )
 
 
 def build_absolute_uri(serializer, f):
-    request = serializer.context.get('request', None)
+    request = serializer.context.get("request", None)
 
-    if not f :
+    if not f:
         return ""
 
     url = f.url
@@ -272,8 +276,11 @@ class Result(imdict):
             res_dict["object_id"] = self.instance.id
             try:
                 res_dict["object"] = (
-                    self.instance if isinstance(self.instance, dict)
-                    else build_excerpt_serializer_class(self.instance.__class__)(self.instance).data
+                    self.instance
+                    if isinstance(self.instance, dict)
+                    else build_excerpt_serializer_class(self.instance.__class__)(
+                        self.instance
+                    ).data
                 )
             except:
                 res_dict["object"] = None

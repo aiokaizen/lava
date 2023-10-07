@@ -8,16 +8,20 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from lava.messages import (
-    FORBIDDEN_MESSAGE, NOT_AUTHENTICATED_MESSAGE, UNKNOWN_ERROR_MESSAGE, NOT_FOUND_MESSAGE
+    FORBIDDEN_MESSAGE,
+    NOT_AUTHENTICATED_MESSAGE,
+    UNKNOWN_ERROR_MESSAGE,
+    NOT_FOUND_MESSAGE,
 )
 from lava.error_codes import (
-    PERMISSION_DENIED_ERROR_CODE, NOT_AUTHENTICATED_ERROR_CODE, UNKNOWN,
-    NOT_FOUND_ERROR_CODE
+    PERMISSION_DENIED_ERROR_CODE,
+    NOT_AUTHENTICATED_ERROR_CODE,
+    UNKNOWN,
+    NOT_FOUND_ERROR_CODE,
 )
 
 
 class LavaBaseException(Exception):
-
     def __init__(self, result):
         message = result.message
         self.message = message
@@ -29,13 +33,17 @@ def lava_drf_exception_handler(exc, context):
 
     if isinstance(exc, NotAuthenticated):
         return Response(
-            Result.error(NOT_AUTHENTICATED_MESSAGE, error_code=NOT_AUTHENTICATED_ERROR_CODE).to_dict(),
-            status=status.HTTP_401_UNAUTHORIZED
+            Result.error(
+                NOT_AUTHENTICATED_MESSAGE, error_code=NOT_AUTHENTICATED_ERROR_CODE
+            ).to_dict(),
+            status=status.HTTP_401_UNAUTHORIZED,
         )
     elif isinstance(exc, PermissionDenied):
         return Response(
-            Result.error(FORBIDDEN_MESSAGE, error_code=PERMISSION_DENIED_ERROR_CODE).to_dict(),
-            status=status.HTTP_403_FORBIDDEN
+            Result.error(
+                FORBIDDEN_MESSAGE, error_code=PERMISSION_DENIED_ERROR_CODE
+            ).to_dict(),
+            status=status.HTTP_403_FORBIDDEN,
         )
 
     # if settings.DEBUG == False and isinstance(exc, Exception):

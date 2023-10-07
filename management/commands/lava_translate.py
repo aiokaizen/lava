@@ -21,37 +21,41 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-l', '--locales',
+            "-l",
+            "--locales",
             required=True,
             type=str,
-            help="The local languages to translate to separated by commas(eg: en,fr_FR,ar,...)."
+            help="The local languages to translate to separated by commas(eg: en,fr_FR,ar,...).",
         )
         parser.add_argument(
-            '-n', '--app-name',
+            "-n",
+            "--app-name",
             required=True,
             type=str,
-            help='The name of the django application to be translated.',
+            help="The name of the django application to be translated.",
         )
         parser.add_argument(
-            '-g', '--generate-translations',
-            action='store_true',
-            help="Automatically generate translations using AI."
+            "-g",
+            "--generate-translations",
+            action="store_true",
+            help="Automatically generate translations using AI.",
         )
         parser.add_argument(
-            '-s', '--source-language',
+            "-s",
+            "--source-language",
             type=str,
             default="en",
-            help="Set the source languange (primary language of the app - defaults to 'en')."
+            help="Set the source languange (primary language of the app - defaults to 'en').",
         )
 
     def handle(self, *args, **options):
         # Create some demo content here
 
         # Getting user input
-        locales = options["locales"].split(',')
+        locales = options["locales"].split(",")
         app_name = options["app_name"]
         generate_translations = options["generate_translations"]
-        source_language =  options["source_language"]
+        source_language = options["source_language"]
 
         logging.info(
             "Start generating translations with the following parameters:\n"
@@ -90,18 +94,25 @@ class Command(BaseCommand):
 
             # Create a translator object
             translator = Translator(
-                to_lang=locale.replace('_', '-'),
-                from_lang=source_language.replace('_', '-')
+                to_lang=locale.replace("_", "-"),
+                from_lang=source_language.replace("_", "-"),
             )
 
             # Translate each message in the .po file
             for entry in po_file:
                 print(f"translating `{entry.msgid}` from English to {locale}")
                 entry.msgstr = translator.translate(entry.msgid)
-                print("translation:", entry.msgstr, '\n\n')
+                print("translation:", entry.msgstr, "\n\n")
 
             # Save the translated .po file
             # po_file.save(locale_po_filename)
-            po_file.save(os.path.join(
-                base_dir, app_name, "locale", locale, "LC_MESSAGES", "auto_generated.po"
-            ))
+            po_file.save(
+                os.path.join(
+                    base_dir,
+                    app_name,
+                    "locale",
+                    locale,
+                    "LC_MESSAGES",
+                    "auto_generated.po",
+                )
+            )

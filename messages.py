@@ -17,12 +17,10 @@ FORBIDDEN_MESSAGE = _(
 )
 HTTP_403_MESSAGE = {"detail": FORBIDDEN_MESSAGE}
 
-ACTION_NOT_ALLOWED = _(
-    "This action is not allowed!"
-)
+ACTION_NOT_ALLOWED = _("This action is not allowed!")
 
-NOT_AUTHENTICATED_MESSAGE =  _('Authentication credentials were not provided.')
+NOT_AUTHENTICATED_MESSAGE = _("Authentication credentials were not provided.")
 
 INVALID_FORMAT_MESSAGE = _("Invalid format.")
 
-NOT_FOUND_MESSAGE = _('Not found.')
+NOT_FOUND_MESSAGE = _("Not found.")

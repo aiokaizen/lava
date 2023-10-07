@@ -25,14 +25,19 @@ class LavaConfig(AppConfig):
 
         try:
             from lava.models import BackupConfig
+
             BackupConfig.get_backup_config()
 
             from lava.settings import AUTOMATIC_BACKUP_ACTIVE
 
-            automatic_backup_active = True if (
-                (AUTOMATIC_BACKUP_ACTIVE is None and settings.DEBUG is False) or
-                AUTOMATIC_BACKUP_ACTIVE is True
-            ) else False
+            automatic_backup_active = (
+                True
+                if (
+                    (AUTOMATIC_BACKUP_ACTIVE is None and settings.DEBUG is False)
+                    or AUTOMATIC_BACKUP_ACTIVE is True
+                )
+                else False
+            )
             if automatic_backup_active:
                 # Start the scheduling thread
                 threading.Thread(target=start_schedule).start()

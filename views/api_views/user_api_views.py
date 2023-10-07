@@ -8,8 +8,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from lava.serializers import ChangePasswordFormSerializer
 from lava.serializers.user_serializers import (
-    UserListSerializer, UserGetSerializer, UserCreateSerializer,
-    UserUpdateSerializer, UserDeleteSerializer
+    UserListSerializer,
+    UserGetSerializer,
+    UserCreateSerializer,
+    UserUpdateSerializer,
+    UserDeleteSerializer,
 )
 from lava.models import User
 from lava.services import class_permissions as lava_permissions
@@ -29,7 +32,7 @@ class UserAPIViewSet(BaseModelViewSet):
     queryset = User.objects.none()
 
     def get_permissions(self):
-        if self.action == 'me' or getattr(self, 'is_me', False):
+        if self.action == "me" or getattr(self, "is_me", False):
             self.permission_classes = [permissions.IsAuthenticated]
 
         return super().get_permissions()
@@ -55,8 +58,10 @@ class UserAPIViewSet(BaseModelViewSet):
         )
         if serializer.is_valid():
             serializer.save()
-            return Response({
-                "success": True,
-                "message": _("Password has been changed successfully!")
-            })
+            return Response(
+                {
+                    "success": True,
+                    "message": _("Password has been changed successfully!"),
+                }
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

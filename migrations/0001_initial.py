@@ -19,324 +19,1150 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=150, unique=True, validators=[django.contrib.auth.validators.UnicodeUsernameValidator()], verbose_name='username')),
-                ('first_name', models.CharField(blank=True, max_length=150, verbose_name='first name')),
-                ('last_name', models.CharField(blank=True, max_length=150, verbose_name='last name')),
-                ('email', models.EmailField(blank=True, max_length=254, verbose_name='email address')),
-                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
-                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
-                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('photo', easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.handle_upload_filenames.get_user_photo_filename, verbose_name='Photo')),
-                ('birth_day', models.DateField(blank=True, null=True, verbose_name='Birth day')),
-                ('gender', models.CharField(blank=True, choices=[('', ''), ('F', 'Female'), ('M', 'Male')], default='', max_length=1, verbose_name='Gender')),
-                ('full_name', models.CharField(blank=True, default='', max_length=128, verbose_name='Full name')),
-                ('country', models.CharField(blank=True, default='', max_length=64, verbose_name='Country')),
-                ('city', models.CharField(blank=True, default='', max_length=64, verbose_name='City')),
-                ('street_address', models.TextField(blank=True, default='', verbose_name='Street address')),
-                ('phone_number', models.CharField(blank=True, default='', max_length=32, verbose_name='Phone number')),
-                ('fax', models.CharField(blank=True, default='', max_length=32, verbose_name='Fax')),
-                ('job', models.CharField(blank=True, default='', max_length=64, verbose_name='Job title')),
-                ('cover_picture', easy_thumbnails.fields.ThumbnailerImageField(blank=True, help_text='Preferred image dimentions: (1200 x 250)', null=True, upload_to=lava.utils.handle_upload_filenames.get_user_cover_filename, verbose_name='Cover picture')),
-                ('tmp_pwd', models.CharField(blank=True, default='', max_length=64, verbose_name='Temporary password')),
-                ('device_id_list', models.JSONField(blank=True, default=list, help_text='A list of devices the the user is connected from.', verbose_name='Device IDs')),
-                ('deleted_at', models.DateTimeField(null=True, verbose_name='Deleted at')),
-                ('extra_fields', models.JSONField(default=dict, verbose_name='Extra fields')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        error_messages={
+                            "unique": "A user with that username already exists."
+                        },
+                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                        max_length=150,
+                        unique=True,
+                        validators=[
+                            django.contrib.auth.validators.UnicodeUsernameValidator()
+                        ],
+                        verbose_name="username",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="first name"
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="last name"
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=254, verbose_name="email address"
+                    ),
+                ),
+                (
+                    "is_staff",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates whether the user can log into this admin site.",
+                        verbose_name="staff status",
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        verbose_name="active",
+                    ),
+                ),
+                (
+                    "date_joined",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="date joined"
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "photo",
+                    easy_thumbnails.fields.ThumbnailerImageField(
+                        blank=True,
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_user_photo_filename,
+                        verbose_name="Photo",
+                    ),
+                ),
+                (
+                    "birth_day",
+                    models.DateField(blank=True, null=True, verbose_name="Birth day"),
+                ),
+                (
+                    "gender",
+                    models.CharField(
+                        blank=True,
+                        choices=[("", ""), ("F", "Female"), ("M", "Male")],
+                        default="",
+                        max_length=1,
+                        verbose_name="Gender",
+                    ),
+                ),
+                (
+                    "full_name",
+                    models.CharField(
+                        blank=True, default="", max_length=128, verbose_name="Full name"
+                    ),
+                ),
+                (
+                    "country",
+                    models.CharField(
+                        blank=True, default="", max_length=64, verbose_name="Country"
+                    ),
+                ),
+                (
+                    "city",
+                    models.CharField(
+                        blank=True, default="", max_length=64, verbose_name="City"
+                    ),
+                ),
+                (
+                    "street_address",
+                    models.TextField(
+                        blank=True, default="", verbose_name="Street address"
+                    ),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(
+                        blank=True,
+                        default="",
+                        max_length=32,
+                        verbose_name="Phone number",
+                    ),
+                ),
+                (
+                    "fax",
+                    models.CharField(
+                        blank=True, default="", max_length=32, verbose_name="Fax"
+                    ),
+                ),
+                (
+                    "job",
+                    models.CharField(
+                        blank=True, default="", max_length=64, verbose_name="Job title"
+                    ),
+                ),
+                (
+                    "cover_picture",
+                    easy_thumbnails.fields.ThumbnailerImageField(
+                        blank=True,
+                        help_text="Preferred image dimentions: (1200 x 250)",
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_user_cover_filename,
+                        verbose_name="Cover picture",
+                    ),
+                ),
+                (
+                    "tmp_pwd",
+                    models.CharField(
+                        blank=True,
+                        default="",
+                        max_length=64,
+                        verbose_name="Temporary password",
+                    ),
+                ),
+                (
+                    "device_id_list",
+                    models.JSONField(
+                        blank=True,
+                        default=list,
+                        help_text="A list of devices the the user is connected from.",
+                        verbose_name="Device IDs",
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(null=True, verbose_name="Deleted at"),
+                ),
+                (
+                    "extra_fields",
+                    models.JSONField(default=dict, verbose_name="Extra fields"),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'user',
-                'verbose_name_plural': 'users',
-                'ordering': ('-date_joined', 'last_name', 'first_name'),
-                'permissions': (('change_current_user', 'Can change user profile'), ('delete_current_user', 'Can delete user profile'), ('soft_delete_current_user', 'Can soft delete user profile')),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "user",
+                "verbose_name_plural": "users",
+                "ordering": ("-date_joined", "last_name", "first_name"),
+                "permissions": (
+                    ("change_current_user", "Can change user profile"),
+                    ("delete_current_user", "Can delete user profile"),
+                    ("soft_delete_current_user", "Can soft delete user profile"),
+                ),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
             managers=[
-                ('objects', lava.managers.LavaUserManager()),
+                ("objects", lava.managers.LavaUserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Bank',
+            name="Bank",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('name', models.CharField(max_length=256, verbose_name='Name')),
-                ('country', models.CharField(blank=True, default='Morocco', max_length=256, verbose_name='Country')),
-                ('city', models.CharField(blank=True, max_length=256, verbose_name='City')),
-                ('agency', models.CharField(blank=True, max_length=256, verbose_name='Agency')),
-                ('routing_number', models.CharField(blank=True, max_length=9, verbose_name='Routing number')),
-                ('swift_code', models.CharField(blank=True, max_length=256, verbose_name='BIC / SWIFT')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                ("name", models.CharField(max_length=256, verbose_name="Name")),
+                (
+                    "country",
+                    models.CharField(
+                        blank=True,
+                        default="Morocco",
+                        max_length=256,
+                        verbose_name="Country",
+                    ),
+                ),
+                (
+                    "city",
+                    models.CharField(blank=True, max_length=256, verbose_name="City"),
+                ),
+                (
+                    "agency",
+                    models.CharField(blank=True, max_length=256, verbose_name="Agency"),
+                ),
+                (
+                    "routing_number",
+                    models.CharField(
+                        blank=True, max_length=9, verbose_name="Routing number"
+                    ),
+                ),
+                (
+                    "swift_code",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="BIC / SWIFT"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Bank',
-                'verbose_name_plural': 'Banks',
-                'ordering': ('name',),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Bank",
+                "verbose_name_plural": "Banks",
+                "ordering": ("name",),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Group',
+            name="Group",
             fields=[
-                ('group_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='auth.group')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('slug', models.SlugField(max_length=256, null=True, unique=True, verbose_name='Slug')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('image', easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to=lava.utils.handle_upload_filenames.get_group_photo_filename, verbose_name='Image')),
-                ('notification_id', models.CharField(blank=True, max_length=256, verbose_name='Notification group id')),
-                ('is_system', models.BooleanField(default=False, verbose_name='Is system group')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='sub_groups', to='lava.group', verbose_name='Parent')),
+                (
+                    "group_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="auth.group",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "slug",
+                    models.SlugField(
+                        max_length=256, null=True, unique=True, verbose_name="Slug"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(blank=True, verbose_name="Description"),
+                ),
+                (
+                    "image",
+                    easy_thumbnails.fields.ThumbnailerImageField(
+                        blank=True,
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_group_photo_filename,
+                        verbose_name="Image",
+                    ),
+                ),
+                (
+                    "notification_id",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="Notification group id"
+                    ),
+                ),
+                (
+                    "is_system",
+                    models.BooleanField(default=False, verbose_name="Is system group"),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="sub_groups",
+                        to="lava.group",
+                        verbose_name="Parent",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Group',
-                'verbose_name_plural': 'Groups',
-                'ordering': ('-created_at',),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Group",
+                "verbose_name_plural": "Groups",
+                "ordering": ("-created_at",),
+                "abstract": False,
+                "default_permissions": (),
             },
-            bases=(lava.models.base_models.BaseModelMixin, 'auth.group', models.Model),
+            bases=(lava.models.base_models.BaseModelMixin, "auth.group", models.Model),
         ),
         migrations.CreateModel(
-            name='LogEntry',
+            name="LogEntry",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Preferences',
+            name="Preferences",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('font_style', models.JSONField(blank=True, default=dict, verbose_name='Font style')),
-                ('dark_theme', models.BooleanField(default=False, verbose_name='Dark theme on?')),
-                ('list_layout', models.CharField(choices=[('list', 'List'), ('cards', 'Cards')], default='list', max_length=8, verbose_name='List layout')),
-                ('menu_layout', models.CharField(choices=[('default', 'Default')], default='default', max_length=16, verbose_name='Menu layout')),
-                ('language', models.CharField(choices=[('en', 'English'), ('fr', 'Français'), ('es', 'Español'), ('ar', 'العربية')], default='en', max_length=2, verbose_name='Language')),
-                ('notifications_settings', models.JSONField(blank=True, default=dict, validators=[lava.validators.validate_notifications_settings], verbose_name='Notifications settings')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "font_style",
+                    models.JSONField(
+                        blank=True, default=dict, verbose_name="Font style"
+                    ),
+                ),
+                (
+                    "dark_theme",
+                    models.BooleanField(default=False, verbose_name="Dark theme on?"),
+                ),
+                (
+                    "list_layout",
+                    models.CharField(
+                        choices=[("list", "List"), ("cards", "Cards")],
+                        default="list",
+                        max_length=8,
+                        verbose_name="List layout",
+                    ),
+                ),
+                (
+                    "menu_layout",
+                    models.CharField(
+                        choices=[("default", "Default")],
+                        default="default",
+                        max_length=16,
+                        verbose_name="Menu layout",
+                    ),
+                ),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[
+                            ("en", "English"),
+                            ("fr", "Français"),
+                            ("es", "Español"),
+                            ("ar", "العربية"),
+                        ],
+                        default="en",
+                        max_length=2,
+                        verbose_name="Language",
+                    ),
+                ),
+                (
+                    "notifications_settings",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        validators=[lava.validators.validate_notifications_settings],
+                        verbose_name="Notifications settings",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Preferences',
-                'verbose_name_plural': 'Preferences',
+                "verbose_name": "Preferences",
+                "verbose_name_plural": "Preferences",
             },
         ),
         migrations.CreateModel(
-            name='Permission',
-            fields=[
-            ],
+            name="Permission",
+            fields=[],
             options={
-                'verbose_name': 'permission',
-                'verbose_name_plural': 'permissions',
-                'ordering': ['content_type__app_label', 'content_type__model', 'codename'],
-                'permissions': (('set_permission', 'Can set permissions'),),
-                'proxy': True,
-                'default_permissions': (),
-                'indexes': [],
-                'constraints': [],
+                "verbose_name": "permission",
+                "verbose_name_plural": "permissions",
+                "ordering": [
+                    "content_type__app_label",
+                    "content_type__model",
+                    "codename",
+                ],
+                "permissions": (("set_permission", "Can set permissions"),),
+                "proxy": True,
+                "default_permissions": (),
+                "indexes": [],
+                "constraints": [],
             },
-            bases=(lava.models.base_models.BaseModelMixin, 'auth.permission'),
+            bases=(lava.models.base_models.BaseModelMixin, "auth.permission"),
             managers=[
-                ('objects', django.contrib.auth.models.PermissionManager()),
+                ("objects", django.contrib.auth.models.PermissionManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateTimeField(auto_now_add=True, verbose_name='Date sent')),
-                ('title', models.CharField(max_length=128, verbose_name='Title')),
-                ('content', models.TextField(blank=True, default='', verbose_name='Content')),
-                ('category', models.CharField(choices=[('alert', 'Alert')], default='alert', max_length=32, verbose_name='Category')),
-                ('url', models.CharField(blank=True, default='', help_text='Action URL', max_length=200, validators=[lava.validators.SchemelessURLValidator()], verbose_name='URL')),
-                ('seen_by', models.JSONField(blank=True, default=list, verbose_name='Seen by')),
-                ('sender', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('target_groups', models.ManyToManyField(blank=True, related_name='notifications', to='lava.Group')),
-                ('target_users', models.ManyToManyField(blank=True, related_name='notifications', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "date",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Date sent"),
+                ),
+                ("title", models.CharField(max_length=128, verbose_name="Title")),
+                (
+                    "content",
+                    models.TextField(blank=True, default="", verbose_name="Content"),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[("alert", "Alert")],
+                        default="alert",
+                        max_length=32,
+                        verbose_name="Category",
+                    ),
+                ),
+                (
+                    "url",
+                    models.CharField(
+                        blank=True,
+                        default="",
+                        help_text="Action URL",
+                        max_length=200,
+                        validators=[lava.validators.SchemelessURLValidator()],
+                        verbose_name="URL",
+                    ),
+                ),
+                (
+                    "seen_by",
+                    models.JSONField(blank=True, default=list, verbose_name="Seen by"),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "target_groups",
+                    models.ManyToManyField(
+                        blank=True, related_name="notifications", to="lava.Group"
+                    ),
+                ),
+                (
+                    "target_users",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="notifications",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Notification',
-                'verbose_name_plural': 'Notifications',
-                'ordering': ('-date',),
-                'permissions': (('list_notification', 'Can list notifications'), ('add_notification', 'Can add notification'), ('view_notification', 'Can view notification'), ('delete_notification', 'Can delete notification')),
-                'default_permissions': (),
+                "verbose_name": "Notification",
+                "verbose_name_plural": "Notifications",
+                "ordering": ("-date",),
+                "permissions": (
+                    ("list_notification", "Can list notifications"),
+                    ("add_notification", "Can add notification"),
+                    ("view_notification", "Can view notification"),
+                    ("delete_notification", "Can delete notification"),
+                ),
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='FileDocument',
+            name="FileDocument",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('name', models.CharField(blank=True, default='', max_length=256, verbose_name='Name')),
-                ('document_file', models.FileField(upload_to=lava.utils.handle_upload_filenames.get_document_filename, verbose_name='File')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, default="", max_length=256, verbose_name="Name"
+                    ),
+                ),
+                (
+                    "document_file",
+                    models.FileField(
+                        upload_to=lava.utils.handle_upload_filenames.get_document_filename,
+                        verbose_name="File",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Document',
-                'verbose_name_plural': 'Documents',
+                "verbose_name": "Document",
+                "verbose_name_plural": "Documents",
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Conversation',
+            name="Conversation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('name', models.CharField(blank=True, max_length=100, verbose_name='Name')),
-                ('is_group_conversation', models.BooleanField(default=False, verbose_name='Group conversation')),
-                ('logo', models.ImageField(blank=True, null=True, upload_to=lava.utils.handle_upload_filenames.get_conversation_logo_filename, verbose_name='Logo')),
-                ('members', models.JSONField(default=dict, verbose_name='Members')),
-                ('pinned_at', models.DateTimeField(blank=True, null=True, verbose_name='Pinned at')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(blank=True, max_length=100, verbose_name="Name"),
+                ),
+                (
+                    "is_group_conversation",
+                    models.BooleanField(
+                        default=False, verbose_name="Group conversation"
+                    ),
+                ),
+                (
+                    "logo",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_conversation_logo_filename,
+                        verbose_name="Logo",
+                    ),
+                ),
+                ("members", models.JSONField(default=dict, verbose_name="Members")),
+                (
+                    "pinned_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Pinned at"
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Conversation',
-                'verbose_name_plural': 'Conversations',
-                'ordering': ('-pinned_at', django.db.models.expressions.OrderBy(django.db.models.expressions.F('last_updated_at'), descending=True, nulls_last=True)),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Conversation",
+                "verbose_name_plural": "Conversations",
+                "ordering": (
+                    "-pinned_at",
+                    django.db.models.expressions.OrderBy(
+                        django.db.models.expressions.F("last_updated_at"),
+                        descending=True,
+                        nulls_last=True,
+                    ),
+                ),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='ChatMessage',
+            name="ChatMessage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('text', models.TextField(blank=True, verbose_name='Text')),
-                ('image', models.ImageField(blank=True, null=True, upload_to=lava.utils.handle_upload_filenames.get_chat_message_image_filename, verbose_name='Image')),
-                ('type', models.CharField(choices=[('text', 'Text'), ('image', 'Image')], default='email', max_length=32, verbose_name='Message type')),
-                ('read_by', models.JSONField(default=dict, verbose_name='Read by')),
-                ('conversation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='lava.conversation', verbose_name='Conversation')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_messages', to=settings.AUTH_USER_MODEL, verbose_name='Sender')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                ("text", models.TextField(blank=True, verbose_name="Text")),
+                (
+                    "image",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_chat_message_image_filename,
+                        verbose_name="Image",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("text", "Text"), ("image", "Image")],
+                        default="email",
+                        max_length=32,
+                        verbose_name="Message type",
+                    ),
+                ),
+                ("read_by", models.JSONField(default=dict, verbose_name="Read by")),
+                (
+                    "conversation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="lava.conversation",
+                        verbose_name="Conversation",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sent_messages",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Sender",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Message',
-                'verbose_name_plural': 'Messages',
-                'ordering': ('created_at',),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Message",
+                "verbose_name_plural": "Messages",
+                "ordering": ("created_at",),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='BankAccount',
+            name="BankAccount",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('name', models.CharField(blank=True, max_length=256, null=True, unique=True, verbose_name='Name')),
-                ('balance', models.DecimalField(blank=True, decimal_places=2, default=0, max_digits=14, verbose_name='Balance')),
-                ('account_holder', models.CharField(blank=True, max_length=256, verbose_name='Account holder')),
-                ('iban', models.CharField(blank=True, max_length=34, verbose_name='Code postal')),
-                ('rib', models.CharField(blank=True, max_length=24, verbose_name='RIB')),
-                ('bank', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='lava.bank', verbose_name='Bank')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        max_length=256,
+                        null=True,
+                        unique=True,
+                        verbose_name="Name",
+                    ),
+                ),
+                (
+                    "balance",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        default=0,
+                        max_digits=14,
+                        verbose_name="Balance",
+                    ),
+                ),
+                (
+                    "account_holder",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="Account holder"
+                    ),
+                ),
+                (
+                    "iban",
+                    models.CharField(
+                        blank=True, max_length=34, verbose_name="Code postal"
+                    ),
+                ),
+                (
+                    "rib",
+                    models.CharField(blank=True, max_length=24, verbose_name="RIB"),
+                ),
+                (
+                    "bank",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="lava.bank",
+                        verbose_name="Bank",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Bank account',
-                'verbose_name_plural': 'Bank accounts',
-                'ordering': ('-created_at',),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Bank account",
+                "verbose_name_plural": "Bank accounts",
+                "ordering": ("-created_at",),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Backup',
+            name="Backup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('name', models.CharField(blank=True, max_length=256, verbose_name='Backup name')),
-                ('type', models.CharField(choices=[('full_backup', 'Full backup'), ('db_backup', 'Database backup')], default='full_backup', max_length=16, verbose_name='Backup type')),
-                ('status', models.CharField(choices=[('running', 'Running'), ('completed', 'Completed'), ('failed', 'Failed')], default='running', max_length=16, verbose_name='Status')),
-                ('backup_file', models.FileField(blank=True, null=True, upload_to=lava.utils.handle_upload_filenames.get_backup_file_filename, verbose_name='Backup file')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="Backup name"
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("full_backup", "Full backup"),
+                            ("db_backup", "Database backup"),
+                        ],
+                        default="full_backup",
+                        max_length=16,
+                        verbose_name="Backup type",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("running", "Running"),
+                            ("completed", "Completed"),
+                            ("failed", "Failed"),
+                        ],
+                        default="running",
+                        max_length=16,
+                        verbose_name="Status",
+                    ),
+                ),
+                (
+                    "backup_file",
+                    models.FileField(
+                        blank=True,
+                        null=True,
+                        upload_to=lava.utils.handle_upload_filenames.get_backup_file_filename,
+                        verbose_name="Backup file",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Backup',
-                'verbose_name_plural': 'Backups',
-                'ordering': ('-created_at',),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Backup",
+                "verbose_name_plural": "Backups",
+                "ordering": ("-created_at",),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Address',
+            name="Address",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(blank=True, default=django.utils.timezone.now, null=True, verbose_name='Created at')),
-                ('last_updated_at', models.DateTimeField(auto_now=True, null=True, verbose_name='Last update')),
-                ('deleted_at', models.DateTimeField(blank=True, null=True, verbose_name='Deleted at')),
-                ('street_address', models.CharField(blank=True, max_length=256, verbose_name='Adresse')),
-                ('postal_code', models.CharField(blank=True, max_length=256, verbose_name='Code postal')),
-                ('city', models.CharField(max_length=256, validators=[lava.validators.validate_empty_field], verbose_name='Ville')),
-                ('country', models.CharField(max_length=256, validators=[lava.validators.validate_empty_field], verbose_name='Pays')),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        blank=True,
+                        default=django.utils.timezone.now,
+                        null=True,
+                        verbose_name="Created at",
+                    ),
+                ),
+                (
+                    "last_updated_at",
+                    models.DateTimeField(
+                        auto_now=True, null=True, verbose_name="Last update"
+                    ),
+                ),
+                (
+                    "deleted_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Deleted at"
+                    ),
+                ),
+                (
+                    "street_address",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="Adresse"
+                    ),
+                ),
+                (
+                    "postal_code",
+                    models.CharField(
+                        blank=True, max_length=256, verbose_name="Code postal"
+                    ),
+                ),
+                (
+                    "city",
+                    models.CharField(
+                        max_length=256,
+                        validators=[lava.validators.validate_empty_field],
+                        verbose_name="Ville",
+                    ),
+                ),
+                (
+                    "country",
+                    models.CharField(
+                        max_length=256,
+                        validators=[lava.validators.validate_empty_field],
+                        verbose_name="Pays",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Adresse',
-                'verbose_name_plural': 'Adresses',
-                'ordering': ('city', 'country', 'street_address'),
-                'abstract': False,
-                'default_permissions': (),
+                "verbose_name": "Adresse",
+                "verbose_name_plural": "Adresses",
+                "ordering": ("city", "country", "street_address"),
+                "abstract": False,
+                "default_permissions": (),
             },
             bases=(lava.models.base_models.BaseModelMixin, models.Model),
         ),
         migrations.AddField(
-            model_name='user',
-            name='groups',
-            field=models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='users', related_query_name='user', to='lava.Group', verbose_name='groups'),
+            model_name="user",
+            name="groups",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                related_name="users",
+                related_query_name="user",
+                to="lava.Group",
+                verbose_name="groups",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='preferences',
-            field=models.OneToOneField(blank=True, on_delete=django.db.models.deletion.PROTECT, to='lava.preferences'),
+            model_name="user",
+            name="preferences",
+            field=models.OneToOneField(
+                blank=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="lava.preferences",
+            ),
         ),
         migrations.AddField(
-            model_name='user',
-            name='user_permissions',
-            field=models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='users', related_query_name='user', to='lava.Permission', verbose_name='user permissions'),
+            model_name="user",
+            name="user_permissions",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Specific permissions for this user.",
+                related_name="users",
+                related_query_name="user",
+                to="lava.Permission",
+                verbose_name="user permissions",
+            ),
         ),
         migrations.CreateModel(
-            name='NotificationGroup',
-            fields=[
-            ],
+            name="NotificationGroup",
+            fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('lava.group',),
+            bases=("lava.group",),
         ),
     ]

@@ -6,10 +6,10 @@ from rest_framework.fields import ImageField, FileField, empty
 from easy_thumbnails.files import get_thumbnailer
 
 
-KILO = 2 ** 10
-MEGA = KILO ** 2
-GIGA = MEGA ** 2
-TERA = GIGA ** 2
+KILO = 2**10
+MEGA = KILO**2
+GIGA = MEGA**2
+TERA = GIGA**2
 
 
 def humanize_file_size(file_size):  # File size in bytes
@@ -26,7 +26,6 @@ def humanize_file_size(file_size):  # File size in bytes
 
 
 class ThumbnailImageField(ImageField):
-
     def __init__(self, alias=None, options=None, **kwargs):
         self.alias = alias
         self.options = options
@@ -45,7 +44,6 @@ class ThumbnailImageField(ImageField):
 
 
 class ControlledFileField(FileField):
-
     def __init__(self, max_size=MEGA, **kwargs):
         self.max_size = max_size  # max_size in Mb
         super().__init__(**kwargs)
@@ -54,23 +52,30 @@ class ControlledFileField(FileField):
         # Validation
         file = data
         if file.size > self.max_size:
-                raise ValidationError(_("The size of the file you uploaded (%(file_size)s) exceeds the maximum allowed size of %(max_size)s." % {
-                    "file_size": humanize_file_size(file.size),
-                    "max_size": humanize_file_size(self.max_size)
-                }))
+            raise ValidationError(
+                _(
+                    "The size of the file you uploaded (%(file_size)s) exceeds the maximum allowed size of %(max_size)s."
+                    % {
+                        "file_size": humanize_file_size(file.size),
+                        "max_size": humanize_file_size(self.max_size),
+                    }
+                )
+            )
         return super().run_validation(data)
 
 
 # Default callabels for serializer fields
 
+
 class NotificationGroupsDefault:
     """
     Returns a list of the user's notification groups.
     """
+
     requires_context = True
 
     def __call__(self, serializer_field):
-        instance = serializer_field.context.get('instance')
+        instance = serializer_field.context.get("instance")
         if not instance:
             return []
         return instance.get_notification_groups_ids()

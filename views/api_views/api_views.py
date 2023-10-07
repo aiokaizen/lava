@@ -114,7 +114,7 @@ class NotificationViewSet(ReadOnlyModelViewSet):
     queryset = Notification.objects.none()
 
     def get_queryset(self):
-        if not hasattr(self, 'user'):
+        if not hasattr(self, "user"):
             return self.queryset
         return self.user.get_notifications()
 
@@ -122,7 +122,7 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         permission_classes = [permissions.IsAuthenticated]
         if self.action == "send_notification":
             permission_classes = [
-                get_model_permission_class(Notification, 'add_notification')
+                get_model_permission_class(Notification, "add_notification")
             ]
         return [permission() for permission in permission_classes]
 
@@ -152,17 +152,18 @@ class NotificationViewSet(ReadOnlyModelViewSet):
         self.user = request.user
         queryset = self.user.get_unread_notifications()
         unread_count = queryset.count()
-        serializer = self.get_serializer(instance=queryset[:5], user=self.user, many=True)
-        return Response({
-            'notifications': serializer.data,
-            'unread': unread_count
-        })
+        serializer = self.get_serializer(
+            instance=queryset[:5], user=self.user, many=True
+        )
+        return Response({"notifications": serializer.data, "unread": unread_count})
 
     @action(detail=False, methods=["POST"])
     def mark_as_read(self, request, *args, **kwargs):
         user = request.user
         self.user = user
-        serializer = ListIDsSerializer(data=request.data, model=Notification, trash=False)
+        serializer = ListIDsSerializer(
+            data=request.data, model=Notification, trash=False
+        )
         serializer.is_valid(raise_exception=True)
         queryset = serializer.validated_data["list_ids"]
         result = Notification.mark_as_read_bulk(queryset, self.user)

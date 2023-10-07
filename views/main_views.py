@@ -5,9 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth import (
-    login as auth_login, logout as do_logout
-)
+from django.contrib.auth import login as auth_login, logout as do_logout
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import resolve_url, render, redirect, HttpResponseRedirect
 from django.urls.base import reverse
@@ -26,7 +24,7 @@ from lava.forms.main_forms import LoginForm, SignupForm
 class Home(View):
 
     template_name = "lava/home.html"
-    page_id = 'home'
+    page_id = "home"
 
     def get_permissions(self, request):
         pass
@@ -34,7 +32,7 @@ class Home(View):
     @method_decorator(login_required)
     def get(self, request, *args, **kwargs):
         context = {
-            'page_breadcrumb_id': self.page_id,
+            "page_breadcrumb_id": self.page_id,
         }
         return render(request, self.template_name, context)
 
@@ -43,26 +41,25 @@ class Login(View):
 
     form_class = LoginForm
     initial = {}
-    template_name = 'lava/login.html'
-    page_id = 'login'
+    template_name = "lava/login.html"
+    page_id = "login"
     authentication_form = None
     redirect_authenticated_user = False
     extra_context = None
-    redirect_field_name = 'next'
+    redirect_field_name = "next"
 
     def get_redirect_url(self):
         """Return the user-originating redirect URL if it's safe."""
         redirect_to = self.request.POST.get(
-            self.redirect_field_name,
-            self.request.GET.get(self.redirect_field_name, '')
+            self.redirect_field_name, self.request.GET.get(self.redirect_field_name, "")
         )
-        print('redirect url:', redirect_to)
+        print("redirect url:", redirect_to)
         url_is_safe = True  # self.request.is_secure()
-        return redirect_to if url_is_safe else ''
+        return redirect_to if url_is_safe else ""
 
     def get_success_url(self):
         url = self.get_redirect_url()
-        return url or resolve_url(settings.LOGIN_REDIRECT_URL or 'lava:home')
+        return url or resolve_url(settings.LOGIN_REDIRECT_URL or "lava:home")
 
     @method_decorator(sensitive_post_parameters())
     @method_decorator(csrf_protect)
@@ -80,10 +77,7 @@ class Login(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(request=request, initial=self.initial)
-        context = {
-            'page_breadcrumb_id': self.page_id,
-            'form': form
-        }
+        context = {"page_breadcrumb_id": self.page_id, "form": form}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -92,10 +86,7 @@ class Login(View):
             auth_login(self.request, form.get_user())
             return HttpResponseRedirect(self.get_success_url())
 
-        context = {
-            'page_breadcrumb_id': self.page_id,
-            'form': form
-        }
+        context = {"page_breadcrumb_id": self.page_id, "form": form}
         return render(request, self.template_name, context)
 
 
@@ -103,40 +94,33 @@ class Signup(View):
 
     form_class = SignupForm
     initial = {}
-    template_name = 'lava/signup.html'
-    page_id = 'signup'
+    template_name = "lava/signup.html"
+    page_id = "signup"
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(initial=self.initial)
-        context = {
-            'page_breadcrumb_id': self.page_id,
-            'form': form
-        }
+        context = {"page_breadcrumb_id": self.page_id, "form": form}
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             # Create a new user
-            return redirect(reverse('lava:login'))
+            return redirect(reverse("lava:login"))
 
-        context = {
-            'page_breadcrumb_id': self.page_id,
-            'form': form
-        }
+        context = {"page_breadcrumb_id": self.page_id, "form": form}
         return render(request, self.template_name, context)
 
 
 class ResetPassword(View):
-
     def get(self, request):
-        return redirect(reverse('lava:home'))
+        return redirect(reverse("lava:home"))
 
 
 @login_required
 def logout(request):
     do_logout(request)
-    return redirect(reverse('lava:home'))
+    return redirect(reverse("lava:home"))
 
 
 def activate_user(request, uid, token):
@@ -158,7 +142,6 @@ def activate_user(request, uid, token):
 
 
 class ResetPasswordConfirm(View):
-
     def get(self, request, uid, token):
         form = SetPasswordForm(user=None)
         return render(
@@ -172,8 +155,7 @@ class ResetPasswordConfirm(View):
         web_url = protocol + request.get_host()
         post_url = web_url + "/auth/users/reset_password_confirm/"
 
-        form = SetPasswordForm(
-            user=None, data=request.POST, files=request.FILES)
+        form = SetPasswordForm(user=None, data=request.POST, files=request.FILES)
         if not form.is_valid():
             return render(
                 request,
@@ -209,6 +191,5 @@ class ResetPasswordConfirm(View):
 
 
 class Notifications(View):
-
     def get(self, request):
         return HttpResponse("<h2>Notifications</h2>")

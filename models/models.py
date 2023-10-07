@@ -187,7 +187,8 @@ class Permission(BaseModelMixin, BasePermissionModel):
         result = super().create(user=user, *args, **kwargs)
         if result.is_error:
             return result
-        return Result.success(_("The permission has been created successfully."), instance=self
+        return Result.success(
+            _("The permission has been created successfully."), instance=self
         )
 
     def update(self, user=None, update_fields=None, *args, **kwargs):
@@ -326,7 +327,7 @@ class NotificationGroup(Group):
                 defaults={
                     "name": group_data.get("name"),
                     "description": group_data.get("description", ""),
-                }
+                },
             )
         return Result.success(
             _("All notification groups have been created successfully.")
@@ -559,7 +560,8 @@ class User(BaseModel, AbstractUser):
             if result.is_error:
                 return result
             self.customer = bt_customer
-            return Result.success(_("Associated BrainTree customer was created successfully.")
+            return Result.success(
+                _("Associated BrainTree customer was created successfully.")
             )
         except Exception as e:
             logging.error(e)
@@ -614,8 +616,7 @@ class User(BaseModel, AbstractUser):
                 field.set(value)
 
         return Result.success(
-            message=_("User has been updated successfully."),
-            instance=self
+            message=_("User has been updated successfully."), instance=self
         )
 
     def delete(self, user=None, soft_delete=True):
@@ -677,7 +678,7 @@ class User(BaseModel, AbstractUser):
         return NotificationGroup.objects.filter(user=self)
 
     def get_notification_groups_ids(self):
-        return self.get_notification_groups().values_list('id', flat=True)
+        return self.get_notification_groups().values_list("id", flat=True)
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
@@ -741,8 +742,7 @@ class User(BaseModel, AbstractUser):
             validate_password(password, User)
             return Result.success(message=_("User password is valid."))
         except ValidationError as e:
-            return Result.error(message=_("Invalid password."), errors=e.messages
-            )
+            return Result.error(message=_("Invalid password."), errors=e.messages)
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
@@ -872,7 +872,9 @@ class Notification(BaseModelMixin, models.Model):
         if not result.is_success:
             return result
 
-        target_notification_groups = list(NotificationGroup.objects.filter(notifications=self))
+        target_notification_groups = list(
+            NotificationGroup.objects.filter(notifications=self)
+        )
         target_groups = list(Group.objects.filter(notifications=self))
         target_users = list(self.target_users.all())
 
@@ -880,7 +882,7 @@ class Notification(BaseModelMixin, models.Model):
             send_ws_notification(
                 self,
                 target_groups=[*target_groups, *target_notification_groups],
-                target_users=target_users
+                target_users=target_users,
             )
 
         # Disable FireBase notifications until it's implemented
@@ -888,7 +890,8 @@ class Notification(BaseModelMixin, models.Model):
         if send_firebase_notification:
             self.send_firebase_notification()
 
-        return Result.success(_("The notification has been created successfully."), instance=self
+        return Result.success(
+            _("The notification has been created successfully."), instance=self
         )
 
     def mark_as_read(self, user):
@@ -967,14 +970,14 @@ class Notification(BaseModelMixin, models.Model):
 
 
 class BackupConfig(BaseModel):
-
     class Meta:
         verbose_name = _("Backup Configuration")
         verbose_name_plural = _("Backup Configuration")
 
     automatic_backup_hour_interval = models.PositiveIntegerField(
-        _("Automatic backup interval"), default=(24 * 7),  # Defaults to 7 days.
-        help_text=_("The number of hours between automatic backups.")
+        _("Automatic backup interval"),
+        default=(24 * 7),  # Defaults to 7 days.
+        help_text=_("The number of hours between automatic backups."),
     )
 
     def __str__(self):
@@ -983,14 +986,16 @@ class BackupConfig(BaseModel):
     def create(self, user=None, *args, **kwargs):
         if BackupConfig.objects.exists():
             # Singlton model
-            return Result.error(_(
-                "A Backup Configuration instance has already been created. "
-                "Try updating it instead."
-            ))
+            return Result.error(
+                _(
+                    "A Backup Configuration instance has already been created. "
+                    "Try updating it instead."
+                )
+            )
 
-        lava_settings.backup_scheduler = schedule.every(self.automatic_backup_hour_interval).hours.do(
-            Backup.start_automatic_backup
-        )
+        lava_settings.backup_scheduler = schedule.every(
+            self.automatic_backup_hour_interval
+        ).hours.do(Backup.start_automatic_backup)
 
         return super().create(user=user, *args, **kwargs)
 
@@ -1000,16 +1005,16 @@ class BackupConfig(BaseModel):
         schedule.cancel_job(lava_settings.backup_scheduler)
 
         # Run new job
-        lava_settings.backup_scheduler = schedule.every(self.automatic_backup_hour_interval).hours.do(
-            Backup.start_automatic_backup
-        )
+        lava_settings.backup_scheduler = schedule.every(
+            self.automatic_backup_hour_interval
+        ).hours.do(Backup.start_automatic_backup)
 
         return super().update(user=user, *args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        return Result.error(_(
-            "You can not delete a singleton object. Please try to update it instead."
-        ))
+        return Result.error(
+            _("You can not delete a singleton object. Please try to update it instead.")
+        )
 
     @classmethod
     def get_backup_config(cls):
@@ -1096,19 +1101,35 @@ class Backup(BaseModel):
         if not latest_backup:
             return Result.success()
 
-        today_backups = all_backups.filter(created_at__date=now.date()).order_by("-created_at")
+        today_backups = all_backups.filter(created_at__date=now.date()).order_by(
+            "-created_at"
+        )
 
         if today_backups.count() >= daily_limit:
-            return Result.error(_("You can not create more than %d backups per day." % daily_limit))
+            return Result.error(
+                _("You can not create more than %d backups per day." % daily_limit)
+            )
 
         latest_backup_time = latest_backup.created_at
         if now < latest_backup_time + min_period_between_backups:
             if min_hours > 1:
-                return Result.error(_("You can only create one backup every %d hours." % min_hours))
+                return Result.error(
+                    _("You can only create one backup every %d hours." % min_hours)
+                )
             elif min_hours * 60 > 1:
-                return Result.error(_("You can only create one backup every %d minutes." % (min_hours * 60)))
+                return Result.error(
+                    _(
+                        "You can only create one backup every %d minutes."
+                        % (min_hours * 60)
+                    )
+                )
             else:
-                return Result.error(_("You can only create one backup every %d seconds." % (min_hours * 60 * 60)))
+                return Result.error(
+                    _(
+                        "You can only create one backup every %d seconds."
+                        % (min_hours * 60 * 60)
+                    )
+                )
 
         return Result.success()
 
@@ -1117,7 +1138,9 @@ class Backup(BaseModel):
         if not result.success:
             return result
 
-        self.name = self.name or f"{self.created_at.strftime('%c')} {self.get_type_display()}"
+        self.name = (
+            self.name or f"{self.created_at.strftime('%c')} {self.get_type_display()}"
+        )
         result = super().create(user, *args, **kwargs)
         if result.is_error:
             return result

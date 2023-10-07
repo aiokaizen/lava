@@ -16,9 +16,7 @@ class BulkNotificationActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = [
-            "notifications_ids"
-        ]
+        fields = ["notifications_ids"]
 
     def __init__(self, user, instance=None, data=empty, **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -26,7 +24,6 @@ class BulkNotificationActionSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)
-
 
 
 class NotificationSerializer(serializers.ModelSerializer):

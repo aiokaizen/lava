@@ -18,12 +18,16 @@ class Address(BaseModel):
     class Meta(BaseModel.Meta):
         verbose_name = _("Adresse")
         verbose_name_plural = _("Adresses")
-        ordering = ('city', 'country', 'street_address')
+        ordering = ("city", "country", "street_address")
 
     street_address = models.CharField(_("Adresse"), max_length=256, blank=True)
     postal_code = models.CharField(_("Code postal"), max_length=256, blank=True)
-    city = models.CharField(_("Ville"), max_length=256, validators=[validate_empty_field])
-    country = models.CharField(_("Pays"), max_length=256, validators=[validate_empty_field])
+    city = models.CharField(
+        _("Ville"), max_length=256, validators=[validate_empty_field]
+    )
+    country = models.CharField(
+        _("Pays"), max_length=256, validators=[validate_empty_field]
+    )
 
     def __str__(self):
         if self.street_address:
@@ -32,7 +36,7 @@ class Address(BaseModel):
             return f"{self.city} {self.postal_code}, {self.country}"
 
     def in_use(self):
-        """ returns True if the address is already used in the system. """
+        """returns True if the address is already used in the system."""
         for field in self._meta.get_fields():
             if not isinstance(field, models.ForeignObjectRel):
                 continue
@@ -55,9 +59,8 @@ class Address(BaseModel):
             kwargs = {}
 
         if "query" in kwargs:
-            filter_params &= (
-                Q(city__icontains=kwargs.get("query")) |
-                Q(country__icontains=kwargs.get("query"))
+            filter_params &= Q(city__icontains=kwargs.get("query")) | Q(
+                country__icontains=kwargs.get("query")
             )
 
         if "city" in kwargs:
@@ -77,7 +80,6 @@ class Address(BaseModel):
 
 
 class FileDocument(BaseModel):
-
     class Meta:
         verbose_name = _("Document")
         verbose_name_plural = _("Documents")

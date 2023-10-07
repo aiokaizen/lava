@@ -25,9 +25,7 @@ class Command(BaseCommand):
             class_name = model.__name__.lower()
             permissions_data[class_name] = {}
             content_type = ContentType.objects.get_for_model(model)
-            permissions = Permission.objects.filter(
-                content_type=content_type
-            )
+            permissions = Permission.objects.filter(content_type=content_type)
             for perm in permissions:
                 if class_name not in perm.codename:
                     continue
@@ -36,5 +34,5 @@ class Command(BaseCommand):
                 codename = f"{content_type.app_label}.{class_name}.{perm.codename}"
                 permissions_data[class_name][perm_id] = codename
 
-        with open(os.path.join(settings.BASE_DIR, "permissions.json"), 'w') as f:
+        with open(os.path.join(settings.BASE_DIR, "permissions.json"), "w") as f:
             json.dump(permissions_data, f)

@@ -15,8 +15,8 @@ class UserListView(View):
 
     filter_form_class = UserFilterForm
     model_class = User
-    template_name = 'lava/users/user-list.html'
-    page_id = 'user_list'
+    template_name = "lava/users/user-list.html"
+    page_id = "user_list"
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -29,8 +29,8 @@ class UserListView(View):
         filter_form = self.filter_form_class(data=request.GET)
         queryset = self.get_queryset(request)
         context = {
-            'page_breadcrumb_id': self.page_id,
-            'queryset': queryset,
-            'filter_form': filter_form
+            "page_breadcrumb_id": self.page_id,
+            "queryset": queryset,
+            "filter_form": filter_form,
         }
         return render(request, self.template_name, context)

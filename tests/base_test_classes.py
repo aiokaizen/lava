@@ -22,7 +22,9 @@ class BaseTestMixin:
     @property
     def data(self):
         if self._data is None:
-            with open(os.path.join(settings.BASE_DIR, self.demo_content_path), "r") as f:
+            with open(
+                os.path.join(settings.BASE_DIR, self.demo_content_path), "r"
+            ) as f:
                 self._data = json.load(f)
 
         return deepcopy(self._data)
@@ -36,16 +38,18 @@ class BaseAPITest(APITestCase, URLPatternsTestCase, BaseTestMixin):
         if not username:
             self.client.credentials()
             return None
-        
+
         user = self.users[username]
         token = Token.objects.get(user=user)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
         return user
 
     def setUp(self):
         super().setUp()
         SetUpLava().handle(no_logs=True, reset_perms=None)
-        LavaInstallDemo().handle(num_users=3, suffix="testuser", skip_avatars=True, no_logs=True)
+        LavaInstallDemo().handle(
+            num_users=3, suffix="testuser", skip_avatars=True, no_logs=True
+        )
 
         self.users = odict(
             ekadmin=User.objects.get(username="ekadmin"),
@@ -72,7 +76,9 @@ class BaseModelTest(TestCase, BaseTestMixin):
     def setUp(self):
         super().setUp()
         SetUpLava().handle(no_logs=True, reset_perms=False)
-        LavaInstallDemo().handle(num_users=2, suffix="testuser", skip_avatars=True, no_logs=True)
+        LavaInstallDemo().handle(
+            num_users=2, suffix="testuser", skip_avatars=True, no_logs=True
+        )
         self.users = odict(
             ekadmin=User.objects.get(username="ekadmin"),
             eksuperuser=User.objects.get(username="eksuperuser"),

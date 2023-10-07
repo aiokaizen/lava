@@ -1,4 +1,3 @@
-
 from lava.tests.base_test_classes import BaseModelTest
 
 from lava.enums import PermissionActionName
@@ -7,7 +6,6 @@ from lava.services.permissions import *
 
 
 class PermissionsTest(BaseModelTest):
-
     def test_add_user_action_permission_exists(self):
         """
         Ensure we can not create a new category object when the name is not provided.

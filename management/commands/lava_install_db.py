@@ -14,9 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--db-name',
-            nargs='?',
-            help="Database name. Choices: moroccan_banks, "
+            "--db-name", nargs="?", help="Database name. Choices: moroccan_banks, "
         )
 
     def handle(self, *args, **options):
@@ -26,7 +24,9 @@ class Command(BaseCommand):
         db_name = options["db_name"]
 
         if db_name in ["moroccan_banks", "moroccan_banks_extended"]:
-            db_file_path = os.path.join(settings.BASE_DIR, f"lava/databases/{db_name}.json")
+            db_file_path = os.path.join(
+                settings.BASE_DIR, f"lava/databases/{db_name}.json"
+            )
             with open(db_file_path) as f:
                 bank_list = json.load(f)
                 for bank_data in bank_list:
@@ -35,7 +35,7 @@ class Command(BaseCommand):
                         name=bank_data.pop("name"),
                         city=bank_data.pop("city", ""),
                         agency=bank_data.pop("agency", ""),
-                        defaults=bank_data
+                        defaults=bank_data,
                     )
                     if created:
                         print(f"Bank: {bank} has been created successfully.")

@@ -13,35 +13,32 @@ from channels.layers import get_channel_layer
 
 
 class BaseConsumer(AsyncWebsocketConsumer):
-
     async def prepare_connection(self):
-        self.user = self.scope['user']
+        self.user = self.scope["user"]
 
         headers = self.scope["headers"]
-        media_protocol = 'https' if settings.DEBUG is False else 'http'
+        media_protocol = "https" if settings.DEBUG is False else "http"
 
         self.base_url = None
         for key, value in headers:
-            if key.decode() == 'host':
+            if key.decode() == "host":
                 self.base_url = f"{media_protocol}://{value.decode()}"
 
         user_groups = await database_sync_to_async(list)(
             NotificationGroup.objects.filter(user=self.user)
         )
 
-        self.user_group_name = f'user_{self.user.id}'
-        await self.channel_layer.group_add(
-            self.user_group_name,
-            self.channel_name
-        )
+        self.user_group_name = f"user_{self.user.id}"
+        await self.channel_layer.group_add(self.user_group_name, self.channel_name)
 
-        setattr(self, f"user_notification_group_names", [
-            f"user_group_{group.id}" for group in user_groups
-        ])
+        setattr(
+            self,
+            f"user_notification_group_names",
+            [f"user_group_{group.id}" for group in user_groups],
+        )
         for user_group in user_groups:
             await self.channel_layer.group_add(
-                f"user_group_{user_group.id}",
-                self.channel_name
+                f"user_group_{user_group.id}", self.channel_name
             )
 
     async def connect(self):
@@ -61,35 +58,32 @@ class BaseConsumer(AsyncWebsocketConsumer):
 
 
 class ChatConsumer(BaseConsumer):
-
     async def connect(self):
         await super().prepare_connection()
-        conversation_id = self.scope['url_route']['kwargs'].get('conversation_id', 0)
+        conversation_id = self.scope["url_route"]["kwargs"].get("conversation_id", 0)
         if conversation_id:
             self.conversation = await database_sync_to_async(
-                lambda : Conversation.objects.get(pk=conversation_id)
+                lambda: Conversation.objects.get(pk=conversation_id)
             )()
-            members = await database_sync_to_async (
-                list
-            )(self.conversation.get_members())
+            members = await database_sync_to_async(list)(
+                self.conversation.get_members()
+            )
             if self.user not in members:
                 return await self.close()
 
-            self.conversation_group_name = f'conversation_{conversation_id}'
+            self.conversation_group_name = f"conversation_{conversation_id}"
             await self.channel_layer.group_add(
-                self.conversation_group_name,
-                self.channel_name
+                self.conversation_group_name, self.channel_name
             )
 
-        user_conversations = await database_sync_to_async(
-            list
-        )(Conversation.get_user_conversations(self.user).exclude(id=conversation_id))
+        user_conversations = await database_sync_to_async(list)(
+            Conversation.get_user_conversations(self.user).exclude(id=conversation_id)
+        )
 
         for conversation in user_conversations:
-            conversation_group_name = f'conversation_{conversation.id}'
+            conversation_group_name = f"conversation_{conversation.id}"
             await self.channel_layer.group_add(
-                conversation_group_name,
-                self.channel_name
+                conversation_group_name, self.channel_name
             )
         await self.accept()
 
@@ -97,10 +91,10 @@ class ChatConsumer(BaseConsumer):
         if not text_data:
             return
         data = json.loads(text_data)
-        action = data.get('action')
-        if action == 'send_message':
+        action = data.get("action")
+        if action == "send_message":
             await self.send_message(data)
-        elif action == 'mark_message_as_read':
+        elif action == "mark_message_as_read":
             await self.mark_as_read(data)
 
     async def send_message(self, data):
@@ -108,87 +102,81 @@ class ChatConsumer(BaseConsumer):
 
         message = ChatMessage(
             sender=user,
-            type=data.get('type', ''),
-            text=data.get('text', ''),
-            conversation=self.conversation
+            type=data.get("type", ""),
+            text=data.get("text", ""),
+            conversation=self.conversation,
         )
-        image = data.get('image', None)
-        result = await database_sync_to_async(
-            message.create
-        )(user=user, file_fields=(("image", image), ) if image else None)
+        image = data.get("image", None)
+        result = await database_sync_to_async(message.create)(
+            user=user, file_fields=(("image", image),) if image else None
+        )
         if result.is_error:
-            await self.send({
-                'type': 'error_message',
-                'error': result.to_dict()
-            })
+            await self.send({"type": "error_message", "error": result.to_dict()})
             return
 
         avatar = message.sender.photo.url if message.sender.photo else None
         await self.channel_layer.group_send(
             self.conversation_group_name,
             {
-                'type': 'chat_message',
-                'conversation_id': self.conversation.id,
-                'message': {
-                    'id': message.id,
-                    'image': self.base_url + image if image else "",
-                    'avatar': self.base_url + avatar if avatar else "",
-                    'sender': {
-                        'id': message.sender.id,
-                        'full_name': message.sender.full_name,
+                "type": "chat_message",
+                "conversation_id": self.conversation.id,
+                "message": {
+                    "id": message.id,
+                    "image": self.base_url + image if image else "",
+                    "avatar": self.base_url + avatar if avatar else "",
+                    "sender": {
+                        "id": message.sender.id,
+                        "full_name": message.sender.full_name,
                     },
-                    'text': message.text,
-                    'type': message.type,
-                    'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S %z'),
-                    'conversation': self.conversation.id
-                }
-            }
+                    "text": message.text,
+                    "type": message.type,
+                    "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S %z"),
+                    "conversation": self.conversation.id,
+                },
+            },
         )
 
     async def mark_as_read(self, data):
         try:
-            message_id = data['message_id']
+            message_id = data["message_id"]
             message = ChatMessage.objects.get(id=message_id)
             message.mark_as_read(self.user)
-            await self.send(text_data=json.dumps({
-                'action': 'message_read',
-                'message_id': message_id
-            }))
+            await self.send(
+                text_data=json.dumps(
+                    {"action": "message_read", "message_id": message_id}
+                )
+            )
         except ChatMessage.DoesNotExist:
-            await self.send({
-                'type': 'error_message',
-                'error': Result.error(_("Message ID is not valid!"))
-            })
+            await self.send(
+                {
+                    "type": "error_message",
+                    "error": Result.error(_("Message ID is not valid!")),
+                }
+            )
 
     async def chat_message(self, event):
-        await self.send(text_data=json.dumps({
-            'action': 'chat_message',
-            'message': event['message']
-        }))
+        await self.send(
+            text_data=json.dumps(
+                {"action": "chat_message", "message": event["message"]}
+            )
+        )
 
     async def error_message(self, event):
-        error = event['error']
-        await self.send(text_data=json.dumps({
-            'action': 'error_message',
-            'error': error
-        }))
+        error = event["error"]
+        await self.send(
+            text_data=json.dumps({"action": "error_message", "error": error})
+        )
 
 
 class NotificationConsumer(BaseConsumer):
-
     async def connect(self):
         await super().prepare_connection()
-        user_groups = await database_sync_to_async (
-            list
-        )(self.user.groups.all())
+        user_groups = await database_sync_to_async(list)(self.user.groups.all())
 
         self.user_groups_names = []
         for group in user_groups:
-            user_group_name = f'user_group_{group.id}'
-            await self.channel_layer.group_add(
-                user_group_name,
-                self.channel_name
-            )
+            user_group_name = f"user_group_{group.id}"
+            await self.channel_layer.group_add(user_group_name, self.channel_name)
             self.user_groups_names.append(user_group_name)
         await self.accept()
 
@@ -196,71 +184,66 @@ class NotificationConsumer(BaseConsumer):
         if not text_data:
             return
         data = json.loads(text_data)
-        action = data.get('action')
+        action = data.get("action")
         # if action == 'send_notification':
         #     await self.send_notification(data)
-        if action == 'mark_notification_as_read':
+        if action == "mark_notification_as_read":
             await self.mark_as_read(data)
 
     async def mark_as_read(self, data):
-        notification_id = data['notification_id']
+        notification_id = data["notification_id"]
         try:
             notification = Notification.objects.get(id=notification_id)
             notification.mark_as_read(self.user)
-            await self.send(text_data=json.dumps({
-                'action': 'notification_read',
-                'notification_id': notification_id
-            }))
+            await self.send(
+                text_data=json.dumps(
+                    {"action": "notification_read", "notification_id": notification_id}
+                )
+            )
         except Notification.DoesNotExist:
-            await self.send({
-                'type': 'error_message',
-                'error': Result.error(_("Notification ID is not valid!"))
-            })
+            await self.send(
+                {
+                    "type": "error_message",
+                    "error": Result.error(_("Notification ID is not valid!")),
+                }
+            )
 
     async def send_notification(self, event):
-        data = event['message']
-        if data.get('sender') is None:
-            data['sender'] = {
+        data = event["message"]
+        if data.get("sender") is None:
+            data["sender"] = {
                 "first_name": "System",
                 "last_name": "",
                 "id": 0,
-                "photo": ""
+                "photo": "",
             }
-        elif data['sender'].get('photo') and hasattr(self, 'baseurl'):
-            if not data['sender'].get('photo').startswith('http'):
-                data['sender']['photo'] = self.baseurl + data['sender']['photo']
+        elif data["sender"].get("photo") and hasattr(self, "baseurl"):
+            if not data["sender"].get("photo").startswith("http"):
+                data["sender"]["photo"] = self.baseurl + data["sender"]["photo"]
 
-        await self.send(text_data=json.dumps({
-            'action': 'notification_message',
-            'message': data
-        }))
+        await self.send(
+            text_data=json.dumps({"action": "notification_message", "message": data})
+        )
 
     async def send_backup_status(self, event):
         pass
 
     async def error_message(self, event):
-        error = event['error']
-        await self.send(text_data=json.dumps({
-            'action': 'error_message',
-            'error': error
-        }))
+        error = event["error"]
+        await self.send(
+            text_data=json.dumps({"action": "error_message", "error": error})
+        )
 
 
 class BackUpConsumer(BaseConsumer):
-
     async def connect(self):
         await super().prepare_connection()
-        user_groups = await database_sync_to_async (
-            list
-        )(self.user.groups.all())
+        user_groups = await database_sync_to_async(list)(self.user.groups.all())
 
         self.user_groups_names = []
         for group in user_groups:
-            user_group_name = f'user_group_{group.id}'
-            await self.channel_layer.group_add(
-                user_group_name,
-                self.channel_name
-            )
+            user_group_name = f"user_group_{group.id}"
+            await self.channel_layer.group_add(user_group_name, self.channel_name)
             self.user_groups_names.append(user_group_name)
         await self.accept()
 
@@ -268,7 +251,8 @@ class BackUpConsumer(BaseConsumer):
         pass
 
     async def send_backup_status(self, event):
-        await self.send(text_data=json.dumps({
-            'action': 'backup_status',
-            'message': event['backup']
-        }))
+        await self.send(
+            text_data=json.dumps(
+                {"action": "backup_status", "message": event["backup"]}
+            )
+        )

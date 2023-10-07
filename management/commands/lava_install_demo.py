@@ -25,35 +25,35 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-num-users',
-            nargs='?',
+            "-num-users",
+            nargs="?",
             default=25,
             type=int,
-            help="Number of users to create, defaults to 25."
+            help="Number of users to create, defaults to 25.",
         )
         parser.add_argument(
-            '--skip-avatars',
-            action='store_true',
-            help='If this argument is set, the users will be created without profile pictures.',
+            "--skip-avatars",
+            action="store_true",
+            help="If this argument is set, the users will be created without profile pictures.",
         )
         parser.add_argument(
-            '-suffix',
-            nargs='?',
-            default='user',
+            "-suffix",
+            nargs="?",
+            default="user",
             type=str,
-            help="The username suffix, defaults to user. eg: user1, user2, ..."
+            help="The username suffix, defaults to user. eg: user1, user2, ...",
         )
         parser.add_argument(
-            '-s',
-            '--skip-groups',
-            action='store_true',
+            "-s",
+            "--skip-groups",
+            action="store_true",
             default=False,
-            help='If this argument is set, groups will not be created.',
+            help="If this argument is set, groups will not be created.",
         )
         parser.add_argument(
-            '--no-logs',
-            action='store_true',
-            help='If this argument is set, the function will not print anything to the console.',
+            "--no-logs",
+            action="store_true",
+            help="If this argument is set, the function will not print anything to the console.",
         )
 
     def handle(self, *args, **options):
@@ -86,9 +86,7 @@ class Command(BaseCommand):
                 for group in groups:
                     Group.objects.get_or_create(name=group["name"])
         else:
-            logging.info(
-                "Group creation has been skipped."
-            )
+            logging.info("Group creation has been skipped.")
 
         # Creating users
         people = []
@@ -101,7 +99,7 @@ class Command(BaseCommand):
 
         today_str = datetime.now().strftime("%Y%m%d")
         download_path = os.path.join(
-            lava_settings.TMP_ROOT, f'tmp_user_avatars_{today_str}'
+            lava_settings.TMP_ROOT, f"tmp_user_avatars_{today_str}"
         )
         if not os.path.exists(download_path):
             os.makedirs(download_path)
@@ -122,11 +120,11 @@ class Command(BaseCommand):
                 if not skip_avatars:
                     response = requests.get(user_avatar)
                     if response.status_code == 200:
-                        content_type = response.headers['content-type']
+                        content_type = response.headers["content-type"]
                         ext = mimetypes.guess_extension(content_type)
                         now_str = datetime.now().strftime("%H%M%S%f")
                         filename = os.path.join(download_path, f"{now_str}{ext}")
-                        with open(filename, 'wb') as fp:
+                        with open(filename, "wb") as fp:
                             fp.write(response.content)
             except ConnectionError:
                 logging.error("Connection ERROR: Could not retrieve user avatar.")
@@ -158,17 +156,16 @@ class Command(BaseCommand):
                 groups=[user_group],
                 password="admin_pass",
                 force_is_active=True,
-                link_payments_app=False
+                link_payments_app=False,
             )
             if filename:
-                with open(filename, 'rb') as f:
-                    user.photo.save(
-                        get_user_photo_filename(user, filename),
-                        File(f)
-                    )
-                    user.update(update_fields=['photo'])
+                with open(filename, "rb") as f:
+                    user.photo.save(get_user_photo_filename(user, filename), File(f))
+                    user.update(update_fields=["photo"])
 
             if not no_logs:
-                print(f'User {user.username} has been created.')
+                print(f"User {user.username} has been created.")
 
-        shutil.rmtree(download_path, )
+        shutil.rmtree(
+            download_path,
+        )

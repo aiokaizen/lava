@@ -42,14 +42,13 @@ class MaintenanceModeMiddleware:
 @database_sync_to_async
 def get_user(token_key):
     try:
-        token = Token.objects.select_related('user').get(key=token_key)
+        token = Token.objects.select_related("user").get(key=token_key)
         return token.user
     except Token.DoesNotExist:
         return None
 
 
 class SocketTokenAuthMiddleware(BaseMiddleware):
-
     def __init__(self, inner):
         self.inner = inner
 
@@ -61,9 +60,12 @@ class SocketTokenAuthMiddleware(BaseMiddleware):
 
             user = await get_user(token_key)
             if user is not None:
-                scope['user'] = user
+                scope["user"] = user
         except (IndexError, ValueError, Token.DoesNotExist):
             pass
         return await super().__call__(scope, receive, send)
 
-SocketTokenAuthMiddlewareStack = lambda inner: SocketTokenAuthMiddleware(AuthMiddlewareStack(inner))
+
+SocketTokenAuthMiddlewareStack = lambda inner: SocketTokenAuthMiddleware(
+    AuthMiddlewareStack(inner)
+)

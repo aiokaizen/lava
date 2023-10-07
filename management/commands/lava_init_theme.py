@@ -15,7 +15,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        if 'admin_interface' not in sys.modules:
+        if "admin_interface" not in sys.modules:
             logging.error("Admin interface is not installed in this project!")
             return
 
@@ -70,13 +70,12 @@ class Command(BaseCommand):
         related_modal_background_opacity = "0.2"
 
         favicon_path = os.path.join(
-            settings.BASE_DIR,
-            'lava/static/lava/assets/images/logo/favicon.png'
+            settings.BASE_DIR, "lava/static/lava/assets/images/logo/favicon.png"
         )
 
         logo_path = os.path.join(
             settings.BASE_DIR,
-            'lava/static/lava/assets/images/logo/logo_hybrid_white.png'
+            "lava/static/lava/assets/images/logo/logo_hybrid_white.png",
         )
 
         try:
@@ -95,7 +94,9 @@ class Command(BaseCommand):
             theme.css_module_rounded_corners = css_module_rounded_corners
             theme.related_modal_active = related_modal_active
             theme.related_modal_rounded_corners = related_modal_rounded_corners
-            theme.related_modal_close_button_visible = related_modal_close_button_visible
+            theme.related_modal_close_button_visible = (
+                related_modal_close_button_visible
+            )
             theme.list_filter_highlight = list_filter_highlight
             theme.list_filter_dropdown = list_filter_dropdown
             theme.list_filter_sticky = list_filter_sticky
@@ -114,7 +115,9 @@ class Command(BaseCommand):
             theme.css_header_link_color = css_header_link_color
             theme.css_header_link_hover_color = css_header_link_hover_color
             theme.css_module_background_color = css_module_background_color
-            theme.css_module_background_selected_color = css_module_background_selected_color
+            theme.css_module_background_selected_color = (
+                css_module_background_selected_color
+            )
             theme.css_module_text_color = css_module_text_color
             theme.css_module_link_color = css_module_link_color
             theme.css_module_link_selected_color = css_module_link_selected_color
@@ -122,10 +125,16 @@ class Command(BaseCommand):
             theme.css_generic_link_color = css_generic_link_color
             theme.css_generic_link_hover_color = css_generic_link_hover_color
             theme.css_save_button_background_color = css_save_button_background_color
-            theme.css_save_button_background_hover_color = css_save_button_background_hover_color
+            theme.css_save_button_background_hover_color = (
+                css_save_button_background_hover_color
+            )
             theme.css_save_button_text_color = css_save_button_text_color
-            theme.css_delete_button_background_color = css_delete_button_background_color
-            theme.css_delete_button_background_hover_color = css_delete_button_background_hover_color
+            theme.css_delete_button_background_color = (
+                css_delete_button_background_color
+            )
+            theme.css_delete_button_background_hover_color = (
+                css_delete_button_background_hover_color
+            )
             theme.css_delete_button_text_color = css_delete_button_text_color
             theme.related_modal_background_color = related_modal_background_color
             theme.related_modal_background_opacity = related_modal_background_opacity
@@ -133,16 +142,10 @@ class Command(BaseCommand):
             theme.logo.delete()
             theme.set_active()
             theme.favicon.delete()
-            with open(logo_path, 'rb') as logo_file:
-                theme.logo.save(
-                    "logo.png",
-                    File(logo_file)
-                )
-            with open(favicon_path, 'rb') as favicon:
-                theme.favicon.save(
-                    "favicon.png",
-                    File(favicon)
-                )
+            with open(logo_path, "rb") as logo_file:
+                theme.logo.save("logo.png", File(logo_file))
+            with open(favicon_path, "rb") as favicon:
+                theme.favicon.save("favicon.png", File(favicon))
         except Theme.DoesNotExist:
             theme = Theme(
                 name=default_theme_name,
@@ -170,18 +173,15 @@ class Command(BaseCommand):
                 recent_actions_visible=recent_actions_visible,
                 form_submit_sticky=form_submit_sticky,
                 form_pagination_sticky=form_pagination_sticky,
-
                 # Default colors
                 title_color=title_color,
                 logo_color=logo_color,
                 env_color=env_color,
-
                 # Header colors
                 css_header_background_color=css_header_background_color,
                 css_header_text_color=css_header_text_color,
                 css_header_link_color=css_header_link_color,
                 css_header_link_hover_color=css_header_link_hover_color,
-
                 # Breadcrumbs colors
                 css_module_background_color=css_module_background_color,
                 css_module_background_selected_color=css_module_background_selected_color,
@@ -204,14 +204,8 @@ class Command(BaseCommand):
             theme.save()
             theme.set_active()
 
-            with open(logo_path, 'rb') as logo_file:
-                theme.logo.save(
-                    "logo.png",
-                    File(logo_file)
-                )
-            with open(favicon_path, 'rb') as favicon:
-                theme.favicon.save(
-                    "favicon.png",
-                    File(favicon)
-                )
+            with open(logo_path, "rb") as logo_file:
+                theme.logo.save("logo.png", File(logo_file))
+            with open(favicon_path, "rb") as favicon:
+                theme.favicon.save("favicon.png", File(favicon))
             logging.info("The default theme has been initialized successfully.")

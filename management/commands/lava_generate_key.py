@@ -15,29 +15,24 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '-name',
-            nargs='?',
-            default='',
-            type=str
-        )
+        parser.add_argument("-name", nargs="?", default="", type=str)
 
     def handle(self, *args, **options):
 
-        name = options['name']
+        name = options["name"]
         if not name:
             name = os.path.basename(os.path.normpath(settings.BASE_DIR)).lower()
 
         path = os.path.join(settings.BASE_DIR, f"{name}_secret.key")
-        
+
         secret = (
-            f'{get_random_secret_key()}'
-            f'{get_random_secret_key()}'
-            f'{get_random_secret_key()}'
+            f"{get_random_secret_key()}"
+            f"{get_random_secret_key()}"
+            f"{get_random_secret_key()}"
         )[:128]
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             f.write(secret)
-        
+
         logging.info(
             f"A key has been generated at {path}\n"
             f"Please copy it to /etc/secrets/[project_name]_secret_key.txt"

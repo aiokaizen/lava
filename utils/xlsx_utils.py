@@ -16,21 +16,23 @@ from django.utils.text import slugify
 
 from lava.styles import XLSXStyles
 from lava.utils.utils import (
-    imdict, odict, get_tmp_root, map_interval, get_image, Result
+    imdict,
+    odict,
+    get_tmp_root,
+    map_interval,
+    get_image,
+    Result,
 )
 
 
 class ExportDataType(imdict):
-
-    def __init__(self, col_titles:list, data:list, row_titles:list=None):
+    def __init__(self, col_titles: list, data: list, row_titles: list = None):
         self.row_titles = row_titles
         self.col_titles = col_titles
         self.data = data
-        super().__init__(**{
-            "row_titles": row_titles,
-            "col_titles": col_titles,
-            "data": data
-        })
+        super().__init__(
+            **{"row_titles": row_titles, "col_titles": col_titles, "data": data}
+        )
 
 
 def get_col_width(content, font_size):
@@ -48,13 +50,20 @@ def get_col_width(content, font_size):
 def get_cell_str(col, row):
     return f"{get_column_letter(col)}{row}"
 
+
 def get_field_name(mapping, column_name):
     if column_name in mapping.keys():
         return mapping[column_name]
     return slugify(column_name)
 
 
-def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet=None, column_name_mapping=None):
+def handle_excel_file(
+    file_name,
+    start_row=1,
+    extract_columns=None,
+    target_sheet=None,
+    column_name_mapping=None,
+):
     """
     file_name | string: The path to open or a File like object
     start_row | int: the number of row where the header of the file is located.
@@ -84,7 +93,9 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
             extract_columns = []
             slugified_extract_columns = []
         else:
-            slugified_extract_columns = [get_field_name(column_name_mapping, name) for name in extract_columns]
+            slugified_extract_columns = [
+                get_field_name(column_name_mapping, name) for name in extract_columns
+            ]
 
         wb = openpyxl.load_workbook(file_name)
         worksheet = wb[target_sheet]
@@ -119,8 +130,8 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
             if column_name not in column_names:
                 raise ValidationError(
                     _(
-                        "The uploaded file does not contain a column named '%s'." %
-                        (column_name, )
+                        "The uploaded file does not contain a column named '%s'."
+                        % (column_name,)
                     )
                 )
 
@@ -150,7 +161,7 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
         return odict(
             column_names=slugified_extract_columns,
             column_names_display=extract_columns,
-            data=excel_data
+            data=excel_data,
         )
 
     except Exception as e:
@@ -159,9 +170,13 @@ def handle_excel_file(file_name, start_row=1, extract_columns=None, target_sheet
 
 
 def export_xlsx(
-    data:ExportDataType, header_title='', description='',
-    sheet_title="Data", freeze_header=True, remove_cells_borders=False,
-    title_section_length=7
+    data: ExportDataType,
+    header_title="",
+    description="",
+    sheet_title="Data",
+    freeze_header=True,
+    remove_cells_borders=False,
+    title_section_length=7,
 ):
     """
     This function creates a tmp .xlsx file based on the data provided and
@@ -179,7 +194,9 @@ def export_xlsx(
     """
 
     logo = None
-    logo_filepath = os.path.join(settings.BASE_DIR, 'lava/static/lava/assets/images/logo/logo.png')
+    logo_filepath = os.path.join(
+        settings.BASE_DIR, "lava/static/lava/assets/images/logo/logo.png"
+    )
     styles = XLSXStyles()
 
     start_file_header_row = 1
@@ -219,16 +236,18 @@ def export_xlsx(
 
         # Remove cell borders
         if remove_cells_borders:
-            last_col_index = max(start_file_header_col + data_cols_count + 15, start_file_header_col + 25)
+            last_col_index = max(
+                start_file_header_col + data_cols_count + 15, start_file_header_col + 25
+            )
             last_row_index = start_row_index + data_rows_count + 50
             for col in range(1, last_col_index):
                 for row_index in range(1, last_row_index):
-                    ws.cell(row=row_index, column=col).style = 'white'
+                    ws.cell(row=row_index, column=col).style = "white"
 
         # Logo cell
         ws.merge_cells(
-            f'{get_cell_str(start_file_header_col, start_file_header_row)}:'
-            f'{get_cell_str(start_file_header_col, start_file_header_row + 1)}'
+            f"{get_cell_str(start_file_header_col, start_file_header_row)}:"
+            f"{get_cell_str(start_file_header_col, start_file_header_row + 1)}"
         )
         cell = ws.cell(row=start_file_header_row, column=start_file_header_col)
         cell.font = styles.fonts.white
@@ -237,35 +256,41 @@ def export_xlsx(
         # Title cell
         if header_title:
             ws.merge_cells(
-                f'{get_cell_str(start_file_header_col + 1, start_file_header_row)}:'
-                f'{get_cell_str(start_file_header_col + title_section_length, start_file_header_row)}'
+                f"{get_cell_str(start_file_header_col + 1, start_file_header_row)}:"
+                f"{get_cell_str(start_file_header_col + title_section_length, start_file_header_row)}"
             )
             title_cell = ws.cell(
-                row=start_file_header_row, column=start_file_header_col + 1,
-                value=header_title
+                row=start_file_header_row,
+                column=start_file_header_col + 1,
+                value=header_title,
             )
-            title_cell.style = 'title'
+            title_cell.style = "title"
 
         # Description cell
         if description:
             ws.merge_cells(
-                f'{get_cell_str(start_file_header_col + 1, start_file_header_row + 1)}:'
-                f'{get_cell_str(start_file_header_col + title_section_length, start_file_header_row + 1)}'
+                f"{get_cell_str(start_file_header_col + 1, start_file_header_row + 1)}:"
+                f"{get_cell_str(start_file_header_col + title_section_length, start_file_header_row + 1)}"
             )
             description_cell = ws.cell(
-                row=start_file_header_row + 1, column=start_file_header_col + 1,
-                value=description
+                row=start_file_header_row + 1,
+                column=start_file_header_col + 1,
+                value=description,
             )
-            description_cell.style = 'default'
+            description_cell.style = "default"
 
         start_column = ws.column_dimensions[get_column_letter(start_col_index)]
         logo = get_image(logo_filepath, target_width=250, margin=(18, 0, 18, 0))
-        ws.add_image(Image(logo), get_cell_str(start_file_header_col, start_file_header_row))
-        start_column.width = 37 # equivalent to 264px
+        ws.add_image(
+            Image(logo), get_cell_str(start_file_header_col, start_file_header_row)
+        )
+        start_column.width = 37  # equivalent to 264px
 
         for index, col_title in enumerate(col_titles):
-            cell = ws.cell(row=start_row_index, column=index + start_col_index, value=col_title)
-            cell.style = 'header'
+            cell = ws.cell(
+                row=start_row_index, column=index + start_col_index, value=col_title
+            )
+            cell.style = "header"
             col_name = get_column_letter(start_col_index + index)
             column = ws.column_dimensions[col_name]
             if column == start_column:
@@ -275,8 +300,12 @@ def export_xlsx(
 
         if row_titles:
             for index, row_title in enumerate(row_titles):
-                cell = ws.cell(row=index + start_row_index + 1, column=start_col_index, value=row_title)
-                cell.style = 'header'
+                cell = ws.cell(
+                    row=index + start_row_index + 1,
+                    column=start_col_index,
+                    value=row_title,
+                )
+                cell.style = "header"
                 cell.alignment = Alignment(horizontal="left", vertical="center")
 
                 col_width = get_col_width(row_title, cell.font.sz)
@@ -291,13 +320,13 @@ def export_xlsx(
                 cell = ws.cell(
                     row=row_index + start_row_index + 1,
                     column=col_index + start_data_col_index,
-                    value=value
+                    value=value,
                 )
-                cell.style = 'colored'
+                cell.style = "colored"
                 cell.alignment = Alignment(horizontal="center", vertical="center")
 
         export_timestamp = int(datetime.now().strftime("%Y%m%d%H%M%S"))
-        filename = f'{slugify(sheet_title)}_{export_timestamp}.xlsx'
+        filename = f"{slugify(sheet_title)}_{export_timestamp}.xlsx"
         tmp_file_path = os.path.join(get_tmp_root(), filename)
 
         saved = excel.save_workbook(wb, tmp_file_path)
@@ -312,9 +341,14 @@ def export_xlsx(
 
 
 def export_serializer_xlsx(
-    queryset, serializer_class, header_title='', description='',
-    sheet_title="Data", freeze_header=True, remove_cells_borders=False,
-    title_section_length=7
+    queryset,
+    serializer_class,
+    header_title="",
+    description="",
+    sheet_title="Data",
+    freeze_header=True,
+    remove_cells_borders=False,
+    title_section_length=7,
 ):
     """
     This function creates a tmp .xlsx file based on the data provided and
@@ -341,13 +375,10 @@ def export_serializer_xlsx(
     for data in serializer.data:
         content = []
         for field_name in field_names:
-            content.append(data.get(field_name, '---'))
+            content.append(data.get(field_name, "---"))
         data_content.append(content)
 
-    data = ExportDataType(
-        col_titles=columns,
-        data=data_content
-    )
+    data = ExportDataType(col_titles=columns, data=data_content)
 
     result = export_xlsx(
         data,
@@ -356,7 +387,7 @@ def export_serializer_xlsx(
         sheet_title=sheet_title,
         freeze_header=freeze_header,
         remove_cells_borders=remove_cells_borders,
-        title_section_length=title_section_length
+        title_section_length=title_section_length,
     )
 
     return result

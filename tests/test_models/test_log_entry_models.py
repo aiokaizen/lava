@@ -8,12 +8,12 @@ from lava.tests.base_test_classes import BaseModelTest
 
 class UserModelTest(BaseModelTest):
 
-    demo_content_path =  "lava/tests/content.json"
+    demo_content_path = "lava/tests/content.json"
     content_type = get_content_type_for_model(LogEntry)
 
-    def get_log_entry_data(self,index=0):
-        """ set index to -1 to get all users. """
-        log_entries = self.data['log_entry']
+    def get_log_entry_data(self, index=0):
+        """set index to -1 to get all users."""
+        log_entries = self.data["log_entry"]
         if index == -1:
             return log_entries
         return log_entries[index]

@@ -4,15 +4,11 @@ import io
 import os
 import re
 
-from django.contrib.admin.models import (
-    DELETION, CHANGE, ADDITION
-)
+from django.contrib.admin.models import DELETION, CHANGE, ADDITION
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.db import models
-from django.db.models import (
-    Q, ForeignKey, ManyToManyField, OneToOneField, FileField
-)
+from django.db.models import Q, ForeignKey, ManyToManyField, OneToOneField, FileField
 from django.contrib.admin.options import get_content_type_for_model
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -37,7 +33,9 @@ class BaseModelMixin:
 
     def get_url(self):
         try:
-            return reverse(f'{self.__class__.__name__.lower()}-detail', args=[str(self.id)])
+            return reverse(
+                f"{self.__class__.__name__.lower()}-detail", args=[str(self.id)]
+            )
         except:
             return ""
 
@@ -77,14 +75,16 @@ class BaseModelMixin:
         if user:
             self.log_action(user, ADDITION)
 
-        return Result.success(self.get_result_message('create'), instance=self)
+        return Result.success(self.get_result_message("create"), instance=self)
 
     def update(self, user=None, update_fields=None, m2m_fields=None, message=""):
         if not self.pk:
             return Result.error(_("This object is not yet created."))
 
         # Get changed message before saving the object
-        message = message or self.get_changed_message(m2m_fields, update_fields=update_fields)
+        message = message or self.get_changed_message(
+            m2m_fields, update_fields=update_fields
+        )
 
         self.save(update_fields=update_fields)
 
@@ -99,20 +99,17 @@ class BaseModelMixin:
         if user:
             self.log_action(user, CHANGE, message)
 
-        return Result.success(self.get_result_message('update'))
+        return Result.success(self.get_result_message("update"))
 
     def delete(self, user=None, soft_delete=None):
 
         if not self.id:
             return Result.error(
-                _("This object is not yet created"),
-                error_code=NOT_CREATED_ERROR_CODE
+                _("This object is not yet created"), error_code=NOT_CREATED_ERROR_CODE
             )
 
-        if getattr(self, 'deleted_at', None) and soft_delete:
-            return Result.warning(
-                _("This object is already deleted.")
-            )
+        if getattr(self, "deleted_at", None) and soft_delete:
+            return Result.warning(_("This object is already deleted."))
 
         if soft_delete is None:
             soft_delete = False
@@ -121,16 +118,18 @@ class BaseModelMixin:
 
         if soft_delete:
             self.deleted_at = timezone.now()
-            res = self.update(user=user, update_fields=['deleted_at'], message="Deletion")
+            res = self.update(
+                user=user, update_fields=["deleted_at"], message="Deletion"
+            )
             if res.is_error:
                 return res
-            return Result.success(self.get_result_message('delete'))
+            return Result.success(self.get_result_message("delete"))
 
         if user:
             self.log_action(user, DELETION)
 
         super().delete()
-        return Result.success(self.get_result_message('delete'))
+        return Result.success(self.get_result_message("delete"))
 
     def duplicate(self, user=None, override_values=None):
         klass = self.__class__
@@ -138,12 +137,12 @@ class BaseModelMixin:
         override_values = override_values or {}
 
         ignore_fields = [
-            'id',
-            'created_at',
-            'created_by',
-            'last_updated_at',
-            'deleted_at',
-            *override_values.keys()
+            "id",
+            "created_at",
+            "created_by",
+            "last_updated_at",
+            "deleted_at",
+            *override_values.keys(),
         ]
         file_fields = []
         m2m_fields = []
@@ -154,7 +153,7 @@ class BaseModelMixin:
                 if isinstance(field, FileField):
                     filefield = getattr(self, field.name)
                     if filefield:
-                        f = filefield.file.open(mode='rb')
+                        f = filefield.file.open(mode="rb")
                         opened_files.append(f)
                         stream = io.BytesIO(f.read())
                         io_file = File(ContentFile(stream.getvalue()))
@@ -177,18 +176,20 @@ class BaseModelMixin:
         if result.is_error:
             return result
 
-        return Result.success(self.get_result_message('duplicate'), instance=new)
+        return Result.success(self.get_result_message("duplicate"), instance=new)
 
     def restore(self, user=None):
         if not self.deleted_at:
             return Result.error(_("Object is not deleted!"))
 
         self.deleted_at = None
-        result = self.update(user=user, update_fields=['deleted_at'], message="Restoration")
+        result = self.update(
+            user=user, update_fields=["deleted_at"], message="Restoration"
+        )
         if result.is_error:
             return result
 
-        return Result.success(self.get_result_message('restore'))
+        return Result.success(self.get_result_message("restore"))
 
     def get_changed_message(self, m2m_fields=None, update_fields=None):
 
@@ -221,7 +222,7 @@ class BaseModelMixin:
             if old_value != new_value:
                 changed_message["fields"][field_name] = {
                     "old_value": str(old_value),
-                    "new_value": str(new_value)
+                    "new_value": str(new_value),
                 }
         return json.dumps(changed_message, ensure_ascii=False)
 
@@ -238,39 +239,40 @@ class BaseModelMixin:
             object_id=self.pk,
             object_repr=str(self),
             action_flag=action_flag,
-            change_message=change_message
+            change_message=change_message,
         )
 
     def get_result_message(self, action):
         message = getattr(self, f"{action}_success_message")
         str_message = str(message)
 
-        fieldnames = re.findall(r'%\((\w+)\)\w', str_message)
+        fieldnames = re.findall(r"%\((\w+)\)\w", str_message)
         if fieldnames:
             format_dict = {}
             for fieldname in fieldnames:
                 if hasattr(self, fieldname):
                     format_dict[fieldname] = getattr(self, fieldname, "")
-            message = (message % format_dict)
+            message = message % format_dict
         return message
 
     @classmethod
     def bulk_delete(cls, queryset, user=None, **kwargs):
         errors = {}
-        soft_delete = not kwargs.get('trash', False)
+        soft_delete = not kwargs.get("trash", False)
         for obj in queryset:
             result = obj.delete(user, soft_delete=soft_delete)
             if result.is_error:
                 errors[str(obj)] = result.message
 
         if errors:
-            return Result.error(
-                _("Some objects were not deleted."), errors=errors
-            )
+            return Result.error(_("Some objects were not deleted."), errors=errors)
 
-        return Result.success(_("%(count)s objects have been deleted successfully." % {
-            'count': queryset.count()
-        }))
+        return Result.success(
+            _(
+                "%(count)s objects have been deleted successfully."
+                % {"count": queryset.count()}
+            )
+        )
 
     @classmethod
     def bulk_restore(cls, queryset, user=None, **kwargs):
@@ -281,13 +283,14 @@ class BaseModelMixin:
                 errors[str(obj)] = result.message
 
         if errors:
-            return Result.error(
-                _("Some objects were not restored."), errors=errors
-            )
+            return Result.error(_("Some objects were not restored."), errors=errors)
 
-        return Result.success(_("%(count)s objects have been restored successfully." % {
-            'count': queryset.count()
-        }))
+        return Result.success(
+            _(
+                "%(count)s objects have been restored successfully."
+                % {"count": queryset.count()}
+            )
+        )
 
     @classmethod
     def get_object_or_none(cls, **kwargs):
@@ -297,7 +300,9 @@ class BaseModelMixin:
             return None
 
     @classmethod
-    def get_or_create(cls, current_user=None, defaults=None, create_params=None, **kwargs):
+    def get_or_create(
+        cls, current_user=None, defaults=None, create_params=None, **kwargs
+    ):
         try:
             return cls.objects.get(**kwargs), False
         except cls.DoesNotExist:
@@ -324,20 +329,38 @@ class BaseModelMixin:
         verbose_name = verbose_name or camel_case_to_spaces(class_name)
         verbose_name_plural = verbose_name_plural or f"{verbose_name}s"
         return (
-            (f'list_{sc_class_name}', _("Can list %s" % (verbose_name_plural, ))),
-            (f'list_all_{sc_class_name}', _("Can list all %s" % (verbose_name_plural, ))),
-            (f'choices_{sc_class_name}', _("Can list choices %s" % (verbose_name_plural, ))),
-            (f'add_{sc_class_name}', _("Can add %s" % (verbose_name, ))),
-            (f'view_{sc_class_name}', _("Can view %s" % (verbose_name, ))),
-            (f'view_excerpt_{sc_class_name}', _("Can view excerpt %s" % (verbose_name_plural, ))),
-            (f'change_{sc_class_name}', _("Can update %s" % (verbose_name, ))),
-            (f'duplicate_{sc_class_name}', _("Can duplicate %s" % (verbose_name, ))),
-            (f'soft_delete_{sc_class_name}', _("Can soft delete %s" % (verbose_name, ))),
-            (f'view_trash_{sc_class_name}', _("Can view deleted %s" % (verbose_name_plural, ))),
-            (f'restore_{sc_class_name}', _("Can restore %s" % (verbose_name, ))),
-            (f'delete_{sc_class_name}', _("Can delete %s" % (verbose_name, ))),
-            (f'import_{sc_class_name}', _("Can import %s list" % (verbose_name_plural, ))),
-            (f'export_{sc_class_name}', _("Can export %s list" % (verbose_name_plural, ))),
+            (f"list_{sc_class_name}", _("Can list %s" % (verbose_name_plural,))),
+            (
+                f"list_all_{sc_class_name}",
+                _("Can list all %s" % (verbose_name_plural,)),
+            ),
+            (
+                f"choices_{sc_class_name}",
+                _("Can list choices %s" % (verbose_name_plural,)),
+            ),
+            (f"add_{sc_class_name}", _("Can add %s" % (verbose_name,))),
+            (f"view_{sc_class_name}", _("Can view %s" % (verbose_name,))),
+            (
+                f"view_excerpt_{sc_class_name}",
+                _("Can view excerpt %s" % (verbose_name_plural,)),
+            ),
+            (f"change_{sc_class_name}", _("Can update %s" % (verbose_name,))),
+            (f"duplicate_{sc_class_name}", _("Can duplicate %s" % (verbose_name,))),
+            (f"soft_delete_{sc_class_name}", _("Can soft delete %s" % (verbose_name,))),
+            (
+                f"view_trash_{sc_class_name}",
+                _("Can view deleted %s" % (verbose_name_plural,)),
+            ),
+            (f"restore_{sc_class_name}", _("Can restore %s" % (verbose_name,))),
+            (f"delete_{sc_class_name}", _("Can delete %s" % (verbose_name,))),
+            (
+                f"import_{sc_class_name}",
+                _("Can import %s list" % (verbose_name_plural,)),
+            ),
+            (
+                f"export_{sc_class_name}",
+                _("Can export %s list" % (verbose_name_plural,)),
+            ),
         )
 
     @classmethod
@@ -353,8 +376,8 @@ class BaseModelMixin:
 
         if "created_by" in kwargs:
             try:
-               created_by_id = int(kwargs["created_by"])
-               filter_params &= Q(created_by=created_by_id)
+                created_by_id = int(kwargs["created_by"])
+                filter_params &= Q(created_by=created_by_id)
             except ValueError:
                 pass
 
@@ -374,8 +397,8 @@ class BaseModelMixin:
 
         if "created_before" in kwargs:
             try:
-               date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
-               filter_params &= Q(created_at__date__lte=date)
+                date = datetime.strptime(kwargs["created_before"], "%m-%d-%Y")
+                filter_params &= Q(created_at__date__lte=date)
             except ValueError:
                 pass
 
@@ -431,11 +454,11 @@ class BaseModelMixin:
             kwargs = {}
 
         if "order_by" in kwargs:
-            order_params = kwargs.getlist('order_by')
+            order_params = kwargs.getlist("order_by")
             object = cls()
             for param in order_params:
                 param = param.lower()
-                field_name = param if not param.startswith('-') else param[1:]
+                field_name = param if not param.startswith("-") else param[1:]
                 if hasattr(object, field_name):
                     ordering.append(param)
 
@@ -459,18 +482,20 @@ class BaseModelMixin:
 
 
 class BaseModel(BaseModelMixin, models.Model):
-
     class Meta:
         abstract = True
-        ordering = ('-created_at', )
+        ordering = ("-created_at",)
         default_permissions = ()
 
-    created_at = models.DateTimeField(_("Created at"), null=True, blank=True, default=timezone.now)
-    created_by = models.ForeignKey(
-        'lava.User', on_delete=models.PROTECT, null=True, blank=True,
-        related_name="+"
+    created_at = models.DateTimeField(
+        _("Created at"), null=True, blank=True, default=timezone.now
     )
-    last_updated_at = models.DateTimeField(_("Last update"), null=True, blank=True, auto_now=True)
+    created_by = models.ForeignKey(
+        "lava.User", on_delete=models.PROTECT, null=True, blank=True, related_name="+"
+    )
+    last_updated_at = models.DateTimeField(
+        _("Last update"), null=True, blank=True, auto_now=True
+    )
     deleted_at = models.DateTimeField(_("Deleted at"), null=True, blank=True)
 
     objects = DefaultModelBaseManager()

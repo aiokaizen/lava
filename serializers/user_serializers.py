@@ -11,18 +11,22 @@ from lava.models import User, Group, NotificationGroup
 from lava.serializer_fields import ThumbnailImageField, NotificationGroupsDefault
 from lava.serializers.serializers import PermissionSerializer
 from lava.serializers.base_serializers import (
-    BaseModelSerializer, ReadOnlyBaseModelSerializer
+    BaseModelSerializer,
+    ReadOnlyBaseModelSerializer,
 )
 from lava.serializers.group_serializers import GroupListSerializer
 from lava.validators import validate_email
 
 
 class UserExerptSerializer(ReadOnlyBaseModelSerializer):
-
     class Meta:
         model = User
         fields = [
-            "id", "photo", "username", "first_name", "last_name",
+            "id",
+            "photo",
+            "username",
+            "first_name",
+            "last_name",
         ]
 
     def save(self, **kwargs):
@@ -33,7 +37,7 @@ class UserExerptSerializer(ReadOnlyBaseModelSerializer):
 
 class UserListSerializer(ReadOnlyBaseModelSerializer):
 
-    photo = ThumbnailImageField(alias='thumbnail')
+    photo = ThumbnailImageField(alias="thumbnail")
 
     class Meta:
         model = User
@@ -56,9 +60,11 @@ class UserGetSerializer(ReadOnlyBaseModelSerializer):
     groups = GroupListSerializer(many=True)
     user_permissions = PermissionSerializer(many=True)
     permissions = PermissionSerializer(many=True, source="get_all_permissions")
-    photo = ThumbnailImageField(alias='avatar')
-    cover_picture = ThumbnailImageField(alias='cover')
-    notification_groups = GroupListSerializer(source="get_notification_groups", many=True)
+    photo = ThumbnailImageField(alias="avatar")
+    cover_picture = ThumbnailImageField(alias="cover")
+    notification_groups = GroupListSerializer(
+        source="get_notification_groups", many=True
+    )
 
     class Meta:
         model = User
@@ -134,13 +140,9 @@ class UserCreateSerializer(BaseModelSerializer):
         password = validated_data.pop("password", None)
         validated_data.pop("confirm_password", None)
         instance = User(**validated_data)
-        self.result = instance.create(
-            user=self.user, photo=photo, password=password
-        )
+        self.result = instance.create(user=self.user, photo=photo, password=password)
         if not self.result.success:
-            raise serializers.ValidationError(
-                self.result.errors or self.result.message
-            )
+            raise serializers.ValidationError(self.result.errors or self.result.message)
         return instance
 
     def update(self, instance, validated_data):
@@ -151,13 +153,11 @@ class UserCreateSerializer(BaseModelSerializer):
 
 class UserUpdateSerializer(BaseModelSerializer):
 
-    m2m_field_names = ['groups', 'user_permissions']
+    m2m_field_names = ["groups", "user_permissions"]
 
-    notification_groups = serializers.ListField(
-        default=NotificationGroupsDefault()
-    )
+    notification_groups = serializers.ListField(default=NotificationGroupsDefault())
 
-    class Meta :
+    class Meta:
         model = User
         fields = [
             "username",
@@ -234,8 +234,7 @@ class UserUpdateSerializer(BaseModelSerializer):
 
 
 class UserProfileUpdateSerializer(BaseModelSerializer):
-
-    class Meta :
+    class Meta:
         model = User
         fields = [
             "username",
@@ -382,7 +381,7 @@ class UserSerializer(serializers.ModelSerializer):
         groups = validated_data.pop("groups_names", None)
         password = validated_data.pop("password", None)
         instance = User(**validated_data)
-        user = getattr(self, 'user', None)
+        user = getattr(self, "user", None)
         result = instance.create(
             user=user, photo=photo, cover=cover, groups=groups, password=password
         )
@@ -394,9 +393,7 @@ class UserSerializer(serializers.ModelSerializer):
         update_fields = validated_data.keys()
         for key, value in validated_data.items():
             setattr(instance, key, value)
-        result = instance.update(
-            update_fields=update_fields
-        )
+        result = instance.update(update_fields=update_fields)
         if not result.success:
             raise serializers.ValidationError(result.as_dict())
         return instance

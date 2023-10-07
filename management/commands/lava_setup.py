@@ -54,7 +54,10 @@ class Command(BaseCommand):
                 for code_name, verbose_name in default_permissions:
 
                     permission_name = f"{content_type.app_label}.{code_name}"
-                    if permission_name in lava_settings.LOCKED_PERMISSIONS["permissions"]:
+                    if (
+                        permission_name
+                        in lava_settings.LOCKED_PERMISSIONS["permissions"]
+                    ):
                         print("Skipping permission:", permission_name)
                         continue
 
@@ -72,7 +75,10 @@ class Command(BaseCommand):
                     name = f"Can {perm} {opts.verbose_name}"
 
                     permission_name = f"{content_type.app_label}.{codename}"
-                    if permission_name in lava_settings.LOCKED_PERMISSIONS["permissions"]:
+                    if (
+                        permission_name
+                        in lava_settings.LOCKED_PERMISSIONS["permissions"]
+                    ):
                         print("Skipping permission:", permission_name)
                         continue
 

@@ -134,7 +134,9 @@ class BaseModelViewSet(ModelViewSet):
             )
         elif self.action == "view_excerpt":
             permission_classes.append(
-                get_model_permission_class(ActiveModel, PermissionActionName.ViewExcerpt)
+                get_model_permission_class(
+                    ActiveModel, PermissionActionName.ViewExcerpt
+                )
             )
         elif self.action == "list":
             permission_classes.append(
@@ -163,8 +165,7 @@ class BaseModelViewSet(ModelViewSet):
         # elif self.action == "metadata":
         #     self.permission_classes = [permissions.AllowAny]
 
-        return  [permission() for permission in permission_classes]
-
+        return [permission() for permission in permission_classes]
 
     def list(self, request, *args, **kwargs):
         if "list" in self.denied_actions:
@@ -428,7 +429,6 @@ class BaseModelViewSet(ModelViewSet):
 
 
 class ReadOnlyBaseModelViewSet(BaseModelViewSet):
-
     def get_permissions(self):
         permission_classes = [ActionNotAllowed]
         ActiveModel = self.permissions_model or self.queryset.model

@@ -8,19 +8,20 @@ from django.utils import timezone
 from lava.error_codes import REQUIRED_ERROR_CODE
 from lava.models import User, BaseModel
 from lava.utils import (
-    Result, get_conversation_logo_filename, get_chat_message_image_filename
+    Result,
+    get_conversation_logo_filename,
+    get_chat_message_image_filename,
 )
 from lava import settings as lava_settings
 
 
 class Conversation(BaseModel):
-
     class Meta(BaseModel.Meta):
         verbose_name = _("Conversation")
         verbose_name_plural = _("Conversations")
         ordering = (
-            '-pinned_at',
-            F('last_updated_at').desc(nulls_last=True),
+            "-pinned_at",
+            F("last_updated_at").desc(nulls_last=True),
         )
 
     name = models.CharField(_("Name"), max_length=100, blank=True)
@@ -52,12 +53,18 @@ class Conversation(BaseModel):
         return self.get_members().exclude(pk=current_user.pk).first()
 
     def get_name(self, current_user):
-        return self.name if self.is_group_conversation else \
-            self.get_recipient(current_user).full_name
+        return (
+            self.name
+            if self.is_group_conversation
+            else self.get_recipient(current_user).full_name
+        )
 
     def get_logo(self, current_user):
-        return self.logo if self.is_group_conversation else \
-            self.get_recipient(current_user).photo
+        return (
+            self.logo
+            if self.is_group_conversation
+            else self.get_recipient(current_user).photo
+        )
 
     def get_unread_messages(self, user):
         return self.messages.all().exclude(
@@ -70,13 +77,13 @@ class Conversation(BaseModel):
 
         if not self.name and self.is_group_conversation:
             msg = _("This field is mandatory")
-            return Result.error(msg, errors={
-                "name": [msg]
-            }, error_code=REQUIRED_ERROR_CODE)
+            return Result.error(
+                msg, errors={"name": [msg]}, error_code=REQUIRED_ERROR_CODE
+            )
 
         if not self.is_group_conversation:
             recepient = self.get_members().exclude(user=user).first()
-            self.name = user.full_name + ' & ' + recepient.full_name
+            self.name = user.full_name + " & " + recepient.full_name
         return super().create(user, *args, **kwargs)
 
     def mark_as_read(self, user):
@@ -96,19 +103,19 @@ class Conversation(BaseModel):
             self.members[str(member.id)] = {
                 "muted": False,
                 "unmute_at": None,
-                "joined_at": now
+                "joined_at": now,
             }
 
         if save:
-            return self.update(update_fields=['members'])
+            return self.update(update_fields=["members"])
 
         return Result.success()
 
     def pin_conversation(self):
         self.pinned_at = timezone.now()
-        return self.update(update_fields=['pinned_at'])
+        return self.update(update_fields=["pinned_at"])
 
-    def mute_for_user(self, user, period : tuple =None):
+    def mute_for_user(self, user, period: tuple = None):
         if not str(user.id) in self.members.keys():
             return Result.error(_("This user is not part of the conversation."))
 
@@ -118,9 +125,9 @@ class Conversation(BaseModel):
             time_unit, n = period[0], int(period[1])
             if time_unit in lava_settings.TIMEUNIT_CHOICES:
                 period = timedelta(**{f"{time_unit}": n})
-                self.members[str(user.id)]["unmute_at"] = (
-                    now + period
-                ).strftime("%Y-%m-%d %H:%M:%S %z")
+                self.members[str(user.id)]["unmute_at"] = (now + period).strftime(
+                    "%Y-%m-%d %H:%M:%S %z"
+                )
 
         self.save(update_fields=["members"])
         return Result.success(_("The conversation has been muted for this user"))
@@ -137,11 +144,11 @@ class Conversation(BaseModel):
     @classmethod
     def get_user_unread_messages(cls, user):
         conversations = cls.get_user_conversations(user)
-        messages = ChatMessage.objects.filter(
-            conversation__in=conversations
-        ).exclude(
-            Q(read_by__has_key=str(user.id)) | Q(sender=user)
-        ).order_by('-created_at')
+        messages = (
+            ChatMessage.objects.filter(conversation__in=conversations)
+            .exclude(Q(read_by__has_key=str(user.id)) | Q(sender=user))
+            .order_by("-created_at")
+        )
         return messages
 
     @classmethod
@@ -152,19 +159,22 @@ class Conversation(BaseModel):
 
 
 class ChatMessage(BaseModel):
-
     class Meta(BaseModel.Meta):
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
-        ordering = ('created_at', )
+        ordering = ("created_at",)
 
     sender = models.ForeignKey(
-        User, verbose_name=_("Sender"), related_name='sent_messages',
-        on_delete=models.CASCADE
+        User,
+        verbose_name=_("Sender"),
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
     )
     conversation = models.ForeignKey(
-        Conversation, verbose_name=_("Conversation"), related_name='messages',
-        on_delete=models.CASCADE
+        Conversation,
+        verbose_name=_("Conversation"),
+        related_name="messages",
+        on_delete=models.CASCADE,
     )
     text = models.TextField(_("Text"), blank=True)
     # @TODO: Use ThumbnailerImageField instead
@@ -172,8 +182,10 @@ class ChatMessage(BaseModel):
         _("Image"), null=True, blank=True, upload_to=get_chat_message_image_filename
     )
     type = models.CharField(
-        _("Message type"), default='email', choices=lava_settings.CHAT_MESSAGE_CHOICES,
-        max_length=32
+        _("Message type"),
+        default="email",
+        choices=lava_settings.CHAT_MESSAGE_CHOICES,
+        max_length=32,
     )
     read_by = models.JSONField(_("Read by"), default=dict)
 

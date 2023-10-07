@@ -7,9 +7,7 @@ from rest_framework.response import Response
 
 from drf_spectacular.utils import extend_schema
 
-from lava.serializers.backup_serializers import (
-    BackupSerializer
-)
+from lava.serializers.backup_serializers import BackupSerializer
 from lava.models import Backup
 from lava.serializers import ResultSerializer
 from lava.services import class_permissions as lava_permissions

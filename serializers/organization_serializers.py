@@ -1,9 +1,13 @@
 from django.utils.translation import gettext_lazy as _
 
-from rest_framework import  serializers
+from rest_framework import serializers
 from rest_framework.serializers import empty
 
-from lava.serializers import ReadOnlyBaseModelSerializer, BaseModelSerializer, UserExerptSerializer
+from lava.serializers import (
+    ReadOnlyBaseModelSerializer,
+    BaseModelSerializer,
+    UserExerptSerializer,
+)
 from lava.models import Entity
 
 

@@ -8,29 +8,46 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin', '0003_logentry_add_action_flag_choices'),
-        ('lava', '0001_initial'),
+        ("admin", "0003_logentry_add_action_flag_choices"),
+        ("lava", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='logentry',
-            options={'default_permissions': (), 'ordering': ['-action_time'], 'permissions': (('list_logentry', 'Can view activity journal'), ('export_logentry', 'Can export activity journal')), 'verbose_name': 'Log entry', 'verbose_name_plural': 'Log entries'},
+            name="logentry",
+            options={
+                "default_permissions": (),
+                "ordering": ["-action_time"],
+                "permissions": (
+                    ("list_logentry", "Can view activity journal"),
+                    ("export_logentry", "Can export activity journal"),
+                ),
+                "verbose_name": "Log entry",
+                "verbose_name_plural": "Log entries",
+            },
         ),
         migrations.AlterModelManagers(
-            name='logentry',
+            name="logentry",
             managers=[
-                ('objects', django.contrib.admin.models.LogEntryManager()),
+                ("objects", django.contrib.admin.models.LogEntryManager()),
             ],
         ),
         migrations.RemoveField(
-            model_name='logentry',
-            name='id',
+            model_name="logentry",
+            name="id",
         ),
         migrations.AddField(
-            model_name='logentry',
-            name='logentry_ptr',
-            field=models.OneToOneField(auto_created=True, default=1, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='admin.logentry'),
+            model_name="logentry",
+            name="logentry_ptr",
+            field=models.OneToOneField(
+                auto_created=True,
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                parent_link=True,
+                primary_key=True,
+                serialize=False,
+                to="admin.logentry",
+            ),
             preserve_default=False,
         ),
     ]

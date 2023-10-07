@@ -22,7 +22,7 @@ def exec_command(command, command_dir=None, stdout=None, **kwargs):
         shell=True,
         stdout=stdout,
         capture_output=capture_output,
-        **kwargs
+        **kwargs,
     )
     if stdout:
         return None
@@ -84,7 +84,9 @@ def restore_backup(backup_filename):
 
     restore_in_progress_flag = ".db_restoration_in_progress"
     if os.path.exists(os.path.join(BASE_DIR, restore_in_progress_flag)):
-        print("Another backup restoration is running. Please wait until it finishes before starting a new one.")
+        print(
+            "Another backup restoration is running. Please wait until it finishes before starting a new one."
+        )
         return
 
     # Create restore_on_progress flag
@@ -101,18 +103,29 @@ def restore_backup(backup_filename):
     psql_username = os.getenv("ADMIN_USER", db_user)
     psql_password = os.getenv("ADMIN_PASSWORD", db_password)
 
-    if (
-        not db_name or not db_user
-        or not psql_username or not psql_password
-    ):
+    if not db_name or not db_user or not psql_username or not psql_password:
         print(
-            ("Please make sure that the following environment variables are correctly setup:\n")
+            (
+                "Please make sure that the following environment variables are correctly setup:\n"
+            )
             + ("    - DB_NAME\n" if not db_name else "")
             + ("    - DB_USER\n" if not db_user else "")
             + ("    - DB_PASSWORD\n" if not db_password else "")
-            + ("    - ADMIN_DB_NAME (If emmited, DB_NAME will be used instead.)\n" if not psql_dbname else "")
-            + ("    - ADMIN_USER (If emmited, DB_USER will be used instead.)\n" if not psql_username else "")
-            + ("    - ADMIN_PASSWORD (If emmited, DB_USER_PWD will be used instead.)\n" if not psql_password else "")
+            + (
+                "    - ADMIN_DB_NAME (If emmited, DB_NAME will be used instead.)\n"
+                if not psql_dbname
+                else ""
+            )
+            + (
+                "    - ADMIN_USER (If emmited, DB_USER will be used instead.)\n"
+                if not psql_username
+                else ""
+            )
+            + (
+                "    - ADMIN_PASSWORD (If emmited, DB_USER_PWD will be used instead.)\n"
+                if not psql_password
+                else ""
+            )
         )
         raise SystemExit(1)
 
@@ -121,9 +134,7 @@ def restore_backup(backup_filename):
     backup_dir_name, _ext = os.path.splitext(os.path.basename(backup_filename))
     backup_dir_path = os.path.join(BASE_DIR, backup_dir_name)
     unzip_out, unzip_err = exec_command(
-        (
-            f"unzip {backup_filename} -d {backup_dir_path}"
-        )
+        (f"unzip {backup_filename} -d {backup_dir_path}")
     )
     if unzip_err:
         raise Exception(unzip_err.decode())
@@ -142,14 +153,10 @@ def restore_backup(backup_filename):
     try:
         try:
             connection = psycopg2.connect(
-                host=host,
-                port=port,
-                dbname=db_name,
-                user=db_user,
-                password=db_password
+                host=host, port=port, dbname=db_name, user=db_user, password=db_password
             )
         except psycopg2.OperationalError as e:
-            does_not_exist_message = f"database \"{db_name}\" does not exist"
+            does_not_exist_message = f'database "{db_name}" does not exist'
             if does_not_exist_message in str(e):
                 print("Database does not exist. No backup will be created.")
                 create_db_backup = False
@@ -162,7 +169,7 @@ def restore_backup(backup_filename):
                 port=port,
                 dbname=psql_dbname,
                 user=psql_username,
-                password=psql_password
+                password=psql_password,
             )
         except psycopg2.OperationalError as e:
             raise e
@@ -182,12 +189,12 @@ def restore_backup(backup_filename):
 
         try:
             print("Creating new database...")
-            connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+            connection.set_isolation_level(
+                psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+            )
             cursor = connection.cursor()
             create_db_query = sql.SQL("CREATE DATABASE {} OWNER {} ENCODING {}").format(
-                sql.Identifier(db_name),
-                sql.Identifier(db_user),
-                sql.Identifier("UTF8")
+                sql.Identifier(db_name), sql.Identifier(db_user), sql.Identifier("UTF8")
             )
             cursor.execute(create_db_query)
             connection.commit()
@@ -209,7 +216,6 @@ def restore_backup(backup_filename):
         except subprocess.CalledProcessError as e:
             raise e
 
-
         try:
             # Build the psql command to restore the dump into the database
             command = [
@@ -218,7 +224,7 @@ def restore_backup(backup_filename):
                 f"-p {port}",
                 f"-d {db_name}",
                 f"-U {db_user}",
-                f"-f {sql_dump_file}"
+                f"-f {sql_dump_file}",
             ]
 
             # If a password is set, add it to the command
@@ -236,25 +242,27 @@ def restore_backup(backup_filename):
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
 
-
         # Remove media and static folders
         print("Removing media and static folders")
         if os.path.exists(os.path.join(BASE_DIR, "media")):
-            os.rename(os.path.join(BASE_DIR, "media"), os.path.join(BASE_DIR, "media.bak"))
+            os.rename(
+                os.path.join(BASE_DIR, "media"), os.path.join(BASE_DIR, "media.bak")
+            )
         if os.path.exists(os.path.join(BASE_DIR, "static")):
-            os.rename(os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "static.bak"))
+            os.rename(
+                os.path.join(BASE_DIR, "static"), os.path.join(BASE_DIR, "static.bak")
+            )
 
         # Copy media from backup folder to the root directory
         print("Copy media from backup folder to the root directory")
         shutil.copytree(
-            os.path.join(backup_dir_path, "media"),
-            os.path.join(BASE_DIR, "media")
+            os.path.join(backup_dir_path, "media"), os.path.join(BASE_DIR, "media")
         )
 
         # Checkout repositories
         print("Checkout repos")
-        repositories_file=os.path.join(backup_dir_path, "repositories.json")
-        with open(repositories_file, 'r') as f:
+        repositories_file = os.path.join(backup_dir_path, "repositories.json")
+        with open(repositories_file, "r") as f:
             data = json.load(f)
             for repo in data.keys():
                 branch = data[repo]["branch"]
@@ -268,11 +276,8 @@ def restore_backup(backup_filename):
                 print(f"command_dir: {command_dir}")
 
                 out, err = exec_command(
-                    (
-                        f"git checkout {branch} && "
-                        f"git checkout {commit}"
-                    ),
-                    command_dir=command_dir
+                    (f"git checkout {branch} && " f"git checkout {commit}"),
+                    command_dir=command_dir,
                 )
                 if err:
                     error_str = err.decode()
@@ -283,10 +288,8 @@ def restore_backup(backup_filename):
         # Generate static files
         print("Collecting static files")
         out, err = exec_command(
-            (
-                f"venv/bin/python manage.py collectstatic --no-input"
-            ),
-            command_dir=BASE_DIR
+            (f"venv/bin/python manage.py collectstatic --no-input"),
+            command_dir=BASE_DIR,
         )
         if err and "WARNING" not in err.decode():
             raise Exception(err.decode())
@@ -294,10 +297,8 @@ def restore_backup(backup_filename):
         # Install all requirements
         print("Installing requirements")
         out, err = exec_command(
-            (
-                f"venv/bin/pip install -r {backup_dir_path}/all_requirements.txt"
-            ),
-            command_dir=BASE_DIR
+            (f"venv/bin/pip install -r {backup_dir_path}/all_requirements.txt"),
+            command_dir=BASE_DIR,
         )
 
         rollback_requirements = True
@@ -321,26 +322,30 @@ def restore_backup(backup_filename):
     except Exception as e:
         print("\n\nException encountered... starting rollback.")
         os.remove(restore_in_progress_flag)
-        if (
-            os.path.exists(os.path.join(BASE_DIR, "media.bak"))
-            and os.path.exists(os.path.join(BASE_DIR, "media"))
+        if os.path.exists(os.path.join(BASE_DIR, "media.bak")) and os.path.exists(
+            os.path.join(BASE_DIR, "media")
         ):
             shutil.rmtree(os.path.join(BASE_DIR, "media"))
-            os.rename(os.path.join(BASE_DIR, "media.bak"), os.path.join(BASE_DIR, "media"))
+            os.rename(
+                os.path.join(BASE_DIR, "media.bak"), os.path.join(BASE_DIR, "media")
+            )
 
-        if (
-            os.path.exists(os.path.join(BASE_DIR, "static.bak"))
-            and os.path.exists(os.path.join(BASE_DIR, "static"))
+        if os.path.exists(os.path.join(BASE_DIR, "static.bak")) and os.path.exists(
+            os.path.join(BASE_DIR, "static")
         ):
             shutil.rmtree(os.path.join(BASE_DIR, "static"))
-            os.rename(os.path.join(BASE_DIR, "static.bak"), os.path.join(BASE_DIR, "static"))
+            os.rename(
+                os.path.join(BASE_DIR, "static.bak"), os.path.join(BASE_DIR, "static")
+            )
 
         if os.path.exists(os.path.join(backup_dir_path)):
             shutil.rmtree(backup_dir_path)
 
         if rollback_db_create:
             try:
-                connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+                connection.set_isolation_level(
+                    psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT
+                )
                 print("Dropping the new database...")
                 cursor = connection.cursor()
                 cursor.execute(f"DROP DATABASE {db_name};")
@@ -350,7 +355,6 @@ def restore_backup(backup_filename):
                 print("Error dropping the database:", e)
             finally:
                 cursor.close()
-
 
         if rollback_db_rename:
             try:
@@ -363,7 +367,6 @@ def restore_backup(backup_filename):
                 raise e
             finally:
                 cursor.close()
-
 
         if rollback_checkout:
             # TODO: Revert git checkouts
@@ -387,6 +390,4 @@ if __name__ == "__main__":
 
     # Print report
     finish = datetime.now()
-    print(
-        f"\n\nScript finished after {(finish - start).total_seconds()} seconds.\n\n"
-    )
+    print(f"\n\nScript finished after {(finish - start).total_seconds()} seconds.\n\n")

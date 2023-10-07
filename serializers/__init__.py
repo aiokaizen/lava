@@ -7,7 +7,7 @@ from .serializers import (
     ListIDsSerializer,
     ResultSerializer,
     build_choices_serializer_class,
-    build_excerpt_serializer_class
+    build_excerpt_serializer_class,
 )
 from .user_serializers import UserSerializer, UserExerptSerializer
 from .base_serializers import BaseModelSerializer, ReadOnlyBaseModelSerializer

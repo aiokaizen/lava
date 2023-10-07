@@ -41,34 +41,35 @@ def collect_statistics(user=None):
 
     return statistics
 
+
 def get_daily_actions(user=None):
 
     daily_actions = (
-        LogEntry.filter(user=user).order_by("-action_time")
-        .annotate(action_day=TruncDate('action_time'))
-        .values('action_day')
+        LogEntry.filter(user=user)
+        .order_by("-action_time")
+        .annotate(action_day=TruncDate("action_time"))
+        .values("action_day")
         .annotate(
-            count=Count('id'),
+            count=Count("id"),
         )
     )[:30]
 
     actions_data = {
-        'actions': dict(),
+        "actions": dict(),
     }
-
 
     for action_data in daily_actions:
         action_day = action_data["action_day"].strftime("%Y-%m-%d")
 
-        if action_day not in list(actions_data['actions'].keys()):
-            actions_data['actions'][action_day] = [action_day, 0]
+        if action_day not in list(actions_data["actions"].keys()):
+            actions_data["actions"][action_day] = [action_day, 0]
 
-        actions_data["actions"][action_day][1] += action_data['count']
+        actions_data["actions"][action_day][1] += action_data["count"]
 
     actions_data["actions"] = list(actions_data["actions"].values())
 
-
     return actions_data
+
 
 def get_indicators(user=None):
 
@@ -77,28 +78,28 @@ def get_indicators(user=None):
     backup_list = Backup.filter(user=user)
     backups_count = backup_list.count()
 
-
     statistics = [
         {
-            "title": _('Utilisateurs'),
+            "title": _("Utilisateurs"),
             "value": users_count,
             "status": None,
-            "subtitle": _('Total des utilisateurs')
+            "subtitle": _("Total des utilisateurs"),
         },
         {
             "title": _("Groupes"),
-            "value":  groups_count,
+            "value": groups_count,
             "status": None,
-            "subtitle": _("Total des groupes")
+            "subtitle": _("Total des groupes"),
         },
         {
-            "title": _('Sauvegardes'),
+            "title": _("Sauvegardes"),
             "value": backups_count,
             "status": None,
-            "subtitle": _('Total des sauvegardes')
+            "subtitle": _("Total des sauvegardes"),
         },
     ]
     return statistics
+
 
 def get_spaces(user=None):
 
@@ -113,6 +114,7 @@ def get_spaces(user=None):
     }
     return statistics
 
+
 def get_active_users(user=None):
 
     connected_users = User.filter(user=user, kwargs={"is_active": "True"})[:7]
@@ -120,6 +122,7 @@ def get_active_users(user=None):
     connected_users_serializer = UserListSerializer(connected_users, many=True)
 
     return connected_users_serializer.data
+
 
 def get_latest_actions(user=None):
 

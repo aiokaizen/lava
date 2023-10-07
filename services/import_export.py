@@ -33,15 +33,11 @@ def export_permissions():
         perms = []
         for group in groups:
             has_perm = permission in group.permissions.all()
-            value = 'X' if has_perm else ''
+            value = "X" if has_perm else ""
             perms.append(value)
         data_content.append(perms)
 
-    data = ExportDataType(
-        row_titles=rows,
-        col_titles=columns,
-        data=data_content
-    )
+    data = ExportDataType(row_titles=rows, col_titles=columns, data=data_content)
 
     result = export_xlsx(
         data,
@@ -60,8 +56,12 @@ def export_permissions():
 
 
 def export_activity_journal(
-    user=None, start_date=None, end_date=None,
-    content_type='', action_type=0, use_base_entry_model=True
+    user=None,
+    start_date=None,
+    end_date=None,
+    content_type="",
+    action_type=0,
+    use_base_entry_model=True,
 ):
     """
     This function creates a tmp file that contains journal of all
@@ -82,19 +82,14 @@ def export_activity_journal(
     if action_type:
         filters |= Q(action_flag=action_type)
     if content_type:
-        app_name, model = content_type.split('.')
-        filters |= (
-            Q(content_type__app_label=app_name) &
-            Q(content_type__model=model)
-        )
+        app_name, model = content_type.split(".")
+        filters |= Q(content_type__app_label=app_name) & Q(content_type__model=model)
 
     LogEntryModel = BaseLogEntryModel if use_base_entry_model else LogEntry
     journal = LogEntryModel.objects.filter(filters)
 
     header_title = __("Activity journal")
-    description = __(
-        "This is the list of actions that were performed in the system."
-    )
+    description = __("This is the list of actions that were performed in the system.")
 
     columns = [
         __("Action time"),
@@ -104,26 +99,25 @@ def export_activity_journal(
         __("Content type"),
         __("Object name"),
         __("Object ID"),
-        __("Message")
+        __("Message"),
     ]
     data_content = []
 
     for action in journal:
-        data_content.append([
-            action.action_time.strftime("%Y/%m/%d %H:%M:%S"),
-            f"{action.user.first_name} {action.user.last_name}",
-            # action.user.id,
-            action.get_action_flag_display(),
-            action.content_type.model.upper(),
-            action.object_repr,
-            action.object_id,
-            action.change_message
-        ])
+        data_content.append(
+            [
+                action.action_time.strftime("%Y/%m/%d %H:%M:%S"),
+                f"{action.user.first_name} {action.user.last_name}",
+                # action.user.id,
+                action.get_action_flag_display(),
+                action.content_type.model.upper(),
+                action.object_repr,
+                action.object_id,
+                action.change_message,
+            ]
+        )
 
-    data = ExportDataType(
-        col_titles=columns,
-        data=data_content
-    )
+    data = ExportDataType(col_titles=columns, data=data_content)
 
     result = export_xlsx(
         data,

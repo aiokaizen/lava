@@ -1,20 +1,24 @@
 from django.contrib import admin, messages
 from django.contrib.auth import admin as auth_admin
-from django.contrib.auth.models import (
-    Group as BaseGroupModel
-)
+from django.contrib.auth.models import Group as BaseGroupModel
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from admin_interface.models import Theme
 
-from lava.forms.main_forms import (
-    LavaUserChangeForm, LavaUserCreationForm
-)
+from lava.forms.main_forms import LavaUserChangeForm, LavaUserCreationForm
 from lava.models import (
-    Notification, Preferences, User, Group, Backup, BackupConfig,
-    Conversation, ChatMessage, NotificationGroup, LogEntry,
-    Bank
+    Notification,
+    Preferences,
+    User,
+    Group,
+    Backup,
+    BackupConfig,
+    Conversation,
+    ChatMessage,
+    NotificationGroup,
+    LogEntry,
+    Bank,
 )
 from lava.utils import pop_list_item
 from lava import settings as lava_settings
@@ -36,15 +40,16 @@ def get_user_permissions_fields():
         permissions_fields.append("user_permissions")
     return tuple(permissions_fields)
 
+
 def get_group_general_fields():
     general_fields = [
         # 'id',
-        'name',
+        "name",
         # 'parent',
-        'slug',
-        'description',
-        'image',
-        'is_system',
+        "slug",
+        "description",
+        "image",
+        "is_system",
     ]
     if not lava_settings.HIDE_PERMISSIONS_FIELDS_FROM_ADMIN:
         general_fields.append("permissions")
@@ -90,19 +95,14 @@ class UserAdmin(auth_admin.UserAdmin):
                 "fields": get_user_permissions_fields(),
             },
         ),
-        (
-            _("Important dates"), {
-                "fields": (
-                    "last_login",
-                    "date_joined",
-                    "deleted_at"
-                )
-            }
-        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
     )
     readonly_fields = [
-        "tmp_pwd", "last_login", "date_joined", "deleted_at",
-        "is_superuser"
+        "tmp_pwd",
+        "last_login",
+        "date_joined",
+        "deleted_at",
+        "is_superuser",
     ]
 
     list_display = (
@@ -114,9 +114,7 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_staff",
     )
 
-    actions = [
-        "link_to_payments"
-    ]
+    actions = ["link_to_payments"]
 
     def thumbnail(self, obj):
         url = (
@@ -130,6 +128,7 @@ class UserAdmin(auth_admin.UserAdmin):
             background-size: cover;
         """
         return format_html(f'<div style="{style}"></div>')
+
     thumbnail.short_description = ""
 
     def save_model(self, request, obj, form, change):
@@ -139,23 +138,24 @@ class UserAdmin(auth_admin.UserAdmin):
             obj.photo = None
             obj.cover_picture = None
             result = obj.create(
-                user=request.user, photo=photo, cover=cover, password=form.cleaned_data["password1"]
+                user=request.user,
+                photo=photo,
+                cover=cover,
+                password=form.cleaned_data["password1"],
             )
             if not result.is_success:
                 raise Exception(result.message)
         elif obj is not None:  # Modification
             # Remove groups and user_permissions from changed_data because .save() method does not accept related fields
             # to be passed in the update_fields parameter.
-            pop_list_item(form.changed_data, 'groups')
-            pop_list_item(form.changed_data, 'user_permissions')
+            pop_list_item(form.changed_data, "groups")
+            pop_list_item(form.changed_data, "user_permissions")
 
-            result = obj.update(
-                user=request.user, update_fields=form.changed_data
-            )
+            result = obj.update(user=request.user, update_fields=form.changed_data)
             if not result.success:
                 raise Exception(result.message)
 
-    @admin.action(description='Link to payments')
+    @admin.action(description="Link to payments")
     def link_to_payments(self, request, queryset):
         for user in queryset:
             result = user.link_payments_app()
@@ -167,11 +167,13 @@ class UserAdmin(auth_admin.UserAdmin):
                         f"The following error rose while trying to link the user '{user}' "
                         f"to the payments app: \n\t{result.message}"
                     ),
-                    lvl
+                    lvl,
                 )
 
         self.message_user(
-            request, "The selected users were successfully linked to payments.", messages.SUCCESS
+            request,
+            "The selected users were successfully linked to payments.",
+            messages.SUCCESS,
         )
 
     def delete_queryset(self, request, queryset):
@@ -182,7 +184,7 @@ class UserAdmin(auth_admin.UserAdmin):
                 self.message_user(
                     request,
                     f"The following error rose while deleting the user '{user}': \n\t{result.message}",
-                    lvl
+                    lvl,
                 )
 
         self.message_user(
@@ -203,27 +205,14 @@ class BaseModelAdmin(admin.ModelAdmin):
             _("Base attributes"),
             {
                 "classes": ("collapse", "expanded"),
-                "fields": (
-                    "created_at",
-                    "created_by",
-                    "last_updated_at",
-                    "deleted_at"
-                ),
+                "fields": ("created_at", "created_by", "last_updated_at", "deleted_at"),
             },
         ),
     )
 
-    readonly_fields = [
-        "created_at",
-        "created_by",
-        "last_updated_at",
-        "deleted_at"
-    ]
+    readonly_fields = ["created_at", "created_by", "last_updated_at", "deleted_at"]
 
-    actions = [
-        "soft_delete",
-        "restore"
-    ]
+    actions = ["soft_delete", "restore"]
 
     def save_related(self, request, form, formsets, change):
         # Disable save related behaviour, since we save our related
@@ -242,29 +231,21 @@ class BaseModelAdmin(admin.ModelAdmin):
             result = self.create(request.user, obj, form.cleaned_data)
             if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
-                self.message_user(
-                    request,
-                    result.message,
-                    lvl
-                )
+                self.message_user(request, result.message, lvl)
         elif obj is not None:  # Modification
             result = self.update(
                 request.user, obj, form.changed_data, form.cleaned_data
             )
             if not result.is_success:
                 lvl = messages.ERROR if result.is_error else messages.WARNING
-                self.message_user(
-                    request,
-                    result.message,
-                    lvl
-                )
+                self.message_user(request, result.message, lvl)
 
     def create(self, user, obj, validated_data, **kwargs):
 
-        m2m_field_names = getattr(self, 'm2m_field_names', [])
+        m2m_field_names = getattr(self, "m2m_field_names", [])
         m2m_fields = [] if m2m_field_names else None
 
-        file_field_names = getattr(self, 'file_field_names', [])
+        file_field_names = getattr(self, "file_field_names", [])
         file_fields = [] if file_field_names else None
 
         for attr, value in validated_data.items():
@@ -281,16 +262,18 @@ class BaseModelAdmin(admin.ModelAdmin):
 
     def update(self, user, obj, update_fields, validated_data, **kwargs):
 
-        m2m_field_names = getattr(self, 'm2m_field_names', [])
+        m2m_field_names = getattr(self, "m2m_field_names", [])
         m2m_fields = []
 
         for attr, value in validated_data.items():
             if attr in m2m_field_names:
                 m2m_fields.append((attr, value))
 
-        return obj.update(user=user, update_fields=update_fields, m2m_fields=m2m_fields, **kwargs)
+        return obj.update(
+            user=user, update_fields=update_fields, m2m_fields=m2m_fields, **kwargs
+        )
 
-    @admin.action(description=_('Soft delete'))
+    @admin.action(description=_("Soft delete"))
     def soft_delete(self, request, queryset):
         for obj in queryset:
             result = obj.soft_delete(user=request.user)
@@ -300,19 +283,19 @@ class BaseModelAdmin(admin.ModelAdmin):
                     request,
                     _(
                         "The following error rose while trying "
-                        "to delete '%(obj)s': \n\t%(msg)s" % {
-                            'obj': obj,
-                            'msg': result.message
-                        }
+                        "to delete '%(obj)s': \n\t%(msg)s"
+                        % {"obj": obj, "msg": result.message}
                     ),
-                    lvl
+                    lvl,
                 )
 
-        self.message_user(request, _(
-            "The selected objects were successfully deleted."
-        ), messages.SUCCESS)
+        self.message_user(
+            request,
+            _("The selected objects were successfully deleted."),
+            messages.SUCCESS,
+        )
 
-    @admin.action(description=_('Restore'))
+    @admin.action(description=_("Restore"))
     def restore(self, request, queryset):
         for obj in queryset:
             result = obj.restore(user=request.user)
@@ -322,17 +305,16 @@ class BaseModelAdmin(admin.ModelAdmin):
                     request,
                     _(
                         "The following error rose while trying "
-                        "to restore '%(obj)s': \n\t%(msg)s" % {
-                            'obj': obj,
-                            'msg': result.message
-                        }
+                        "to restore '%(obj)s': \n\t%(msg)s"
+                        % {"obj": obj, "msg": result.message}
                     ),
-                    lvl
+                    lvl,
                 )
 
         self.message_user(
-            request, _("The selected objects were successfully restored."),
-            messages.SUCCESS
+            request,
+            _("The selected objects were successfully restored."),
+            messages.SUCCESS,
         )
 
     def delete_queryset(self, request, queryset):
@@ -342,16 +324,18 @@ class BaseModelAdmin(admin.ModelAdmin):
                 lvl = messages.ERROR if result.is_error else messages.WARNING
                 self.message_user(
                     request,
-                    _("The following error rose while deleting '%(obj)s': \n\t%(msg)s" % {
-                        'obj': obj,
-                        'msg': result.message
-                    }),
-                    lvl
+                    _(
+                        "The following error rose while deleting '%(obj)s': \n\t%(msg)s"
+                        % {"obj": obj, "msg": result.message}
+                    ),
+                    lvl,
                 )
 
-        self.message_user(request, _(
-            "The selected objects were successfully deleted."
-        ), messages.SUCCESS)
+        self.message_user(
+            request,
+            _("The selected objects were successfully deleted."),
+            messages.SUCCESS,
+        )
 
     def get_queryset(self, request):
         return self.model.filter(user=request.user, kwargs=request.GET)
@@ -363,30 +347,17 @@ class GroupAdmin(auth_admin.GroupAdmin):
     fieldsets = (
         (
             "General Infos",
-            {
-                "classes": ("collapse", "expanded"),
-                "fields": get_group_general_fields()
-            }
+            {"classes": ("collapse", "expanded"), "fields": get_group_general_fields()},
         ),
         (
             "Important dates",
             {
                 "classes": ("collapse", "expanded"),
-                "fields": (
-                    "created_at",
-                    "created_by",
-                    "last_updated_at",
-                    "deleted_at"
-                ),
-            }
-        )
+                "fields": ("created_at", "created_by", "last_updated_at", "deleted_at"),
+            },
+        ),
     )
-    readonly_fields = [
-        "created_at",
-        "created_by",
-        "last_updated_at",
-        "deleted_at"
-    ]
+    readonly_fields = ["created_at", "created_by", "last_updated_at", "deleted_at"]
 
 
 @admin.register(NotificationGroup)
@@ -398,33 +369,23 @@ class NotificationGroupAdmin(BaseModelAdmin):
                 "classes": ("collapse", "expanded"),
                 "fields": [
                     # 'id',
-                    'name',
-                    'slug',
-                    'notification_id',
-                    'description',
-                    'image',
-                ]
-            }
+                    "name",
+                    "slug",
+                    "notification_id",
+                    "description",
+                    "image",
+                ],
+            },
         ),
         (
             "Important dates",
             {
                 "classes": ("collapse", "expanded"),
-                "fields": (
-                    "created_at",
-                    "created_by",
-                    "last_updated_at",
-                    "deleted_at"
-                ),
-            }
-        )
+                "fields": ("created_at", "created_by", "last_updated_at", "deleted_at"),
+            },
+        ),
     )
-    readonly_fields = [
-        "created_at",
-        "created_by",
-        "last_updated_at",
-        "deleted_at"
-    ]
+    readonly_fields = ["created_at", "created_by", "last_updated_at", "deleted_at"]
 
 
 @admin.register(LogEntry)
@@ -447,23 +408,16 @@ class BackupAdmin(BaseModelAdmin):
         (
             None,
             {
-                "fields": (
-                    "backup_file",
-                ),
+                "fields": ("backup_file",),
             },
         ),
         (
             _("Base attributes"),
             {
                 "classes": ("collapse", "expanded"),
-                "fields": (
-                    "created_at",
-                    "created_by",
-                    "last_updated_at",
-                    "deleted_at"
-                ),
+                "fields": ("created_at", "created_by", "last_updated_at", "deleted_at"),
             },
-        )
+        ),
     )
 
 
@@ -473,9 +427,7 @@ class BackupConfigAdmin(BaseModelAdmin):
         (
             None,
             {
-                "fields": (
-                    "automatic_backup_hour_interval",
-                ),
+                "fields": ("automatic_backup_hour_interval",),
             },
         ),
     )
@@ -483,7 +435,7 @@ class BackupConfigAdmin(BaseModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(BaseModelAdmin):
-    m2m_field_names = ['target_users', 'target_groups']
+    m2m_field_names = ["target_users", "target_groups"]
     file_field_names = []
     fieldsets = None
     readonly_fields = ()
@@ -516,12 +468,7 @@ class ConversationAdmin(BaseModelAdmin):
             _("Base attributes"),
             {
                 "classes": ("collapse", "expanded"),
-                "fields": (
-                    "created_at",
-                    "created_by",
-                    "last_updated_at",
-                    "deleted_at"
-                ),
+                "fields": ("created_at", "created_by", "last_updated_at", "deleted_at"),
             },
         ),
     )

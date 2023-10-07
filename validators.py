@@ -1,7 +1,10 @@
 import qrcode
 
 from django.core.validators import (
-    EmailValidator, URLValidator, RegexValidator, BaseValidator
+    EmailValidator,
+    URLValidator,
+    RegexValidator,
+    BaseValidator,
 )
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
@@ -12,7 +15,7 @@ from lava import settings as lava_settings
 
 
 def validate_empty_field(value):
-    validator = RegexValidator('.+', _("This field is required"), "required")
+    validator = RegexValidator(".+", _("This field is required"), "required")
     return validator(value)
 
 
@@ -57,10 +60,11 @@ class SchemelessURLValidator(URLValidator):
 @deconstructible
 class ExactLengthValidator(BaseValidator):
     message = ngettext_lazy(
-        'Ensure this value has exactly %(limit_value)d character (it has %(show_value)d)',
-        'Ensure this value has exactly %(limit_value)d characters (it has %(show_value)d)',
-        'limit_value')
-    code = 'exact_length'
+        "Ensure this value has exactly %(limit_value)d character (it has %(show_value)d)",
+        "Ensure this value has exactly %(limit_value)d characters (it has %(show_value)d)",
+        "limit_value",
+    )
+    code = "exact_length"
 
     def compare(self, a, b):
         return a != b
@@ -71,21 +75,25 @@ class ExactLengthValidator(BaseValidator):
 
 def qr_code_validator(value):
     try:
-        qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_L)
+        qr = qrcode.QRCode(
+            version=None, error_correction=qrcode.constants.ERROR_CORRECT_L
+        )
         qr.add_data(value)
         qr.make(fit=True)
     except:
-        raise ValidationError(_('Invalid QR code'))
+        raise ValidationError(_("Invalid QR code"))
 
 
 def validate_notifications_settings(value):
     """Raises a ValidationError if the value is not valid, otherwize, returns None."""
 
-    custom_notification_settings = getattr(settings, "AVAILABLE_NOTIFICATION_SETTINGS", [])
+    custom_notification_settings = getattr(
+        settings, "AVAILABLE_NOTIFICATION_SETTINGS", []
+    )
     available_settings = [
         "allow_push_notifications",
         "allow_email_notifications",
-        *custom_notification_settings
+        *custom_notification_settings,
     ]
 
     if type(value) != dict:
