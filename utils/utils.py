@@ -24,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.mail import get_connection, EmailMultiAlternatives
 from django.template.context import make_context
 from django.template.loader import render_to_string
+from django.db.models import Model
 
 from templated_mail.mail import BaseEmailMessage
 
@@ -273,11 +274,12 @@ class Result(imdict):
             res_dict["errors"] = self.errors or []
             res_dict["error_code"] = self.error_code
         if self.instance:
-            res_dict["object_id"] = self.instance.id
+            if hasattr(self.instance, 'id'):
+                res_dict["object_id"] = self.instance.id
             try:
                 res_dict["object"] = (
                     self.instance
-                    if isinstance(self.instance, dict)
+                    if not isinstance(self.instance, Model)
                     else build_excerpt_serializer_class(self.instance.__class__)(
                         self.instance
                     ).data

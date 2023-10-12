@@ -162,7 +162,7 @@ def handle_excel_file(
 
         # return odict object with the following format:
         return odict(
-            column_names=slugified_extract_columns,
+            column_names=list(column_name_mapping.values()) or slugified_extract_columns,
             column_names_display=extract_columns,
             data=excel_data,
         )
