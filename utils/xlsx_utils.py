@@ -12,7 +12,6 @@ from openpyxl.drawing.image import Image
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _, get_language
-from django.utils.text import slugify
 
 from lava.styles import XLSXStyles
 from lava.utils.utils import (
@@ -22,6 +21,7 @@ from lava.utils.utils import (
     map_interval,
     get_image,
     Result,
+    slugify,
 )
 
 
@@ -94,11 +94,13 @@ def handle_excel_file(
             slugified_extract_columns = []
         else:
             slugified_extract_columns = [
-                get_field_name(column_name_mapping, name) for name in extract_columns
+                slugify(name) for name in extract_columns
             ]
-
         wb = openpyxl.load_workbook(file_name)
-        worksheet = wb[target_sheet]
+        if target_sheet:
+            worksheet = wb[target_sheet]
+        else:
+            worksheet = wb.active
 
         # Extract columns names from the excel file
         column_names = []
@@ -150,7 +152,8 @@ def handle_excel_file(
             row_data = odict()
             for col_index, cell in enumerate(row):
                 if col_index in extract_columns_indexes:
-                    row_data[column_names[col_index]] = cell.value
+                    field_name = get_field_name(column_name_mapping, column_names[col_index])
+                    row_data[field_name] = cell.value
                     if cell.value:
                         is_row_empty = False
 
