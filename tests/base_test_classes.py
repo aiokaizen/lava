@@ -47,9 +47,14 @@ class BaseAPITest(APITestCase, URLPatternsTestCase, BaseTestMixin):
     def setUp(self):
         super().setUp()
         SetUpLava().handle(no_logs=True, reset_perms=None)
-        LavaInstallDemo().handle(
-            num_users=3, suffix="testuser", skip_avatars=True, no_logs=True
-        )
+        options = {
+            "num_users": 3,
+            "suffix": "testuser",
+            "skip_avatars": True,
+            "no_logs": True,
+            "skip_groups": False,
+        }
+        LavaInstallDemo().handle(**options)
 
         self.users = odict(
             ekadmin=User.objects.get(username="ekadmin"),
