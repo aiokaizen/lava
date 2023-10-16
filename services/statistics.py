@@ -14,7 +14,7 @@ from lava.serializers.log_entry_serializer import LogEntrySerializer
 def collect_statistics(user=None):
 
     # active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-    connected_users = User.filter(user=user, kwargs={"is_active": "True"})[:7]
+    connected_users = User.filter(user=user, params={"is_active": "True"})[:7]
     users_count = User.filter(user=user).count()
     connected_users_serializer = UserListSerializer(connected_users, many=True)
     groups_count = Group.filter(user=user).count()
@@ -117,7 +117,7 @@ def get_spaces(user=None):
 
 def get_active_users(user=None):
 
-    connected_users = User.filter(user=user, kwargs={"is_active": "True"})[:7]
+    connected_users = User.filter(user=user, params={"is_active": "True"})[:7]
 
     connected_users_serializer = UserListSerializer(connected_users, many=True)
 

@@ -153,7 +153,9 @@ class Conversation(BaseModel):
 
     @classmethod
     def get_user_conversations(cls, user, trash=False, kwargs=None):
-        return Conversation.filter(user, trash, kwargs).filter(
+        return Conversation.filter(
+            user=user, trash=trash, params=kwargs
+        ).filter(
             members__has_key=str(user.id)
         )
 

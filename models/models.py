@@ -305,7 +305,7 @@ class Group(BaseModel, BaseGroupModel):
     @classmethod
     def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
         filter_params = cls.get_filter_params(kwargs)
-        queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+        queryset = super().filter(user=user, trash=trash, params=kwargs)
         queryset = queryset.filter(filter_params)
 
         return queryset
@@ -337,7 +337,7 @@ class NotificationGroup(Group):
     @classmethod
     def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
         filter_params = cls.get_filter_params(kwargs)
-        queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+        queryset = super().filter(user=user, trash=trash, params=kwargs)
         queryset = queryset.filter(filter_params)
 
         return queryset
