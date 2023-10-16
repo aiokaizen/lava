@@ -2,6 +2,7 @@ import os
 import logging
 import threading
 import itertools
+import random
 from datetime import datetime, timedelta
 from time import sleep
 
@@ -628,7 +629,18 @@ class User(BaseModel, AbstractUser):
         if soft_delete:
             # self.is_active = False
             self.deleted_at = timezone.now()
-            self.update(user=user, update_fields=["deleted_at"], message="Soft Delete")
+            new_username = f"{self.username}_deleted"
+            try:
+                User.trash.get(username=new_username)
+                self.username = f"{new_username}{random.randint(1000, 9999)}"
+            except User.DoesNotExist:
+                self.username = new_username
+
+            self.update(
+                user=user,
+                update_fields=["deleted_at", "username"],
+                message="Soft Delete"
+            )
             return Result.success(message=success_message)
 
         # Unlink from payments app
@@ -671,6 +683,15 @@ class User(BaseModel, AbstractUser):
         result = super().restore(user=user)
         if result.is_error:
             return result
+
+        restored_username = self.username.split("_deleted")[0]
+        try:
+            User.objects.get(username=restored_username)
+            self.username = f"{restored_username}_restored"
+        except User.DoesNotExist:
+            self.username = restored_username
+
+        self.save(update_fields=["username"])
 
         return Result.success(_("The user has been restored successfully."))
 
