@@ -465,12 +465,20 @@ class BaseModelMixin:
         return ordering
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        exclude = (kwargs or {}).get("exclude", False)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        exclude = (params or {}).get("exclude", False)
         filter_action = "filter" if not exclude else "exclude"
 
-        filter_params = BaseModelMixin.get_filter_params(kwargs)
-        ordering = cls.get_ordering_params(kwargs)
+        # Use the choices param passed in kwargs in your child models to determine
+        # whether you should check for specific role permissions or not.
+        # You can also use it to add some custom code to the choices list.
+        # e.g. :
+        # choices = kwargs.get("choices", False)
+        # if choices is False:
+        #     permission_filters = MyModel.get_permission_filters(user=user)
+
+        filter_params = BaseModelMixin.get_filter_params(params)
+        ordering = cls.get_ordering_params(params)
         if not trash:
             queryset = getattr(cls.objects, filter_action)(filter_params)
         else:

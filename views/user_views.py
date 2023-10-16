@@ -23,7 +23,7 @@ class UserListView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self, request):
-        return self.model_class.filter(kwargs=request.GET)
+        return self.model_class.filter(params=request.GET)
 
     def get(self, request, *args, **kwargs):
         filter_form = self.filter_form_class(data=request.GET)

@@ -61,7 +61,10 @@ class BaseModelViewSet(ModelViewSet):
         ActiveModel = self.queryset.model
         trash = getattr(self, "trash", False)
         user = getattr(self, "user", None)
-        return ActiveModel.filter(user=user, trash=trash, kwargs=self.request.GET)
+        choices = getattr(self, "choices", False)
+        return ActiveModel.filter(
+            user=user, trash=trash, params=self.request.GET, choices=choices
+        )
 
     def get_serializer_class(self):
         self.serializer_class = self.list_serializer_class or self.serializer_class
@@ -197,6 +200,7 @@ class BaseModelViewSet(ModelViewSet):
             )
 
         self.user = request.user
+        self.choices = True
 
         qset = self.get_queryset()
         serializer = self.get_serializer(qset, many=True)

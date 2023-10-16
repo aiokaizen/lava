@@ -12,7 +12,7 @@ class Address(BaseModel):
 
     create_success_message = _("L'adresse a été créée avec succès.")
     update_success_message = _("L'adresse a été modifiée avec succès")
-    delete_success_message = _("L'addresse a été supprimée avec succès.")
+    delete_success_message = _("l’adresse a été supprimée avec succès.")
     default_delete_policy = DeletePolicy.HARD_DELETE
 
     class Meta(BaseModel.Meta):
@@ -72,9 +72,9 @@ class Address(BaseModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = cls.get_filter_params(kwargs)
-        base_queryset = super().filter(user=user, kwargs=kwargs)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        filter_params = cls.get_filter_params(params)
+        base_queryset = super().filter(user=user, params=params, *args, **kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
 
@@ -163,7 +163,7 @@ class FileDocument(BaseModel):
 #         verbose_name_plural = _("Contacts info")
 
 #     phone_number = models.CharField(_("Phone number"), max_length=32, default="", blank=True)
-#     phone_number2 = models.CharField(_("Phone numbser 2"), max_length=32, default="", blank=True)
+#     phone_number2 = models.CharField(_("Phone number 2"), max_length=32, default="", blank=True)
 #     email = models.EmailField(_("E-mail"), default="", blank=True)
 #     website = models.URLField(_("Website"), null=True, blank=True)
 

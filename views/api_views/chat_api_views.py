@@ -29,7 +29,7 @@ class ChatAPIViewSet(BaseModelViewSet):
         user = getattr(self, "user", None)
         trash = getattr(self, "trash", False)
         return Conversation.get_user_conversations(
-            user=user, trash=trash, kwargs=self.request.GET
+            user=user, trash=trash, params=self.request.GET
         )
 
     def get_permissions(self):

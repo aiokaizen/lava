@@ -192,7 +192,7 @@ class UserAdmin(auth_admin.UserAdmin):
         )
 
     def get_queryset(self, request):
-        return User.filter(user=request.user, kwargs=request.GET)
+        return User.filter(user=request.user, params=request.GET)
 
 
 class BaseModelAdmin(admin.ModelAdmin):
@@ -338,7 +338,7 @@ class BaseModelAdmin(admin.ModelAdmin):
         )
 
     def get_queryset(self, request):
-        return self.model.filter(user=request.user, kwargs=request.GET)
+        return self.model.filter(user=request.user, params=request.GET)
 
 
 @admin.register(Group)

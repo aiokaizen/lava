@@ -137,9 +137,9 @@ class BankAccount(Account):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = cls.get_filter_params(kwargs)
-        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        filter_params = cls.get_filter_params(params)
+        base_queryset = super().filter(user=user, trash=trash, params=params, *args, **kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset
 
@@ -248,8 +248,8 @@ class Entity(BaseModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = Entity.get_filter_params(kwargs)
-        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        filter_params = Entity.get_filter_params(params)
+        base_queryset = super().filter(user=user, trash=trash, params=params, *args, **kwargs)
         queryset = base_queryset.filter(filter_params)
         return queryset

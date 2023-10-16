@@ -154,8 +154,8 @@ class LogEntry(BaseLogEntryModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None, include_admin_entries=False, trash=False):
-        filter_params = cls.get_filter_params(kwargs)
+    def filter(cls, user=None, params=None, include_admin_entries=False, trash=False, *args, **kwargs):
+        filter_params = cls.get_filter_params(params)
         exclude_params = {}
 
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
@@ -218,7 +218,7 @@ class Permission(BaseModelMixin, BasePermissionModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
         filter_params = Permission.get_filter_params(kwargs)
         queryset = Permission.objects.filter(filter_params)
 
@@ -302,7 +302,7 @@ class Group(BaseModel, BaseGroupModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
         filter_params = cls.get_filter_params(kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
@@ -334,7 +334,7 @@ class NotificationGroup(Group):
         )
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
         filter_params = cls.get_filter_params(kwargs)
         queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
         queryset = queryset.filter(filter_params)
@@ -779,10 +779,10 @@ class User(BaseModel, AbstractUser):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = User.get_filter_params(kwargs)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        filter_params = User.get_filter_params(params)
 
-        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+        base_queryset = super().filter(user=user, trash=trash, params=params, *args, **kwargs)
         admin_users = User.objects.filter(username__in=["ekadmin", "eksuperuser"])
 
         if user and user not in admin_users:
@@ -963,8 +963,8 @@ class Notification(BaseModelMixin, models.Model):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, kwargs=None):
-        # filter_params = Notification.get_filter_params(kwargs)
+    def filter(cls, user=None, params=None, *args, **kwargs):
+        # filter_params = Notification.get_filter_params(params)
         # return Notification.objects.filter(filter_params)
         return Notification.objects.all()
 
@@ -1307,9 +1307,9 @@ class Backup(BaseModel):
         return filter_params
 
     @classmethod
-    def filter(cls, user=None, trash=False, kwargs=None):
-        filter_params = Backup.get_filter_params(kwargs)
+    def filter(cls, user=None, trash=False, params=None, *args, **kwargs):
+        filter_params = Backup.get_filter_params(params)
 
-        base_queryset = super().filter(user=user, trash=trash, kwargs=kwargs)
+        base_queryset = super().filter(user=user, trash=trash, params=params, *args, **kwargs)
 
         return base_queryset.filter(filter_params)
