@@ -226,8 +226,14 @@ class Result(imdict):
         return Result(True, message, instance=instance)
 
     @classmethod
-    def warning(self, message="", instance=None):
-        return Result(False, message, instance=instance, tag="warning")
+    def warning(self, message="", instance=None, error_code=""):
+        return Result(
+            False,
+            message,
+            instance=instance,
+            error_code=error_code,
+            tag="warning"
+        )
 
     @classmethod
     def error(self, message="", instance=None, errors=None, error_code=""):
