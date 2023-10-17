@@ -343,13 +343,17 @@ def get_model_file_from_io(filename, is_image=False):
 
             file_data = f.read()
             if is_image:
-                file = PILImage.open(BytesIO(file_data))
+                image = PILImage.open(BytesIO(file_data))
+                file_io = BytesIO()
+                image.save(file_io, format=image.format)
             else:
-                file = BytesIO(file_data)
-            file_io = BytesIO()
-            file.save(file_io, format=file.format)
-            model_file = File(ContentFile(file_io.getvalue()))
-            model_file.name = f"{fname}{ext}"
+                file_io = BytesIO(file_data)
+
+            model_file = File(
+                ContentFile(file_io.getvalue()),
+                name=f"{fname}{ext}"
+            )
+
             return Result.success(instance=model_file)
     except Exception as e:
         return Result.error(str(e))
