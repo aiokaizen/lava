@@ -301,6 +301,9 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     groups_names = serializers.ListField(label=_("Groups"), required=True)
+    notification_groups = GroupListSerializer(
+        source="get_notification_groups", many=True
+    )
 
     class Meta:
         model = User
@@ -324,6 +327,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_login",
             "date_joined",
             "password",
+            "notification_groups"
         ]
         read_only_fields = ["id", "is_active", "last_login", "date_joined"]
         extra_kwargs = {
@@ -335,6 +339,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_login": {"format": "%Y/%m/%d %H:%M:%S"},
             "date_joined": {"format": "%Y/%m/%d %H:%M:%S"},
         }
+
 
     def validate(self, value):
         validated_data = super().validate(value)
