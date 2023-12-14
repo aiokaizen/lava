@@ -51,7 +51,7 @@ class ControlledFileField(FileField):
     def run_validation(self, data=empty):
         # Validation
         file = data
-        if file.size > self.max_size:
+        if file is not empty and file.size > self.max_size: 
             raise ValidationError(
                 _(
                     "The size of the file you uploaded (%(file_size)s) exceeds the maximum allowed size of %(max_size)s."
