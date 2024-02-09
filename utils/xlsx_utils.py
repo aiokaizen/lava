@@ -352,6 +352,7 @@ def export_serializer_xlsx(
     freeze_header=True,
     remove_cells_borders=False,
     title_section_length=7,
+    context=None
 ):
     """
     This function creates a tmp .xlsx file based on the data provided and
@@ -372,8 +373,7 @@ def export_serializer_xlsx(
     empty_serializer = serializer_class()
     field_names = [field_name for field_name in empty_serializer.get_fields()]
     columns = [str(empty_serializer[field_name].label) for field_name in field_names]
-    serializer = serializer_class(instance=queryset, many=True)
-
+    serializer = serializer_class(instance=queryset, many=True, context=context or dict())
     data_content = []
     for data in serializer.data:
         content = []
@@ -382,7 +382,6 @@ def export_serializer_xlsx(
         data_content.append(content)
 
     data = ExportDataType(col_titles=columns, data=data_content)
-
     result = export_xlsx(
         data,
         header_title=header_title,
