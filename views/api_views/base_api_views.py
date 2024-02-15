@@ -361,7 +361,7 @@ class BaseModelViewSet(ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         result = serializer.perform_action(user)
-        if not result:
+        if result.is_error:
             return Response(result.to_dict(), status=status.HTTP_400_BAD_REQUEST)
         return Response(result.to_dict(), status=status.HTTP_200_OK)
 
