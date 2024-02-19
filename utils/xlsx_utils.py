@@ -179,6 +179,7 @@ def export_xlsx(
     sheet_title="Data",
     freeze_header=True,
     remove_cells_borders=False,
+    include_heading=True,
     title_section_length=7,
 ):
     """
@@ -203,9 +204,9 @@ def export_xlsx(
     styles = XLSXStyles()
 
     start_file_header_row = 1
-    start_file_header_col = 2
+    start_file_header_col = 2 if include_heading else 1
 
-    start_row_index = start_file_header_row + 3
+    start_row_index = start_file_header_row + 3 if include_heading else start_file_header_row
     start_col_index = 1
 
     row_titles = data.row_titles
@@ -247,17 +248,18 @@ def export_xlsx(
                 for row_index in range(1, last_row_index):
                     ws.cell(row=row_index, column=col).style = "white"
 
-        # Logo cell
-        ws.merge_cells(
-            f"{get_cell_str(start_file_header_col, start_file_header_row)}:"
-            f"{get_cell_str(start_file_header_col, start_file_header_row + 1)}"
-        )
-        cell = ws.cell(row=start_file_header_row, column=start_file_header_col)
-        cell.font = styles.fonts.white
-        cell.value = language_code
+        if include_heading:
+            # Logo cell
+            ws.merge_cells(
+                f"{get_cell_str(start_file_header_col, start_file_header_row)}:"
+                f"{get_cell_str(start_file_header_col, start_file_header_row + 1)}"
+            )
+            cell = ws.cell(row=start_file_header_row, column=start_file_header_col)
+            cell.font = styles.fonts.white
+            cell.value = language_code
 
         # Title cell
-        if header_title:
+        if header_title and include_heading:
             ws.merge_cells(
                 f"{get_cell_str(start_file_header_col + 1, start_file_header_row)}:"
                 f"{get_cell_str(start_file_header_col + title_section_length, start_file_header_row)}"
@@ -283,10 +285,11 @@ def export_xlsx(
             description_cell.style = "default"
 
         start_column = ws.column_dimensions[get_column_letter(start_col_index)]
-        logo = get_image(logo_filepath, target_width=250, margin=(18, 0, 18, 0))
-        ws.add_image(
-            Image(logo), get_cell_str(start_file_header_col, start_file_header_row)
-        )
+        if include_heading:
+            logo = get_image(logo_filepath, target_width=250, margin=(18, 0, 18, 0))
+            ws.add_image(
+                Image(logo), get_cell_str(start_file_header_col, start_file_header_row)
+            )
         start_column.width = 37  # equivalent to 264px
 
         for index, col_title in enumerate(col_titles):
@@ -352,6 +355,7 @@ def export_serializer_xlsx(
     freeze_header=True,
     remove_cells_borders=False,
     title_section_length=7,
+    include_heading=True,
     context=None
 ):
     """
@@ -388,6 +392,7 @@ def export_serializer_xlsx(
         description=description,
         sheet_title=sheet_title,
         freeze_header=freeze_header,
+        include_heading=include_heading,
         remove_cells_borders=remove_cells_borders,
         title_section_length=title_section_length,
     )
