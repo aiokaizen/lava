@@ -15,6 +15,17 @@ class IsSuperUser(IsAuthenticated):
         return is_authenticated and user.is_superuser
 
 
+class IsEKAdminOrSuperUser(IsSuperUser):
+    """
+    Checks if a user is an EKBlocks admin.
+    """
+
+    def has_permission(self, request, view):
+        is_superuser = super().has_permission(request, view)
+        user = request.user
+        return is_superuser or user.username == "ekadmin"
+
+
 class ActionNotAllowed(IsAuthenticated):
     """
     Checks if a user is authenticated and is a super user.

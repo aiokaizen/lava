@@ -315,15 +315,17 @@ def try_parse(value, t, default=None):
     try:
         if type(t) not in (list, tuple, set):
             return t(value)
-
-        for item in t:
-            try:
-                return item(value)
-            except (ValueError, TypeError):
-                pass
-        return default
     except (ValueError, TypeError):
         return default
+
+    parsed_value = []
+    for _type in t:
+        try:
+            return _type(value)
+        except (ValueError, TypeError):
+            pass
+
+    return default
 
 
 def unmask_number(mask):
