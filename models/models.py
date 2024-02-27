@@ -123,20 +123,26 @@ class LogEntry(BaseLogEntryModel):
 
     @classmethod
     def get_filter_params(cls, kwargs=None):
-        filters = Q()
         filter_params = Q()
         if kwargs is None:
             kwargs = {}
-
+        
+        if "query" in kwargs:
+            filter_params &= (
+                Q(user__first_name__icontains=kwargs.get("query")) |
+                Q(user__last_name__icontains=kwargs.get("query")) |
+                Q(object_repr__icontains=kwargs.get("query")) |
+                Q(content_type__model__icontains=kwargs.get("query"))
+            )
         if "user" in kwargs:
-            filters |= Q(user=kwargs.get("user"))
+            filter_params |= Q(user=kwargs.get("user"))
 
         if "action_type" in kwargs:
-            filters |= Q(action_flag=kwargs["action_type"])
+            filter_params |= Q(action_flag=kwargs["action_type"])
 
         if "content_type" in kwargs:
             app_name, model = kwargs["content_type"].split(".")
-            filters |= Q(content_type__app_label=app_name) & Q(
+            filter_params |= Q(content_type__app_label=app_name) & Q(
                 content_type__model=model
             )
 
@@ -170,6 +176,12 @@ class LogEntry(BaseLogEntryModel):
             )
 
         queryset = cls.objects.filter(filter_params).exclude(**exclude_params)
+        print(" ---------------------------------------------- ")
+        print(queryset.count())
+        print(cls.objects.all().count())
+        print(filter_params)
+        print(" ---------------------------------------------- ")
+
         return queryset | base_queryset
 
 
