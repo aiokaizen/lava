@@ -1,12 +1,8 @@
-# README #
+# Description ##
 
-This README would normally document whatever steps are necessary to get your application up and running.
-<br>
-<br>
-
-## Description ##
-
-This application is the base for all our django projects. It contains the core functionality that is required for any project (eg: Authentication, Logging, User management, Goup management, Authorization, Forgot password, Confirmation, ...etc).
+This is a management systems framework based on django. It contains the core functionality that is required for any management project
+(eg: Authentication, Logging, User management, Goup management, Authorization, Forgot password, Confirmation, ...etc). It also provides advanced
+logging and a ready to use API for each new model you create.
 <br>
 <br>
 
